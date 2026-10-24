@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FFFAF3">
+<title>狗聚・連線檢查</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root { --page: #FFFAF3; --ink: #342824; --body: #3B3430; --muted: #6E5E52; --teal-ink: #1F6670; --teal-tint: #E7F3F4; --cream: #F5EEE4; --coral: #E8775A; --coral-tint: #FBE6DF; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--body); font: 16px/1.5 'PingFang TC', 'Noto Sans TC', system-ui, sans-serif; }
+main { max-width: 520px; margin: 0 auto; padding: calc(24px + env(safe-area-inset-top, 0px)) 16px calc(32px + env(safe-area-inset-bottom, 0px)); }
+h1 { font-size: 24px; line-height: 32px; color: var(--ink); margin: 0 0 8px; }
+p { margin: 0 0 12px; }
+.note { font-size: 14px; color: var(--muted); }
+ol { list-style: none; margin: 16px 0; padding: 0; }
+li { margin: 0 0 10px; padding: 12px 14px; border-radius: 16px; background: var(--cream); }
+li.ok { background: var(--teal-tint); }
+li.bad { background: var(--coral-tint); }
+li.skip .lbl { color: var(--muted); }
+.line { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; color: var(--ink); }
+.mark { width: 28px; flex-shrink: 0; text-align: center; font-size: 20px; }
+.hint { margin: 6px 0 0 38px; font-size: 14px; line-height: 20px; color: var(--body); overflow-wrap: anywhere; }
+.hint:empty { display: none; }
+button { width: 100%; min-height: 52px; border: 0; border-radius: 26px; background: var(--coral); color: var(--ink); font: inherit; font-size: 17px; font-weight: 700; }
+button:disabled { opacity: .6; }
+#sum { margin-top: 12px; font-weight: 700; color: var(--ink); }
+a { color: var(--teal-ink); display: inline-flex; align-items: center; min-height: 44px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R" crossorigin="anonymous"></script>
+<script src="app-config.js"></script>
+</head>
+<body>
+<main>
+<h1>連線檢查</h1>
+<p>Supabase 和 GitHub 都設定好之後，打開這一頁。五項都打勾，就可以把狗聚的連結傳給朋友了。</p>
+<ol id="list"></ol>
+<button type="button" id="again" disabled>檢查中…</button>
+<p id="sum" role="status" aria-live="polite"></p>
+<p class="note">這一頁會用這支手機的身分寫一筆測試資料、傳一張很小的測試照片，檢查完就刪掉。<a href="./">回到狗聚</a></p>
+</main>
+<script>
+(function () {
+  'use strict';
+  var CHECKS = [
+    { id: 'reach', label: '連得上 Supabase' },
+    { id: 'anon', label: '匿名登入' },
+    { id: 'save', label: '能存資料' },
+    { id: 'live', label: '即時同步' },
+    { id: 'photo', label: '照片上傳' }
+  ];
+  var list = document.getElementById('list'), btn = document.getElementById('again'), sum = document.getElementById('sum');
+  function row(c) {
+    var li = document.getElementById('c-' + c.id);
+    if (!li) {
+      li = document.createElement('li'); li.id = 'c-' + c.id;
+      li.innerHTML = '<div class="line"><span class="mark" aria-hidden="true"></span><span class="lbl"></span></div><p class="hint"></p>';
+      li.querySelector('.lbl').textContent = c.label;
+      list.appendChild(li);
+    }
+    return li;
+  }
+  /** state: true ✅ · false ❌ · 'skip' (not checked: an earlier line failed) · null (checking) */
+  function set(id, state, hint) {
+    var c = CHECKS.filter(function (x) { return x.id === id; })[0], li = row(c);
+    li.className = state === true ? 'ok' : state === false ? 'bad' : state === 'skip' ? 'skip' : '';
+    li.querySelector('.mark').textContent = state === true ? '✅' : state === false ? '❌' : state === 'skip' ? '－' : '…';
+    li.querySelector('.lbl').textContent = c.label + (state === true ? '' : state === false ? '：沒有成功' : state === 'skip' ? '：還沒檢查' : '：檢查中');
+    li.querySelector('.hint').textContent = hint || '';
+  }
+  function msgOf(e) { return String((e && (e.message || e.error_description || e.error)) || e || ''); }
+  function codeOf(e) { return String((e && e.code) || ''); }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function withTimeout(p, ms, what) { return Promise.race([p, sleep(ms).then(function () { throw new Error('timeout: ' + what); })]); }
+  function dbHint(e) {
+    var m = msgOf(e), c = codeOf(e);
+    if (c === 'PGRST205' || c === '42P01' || /could not find the table|does not exist/i.test(m)) return '資料表還沒建立：到 Supabase 左邊的「SQL Editor」，貼上 supabase.sql 全部內容，按 Run。';
+    if (c === 'PGRST202' || c === '42883' || /could not find the function/i.test(m)) return 'SQL 不是最新版：到「SQL Editor」再貼一次最新的 supabase.sql，按 Run。';
+    if (c === '42501' || /row-level security|permission denied/i.test(m)) return '權限設定不對：到「SQL Editor」再執行一次最新的 supabase.sql。';
+    if (/fetch|network|load failed|timeout/i.test(m)) return '網路斷了，或 Supabase 專案暫停了（一週沒人用會暫停，到 Supabase 後台按 Restore）。';
+    return '錯誤訊息：' + m;
+  }
+
+  var cfg = window.APP_CONFIG || {};
+  var url = String(cfg.supabaseUrl || '').trim().replace(/\/+$/, ''), key = String(cfg.supabaseAnonKey || '').trim();
+  var sb = null, uid = null, path = null;
+
+  function reach() {
+    if (!url || !key) throw { hint: 'app-config.js 還沒填 Supabase 的 Project URL 和 anon（publishable）key。' };
+    if (!window.supabase || !window.supabase.createClient) throw { hint: 'Supabase 的程式沒有載入：可能是網路，或瀏覽器擋廣告的外掛。關掉外掛後重新整理。' };
+    return withTimeout(fetch(url + '/auth/v1/settings', { headers: { apikey: key } }), 15000, 'settings').then(function (r) {
+      if (r.status === 401 || r.status === 403) throw { hint: '金鑰不對：app-config.js 要放 anon public 或 Publishable key（sb_publishable_…），不要放 secret / service_role。' };
+      if (!r.ok) throw { hint: 'Supabase 回應 ' + r.status + '：專案可能暫停或網址打錯（Project URL 長得像 https://xxxx.supabase.co）。' };
+      return r.json().catch(function () { return {}; });
+    }, function () {
+      throw { hint: '連不上：網址打錯、沒有網路，或 Supabase 專案暫停了（一週沒人用會暫停，到後台按 Restore）。' };
+    }).then(function (settings) {
+      sb = window.supabase.createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'dogju.auth' } });
+      return settings;
+    });
+  }
+  function anon(settings) {
+    var off = settings && settings.external && settings.external.anonymous_users === false;
+    return sb.auth.getSession().then(function (r) {
+      if (r && r.data && r.data.session) return r.data.session;
+      return sb.auth.signInAnonymously().then(function (r2) { if (r2.error) throw r2.error; return r2.data.session; });
+    }).then(function (s) {
+      uid = s && s.user && s.user.id;
+      if (!uid) throw new Error('no user');
+      path = 'data/users/' + uid + '/check';
+      return sb.realtime.setAuth ? Promise.resolve(sb.realtime.setAuth()).catch(function () {}) : null;
+    }).catch(function (e) {
+      if (e && e.hint) throw e;
+      var m = msgOf(e), c = codeOf(e);
+      if (off || c === 'anonymous_provider_disabled' || /anonymous sign-?ins? (are|is) disabled/i.test(m)) throw { hint: '還沒打開匿名登入：Supabase 左邊「Authentication」→「Sign In / Providers」→ 打開「Allow anonymous sign-ins」→ Save。' };
+      if ((e && e.status === 429) || /rate limit/i.test(m)) throw { hint: '同一個網路一小時內新訪客太多（每小時 30 位），請過一陣子再試，或換手機網路。' };
+      if (/captcha/i.test(m)) throw { hint: 'Supabase 開了人機驗證（CAPTCHA），請到 Authentication 的設定關掉。' };
+      throw { hint: '登入沒有成功：' + m };
+    });
+  }
+  function save() {
+    var n = Math.random().toString(36).slice(2, 10);
+    var i = path.lastIndexOf('/');
+    return sb.from('docs').upsert({ path: path, coll: path.slice(0, i), id: path.slice(i + 1), data: { at: Date.now(), n: n } }, { onConflict: 'path' }).select('updated_at').maybeSingle()
+      .then(function (r) { if (r.error) throw r.error; return sb.from('docs').select('path,data').eq('path', path).maybeSingle(); })
+      .then(function (r) { if (r.error) throw r.error; if (!r.data || !r.data.data || r.data.data.n !== n) throw new Error('read back failed'); return sb.rpc('doc_update', { p_path: path, p_patch: { ok: true } }); })
+      .then(function (r) { if (r.error) throw r.error; return sb.rpc('my_actor'); })
+      .then(function (r) { if (r.error) throw r.error; })
+      .catch(function (e) { if (e && e.hint) throw e; throw { hint: dbHint(e) }; });
+  }
+  function live() {
+    var n = 'n' + Math.random().toString(36).slice(2, 10), ch = null, got = false, sysMsg = '';
+    return new Promise(function (resolve, reject) {
+      var done = false;
+      function finish(err) { if (done) return; done = true; if (ch) { try { sb.removeChannel(ch); } catch (x) { /* ignore */ } } if (err) reject(err); else resolve(); }
+      ch = sb.channel('dogju-check-' + n);
+      ch.on('postgres_changes', { event: '*', schema: 'public', table: 'docs', filter: 'path=eq.' + path }, function (p) {
+        if (p && p.new && p.new.data && p.new.data.live === n) { got = true; finish(null); }
+      });
+      ch.on('system', {}, function (m) { if (m && String(m.status).toLowerCase() === 'error') sysMsg = msgOf(m); });
+      ch.subscribe(function (status) {
+        if (status === 'SUBSCRIBED') {
+          sleep(1500).then(function () { return sb.rpc('doc_update', { p_path: path, p_patch: { live: n } }); }).then(function (r) { if (r && r.error) finish({ hint: dbHint(r.error) }); });
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') finish({ hint: '即時連線打不開（' + status + '）：可能是網路擋住 WebSocket，換個網路再試。' });
+      });
+      setTimeout(function () {
+        if (got) return;
+        finish({ hint: sysMsg ? '即時同步沒有開：' + sysMsg + '。到「SQL Editor」再執行一次最新的 supabase.sql（會把 docs 表加進 Realtime）。'
+          : '10 秒內沒有收到更新：到「SQL Editor」再執行一次最新的 supabase.sql；還是不行，到 Database → Publications 確認 supabase_realtime 有勾 docs。' });
+      }, 10000);
+    });
+  }
+  function tinyJpeg() {
+    return new Promise(function (resolve, reject) {
+      var c = document.createElement('canvas'); c.width = 16; c.height = 16;
+      var g = c.getContext('2d'); g.fillStyle = '#2F8592'; g.fillRect(0, 0, 16, 16);
+      if (c.toBlob) c.toBlob(function (b) { if (b) resolve(b); else reject(new Error('toBlob')); }, 'image/jpeg', 0.8);
+      else reject(new Error('no canvas'));
+    });
+  }
+  function photo() {
+    var file = uid + '/check/test-' + Date.now() + '.jpg';
+    var store = sb.storage.from('photos');
+    return tinyJpeg().then(function (blob) {
+      return store.upload(file, blob, { contentType: 'image/jpeg', upsert: true });
+    }).then(function (r) {
+      if (r.error) {
+        var m = msgOf(r.error);
+        if (/bucket not found/i.test(m)) throw { hint: '照片空間還沒建立：到「SQL Editor」再執行一次最新的 supabase.sql。' };
+        if (/row-level security|unauthori|policy|permission/i.test(m)) throw { hint: '照片權限不對：到「SQL Editor」再執行一次最新的 supabase.sql。' };
+        throw { hint: '照片沒有上傳成功：' + m };
+      }
+      var pub = store.getPublicUrl(file).data.publicUrl;
+      return fetch(pub + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r2) {
+        if (!r2.ok) throw { hint: '照片傳上去了，但別人看不到：到 Supabase 左邊「Storage」→ photos → 設定成 Public bucket（或再執行一次最新的 supabase.sql）。' };
+      }, function () { throw { hint: '照片傳上去了，但讀不回來（網路？）。重新檢查一次。' }; });
+    }).then(function () {
+      return store.remove([file]).then(function () {}, function () {});
+    });
+  }
+
+  function run() {
+    btn.disabled = true; btn.textContent = '檢查中…'; sum.textContent = '';
+    CHECKS.forEach(function (c) { set(c.id, null, ''); });
+    var ok = 0, bad = 0, skipped = 0, stop = false;
+    function stage(id, fn, arg) {
+      if (stop) { skipped++; set(id, 'skip', '前面的項目要先打勾，這項才能檢查。'); return Promise.resolve(); }
+      return Promise.resolve().then(function () { return fn(arg); }).then(function (v) { set(id, true, ''); ok++; return v; }, function (e) {
+        console.warn('[check] ' + id, e);
+        bad++;
+        set(id, false, (e && e.hint) || dbHint(e));
+        if (id === 'reach' || id === 'anon') stop = true;
+      });
+    }
+    var settings = null;
+    stage('reach', reach).then(function (s) { settings = s; return stage('anon', anon, settings); })
+      .then(function () { return stage('save', save); })
+      .then(function () { return stage('live', live); })
+      .then(function () { return stage('photo', photo); })
+      .then(function () {
+        if (sb && path && !stop) sb.from('docs').delete().eq('path', path).then(function () {}, function () {});
+        sum.textContent = ok === CHECKS.length ? '全部打勾了，可以分享狗聚的連結了。' : '有 ' + bad + ' 項沒過' + (skipped ? '（後面 ' + skipped + ' 項還沒檢查）' : '') + '，照著上面的提示改，改完按「再檢查一次」。';
+        btn.disabled = false; btn.textContent = '再檢查一次';
+      });
+  }
+  btn.addEventListener('click', run);
+  CHECKS.forEach(row);
+  run();
+})();
+</script>
+</body>
+</html>
