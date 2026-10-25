@@ -1004,7 +1004,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-25.e5dfa0d2","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-25.77579d42","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -3264,6 +3264,9 @@ window.APP_BUILD = {"version":"2026-10-25.e5dfa0d2","seedUrl":"seed-data.json"};
   var C = App.content;
   var el = null, map = null, labels = {}, opts = {}, lastW = -1, lastH = -1, tapTimer = null;
 
+  /** OpenStreetMap's tile policy needs a Referer, but the page sends none (meta referrer no-referrer keeps health-card
+      links private). Tiles alone send the site's origin only — never the path, query or hash. */
+  function tileOptions() { return { maxZoom: 19, attribution: C.map.attribution, referrerPolicy: 'origin' }; }
   function create() {
     var L = window.L;
     el = document.createElement('div');
@@ -3273,7 +3276,7 @@ window.APP_BUILD = {"version":"2026-10-25.e5dfa0d2","seedUrl":"seed-data.json"};
     map = L.map(el, { center: C.map.center, zoom: C.map.zoom, zoomControl: true, attributionControl: true, minZoom: 7, maxZoom: 19 });
     map.attributionControl.setPrefix(false);
     // the automated test runner sets DOGJU_NO_TILES so it never fetches map pictures
-    if (C.map.tiles && !window.DOGJU_NO_TILES) L.tileLayer(C.map.tiles, { maxZoom: 19, attribution: C.map.attribution }).addTo(map);
+    if (C.map.tiles && !window.DOGJU_NO_TILES) L.tileLayer(C.map.tiles, tileOptions()).addTo(map);
     else map.attributionControl.addAttribution(C.map.attribution);
     // a tap waits a moment: the two clicks of a double tap (zoom in) must not look up a park
     map.on('click', function (e) {
@@ -3335,7 +3338,7 @@ window.APP_BUILD = {"version":"2026-10-25.e5dfa0d2","seedUrl":"seed-data.json"};
   function inView(p) { return !!(map && p && isFinite(p.lat) && isFinite(p.lng) && map.getBounds().contains([p.lat, p.lng])); }
   function zoom() { return map ? map.getZoom() : C.map.zoom; }
 
-  var api = App.map = { attach: attach, setLabels: setLabels, locate: locate, inView: inView, zoom: zoom, _geo: null };
+  var api = App.map = { attach: attach, setLabels: setLabels, locate: locate, inView: inView, zoom: zoom, _geo: null, _tileOptions: tileOptions };
   Object.defineProperty(api, '_leaflet', { get: function () { return map; } });
 })(window.App = window.App || {});
 
