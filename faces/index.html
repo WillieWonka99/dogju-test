@@ -1,0 +1,23 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>狗臉草稿</title>
+<style>
+body{margin:0;padding:16px;background:#FFFAF3;font-family:-apple-system,"PingFang TC",sans-serif;color:#342824}
+h1{font-size:20px;margin:0 0 4px}p{margin:0 0 14px;color:#6b5d57;font-size:14px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.c{background:#fff;border-radius:16px;padding:10px 4px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.c svg{display:block;margin:0 auto}.n{font-size:14px;margin-top:4px;font-weight:600}.sm{display:flex;justify-content:center;gap:6px;margin-top:4px}
+.sm span{width:36px;height:36px;border-radius:18px;background:#E8F2F3;display:flex;align-items:center;justify-content:center}
+</style></head><body>
+<h1>18 種狗臉草稿</h1>
+<p>上面是大圖，下面小圓圈是 App 裡頭像實際的大小。</p>
+<div class="grid" id="g"></div>
+<script src="breedfaces.js"></script>
+<script>
+var g=document.getElementById('g');
+BREED_LIST.forEach(function(b){
+  var inner=BREED_FACES[b[1]]();
+  var big='<svg width="84" height="84" viewBox="0 0 48 48">'+inner+'</svg>';
+  var small='<span><svg width="30" height="30" viewBox="0 0 48 48">'+inner+'</svg></span>';
+  var d=document.createElement('div');d.className='c';d.innerHTML=big+'<div class="n">'+b[0]+'</div><div class="sm">'+small+'</div>';g.appendChild(d);
+});
+</script></body></html>
