@@ -914,6 +914,7 @@ button.row, a.row { cursor: pointer; }
 .dj-map .leaflet-control-zoom a { width: 36px; height: 36px; line-height: 34px; }
 .dj-pin-wrap { background: none; border: none; }
 .dj-pin { display: inline-flex; align-items: center; gap: 4px; transform: translate(-50%, -100%); padding: 4px 10px; min-height: 28px; border: none; border-radius: 14px; background: var(--teal-ink); color: var(--white); font: inherit; font-size: 12px; line-height: 18px; white-space: nowrap; box-shadow: 0 2px 6px rgba(0, 0, 0, .2); cursor: pointer; }
+.dj-walk { display: inline-flex; align-items: center; transform: translate(-50%, -50%); padding: 3px 9px; min-height: 26px; border: none; border-radius: 13px; background: var(--white); color: var(--ink); font: inherit; font-size: 12px; line-height: 18px; white-space: nowrap; box-shadow: 0 1px 5px rgba(0, 0, 0, .18); cursor: pointer; }
 .map.map-real { height: min(56vh, 420px); isolation: isolate; } /* own stacking layer: the map buttons (z 1000, above Leaflet) stay under sheets */
 .map.map-real .map-slot { position: absolute; inset: 0; }
 .map.map-real .map-cta { z-index: 1000; }
@@ -1004,7 +1005,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-25.39ea7680","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2614,8 +2615,9 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     sections: [
       { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋。晶片號、家的範圍、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
       { title: '誰看得到', body: '用狗聚的人都看得到狗狗名片、狗聚和聊天室；打卡照你的設定（狗友或公開）。上傳的照片，拿到網址的人都看得到。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
-      { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片；點地圖上的公園時，會把點的那個位置送去查是哪座公園。按「回到我這裡」才會用到手機定位，位置只用來移動地圖，不會存起來。' },
-      { title: '還是測試', body: '試辦版的保護還不完整，懂技術的人可能讀得到、甚至改得到共用的資料（狗聚、聊天、協尋），請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
+      { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位，位置只用來移動地圖，不會存起來。' },
+      { title: '我出門遛狗', body: '按「我出門遛狗」才會用一次手機定位，不會一直追蹤。在公園裡就打卡在那座公園；在外面，別人只看到你大約在哪個 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。不存精確位置，也不送給任何人。家的位置只有你知道，存在你自己的資料裡。' },
+      { title: '還是測試', body: '試辦版的保護還不完整，懂技術的人可能讀得到、甚至改得到共用的資料（狗聚、聊天、協尋）；「只給狗友看」的打卡和散步的範圍，也只是在畫面上藏起來，懂技術的人還是讀得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
       { title: '沒有帳號', body: '不用註冊。你的身分記在這支手機的瀏覽器裡，清除瀏覽器資料、換手機、或從主畫面打開（iPhone），都會變成新的人。要變回同一隻狗，用「我的」裡的找回碼。' },
       { title: '回報問題', body: '按「回報問題」送出時，會一起附上你是哪隻狗、畫面名稱、App 版本、手機和瀏覽器的種類、時間，方便找出問題。私訊頁的「檢舉」也會用回報問題送給開這個 App 的人。' },
       { title: '怎麼刪掉', body: '「我的」→「隱私說明」→「刪除我的資料」。刪掉後，下次打開會變成新的人。' }
@@ -3181,18 +3183,39 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     return { id: 'osm-' + type + '-' + num, osm: osm, name: clean(r[1]), area: clean(L.areas[r[2]] || ''),
       lat: (r[4] + r[6] / 2) / 1e5, lng: (r[5] + r[7] / 2) / 1e5 };
   }
+  /** The district (…區/鄉/鎮/市) of the nearest listed park within ~2 km, or ''. Needs the list (loadLocal). */
+  function districtNear(lat, lng) {
+    var L = api._local;
+    if (!L) return '';
+    var best = null, cy = Math.floor(lat / CELL), cx = Math.floor(lng / CELL);
+    for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) {
+      (L.grid[(cy + dy) + ':' + (cx + dx)] || []).forEach(function (i) {
+        var r = L.rows[i], y = (r[4] + r[6] / 2) / 1e5, x = (r[5] + r[7] / 2) / 1e5;
+        var d = (y - lat) * (y - lat) + (x - lng) * (x - lng);
+        if (L.areas[r[2]] && (!best || d < best.d)) best = { d: d, area: L.areas[r[2]] };
+      });
+    }
+    var m = best && String(best.area).match(/([^縣市]{1,4}[區鄉鎮市])$/);
+    return m ? clean(m[1]) : '';
+  }
   var localP = null;
   /** Load the shipped list once (resolves true when usable). */
   function loadLocal() {
     if (api._local) return Promise.resolve(true);
     if (!api._localUrl) return Promise.resolve(false);
-    if (localP && localP.url === api._localUrl) return localP;
     var url = api._localUrl;
-    localP = Promise.resolve().then(function () { return api._fetchLocal(url); })
-      .then(function (r) { if (!r || !r.ok) throw new Error('park list ' + (r && r.status)); return r.json(); })
-      .then(function (doc) { setLocal(doc); return true; }, function (e) { console.warn('[osm] no park list', e && e.message); localP = null; return false; });
-    localP.url = url;
-    return localP;
+    if (!localP || localP.url !== url) {
+      // the promise keeps the downloaded document, so a cleared index is rebuilt without downloading again
+      localP = Promise.resolve().then(function () { return api._fetchLocal(url); })
+        .then(function (r) { if (!r || !r.ok) throw new Error('park list ' + (r && r.status)); return r.json(); })
+        .then(null, function (e) { console.warn('[osm] no park list', e && e.message); localP = null; return null; });
+      localP.url = url;
+    }
+    return localP.then(function (doc) {
+      if (!doc) return false;
+      if (!api._local) setLocal(doc);
+      return true;
+    });
   }
 
   function parkAt(lat, lng) {
@@ -3239,7 +3262,7 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
   }
 
   var api = App.osm = {
-    parkAt: parkAt, pick: pick, nameOf: nameOf, loadLocal: loadLocal,
+    parkAt: parkAt, pick: pick, nameOf: nameOf, loadLocal: loadLocal, districtNear: districtNear,
     lastError: null,
     _fetch: function (u, i) { return window.fetch(u, i); },
     _fetchLocal: function (u) { return window.fetch(u); },
@@ -3261,7 +3284,7 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
 (function (App) {
   'use strict';
   var C = App.content;
-  var el = null, map = null, labels = {}, opts = {}, lastW = -1, lastH = -1, tapTimer = null;
+  var el = null, map = null, labels = {}, walks = {}, opts = {}, lastW = -1, lastH = -1, tapTimer = null;
 
   /** OpenStreetMap's tile policy needs a Referer, but the page sends none (meta referrer no-referrer keeps health-card
       links private). Tiles alone send the site's origin only — never the path, query or hash. */
@@ -3320,25 +3343,48 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     });
     Object.keys(labels).forEach(function (id) { if (!seen[id]) { map.removeLayer(labels[id].marker); delete labels[id]; } });
   }
+  /** Walk circles (我出門遛狗): [{id, lat, lng, r (metres), text, aria}] — a soft circle on the grid cell plus a label
+      (text, not HTML). Unchanged walks are kept, so a re-render never stacks circles. */
+  function setWalks(items) {
+    if (!map) create();
+    var L = window.L, seen = {};
+    (items || []).forEach(function (it) {
+      if (!it || typeof it.id !== 'string' || !isFinite(it.lat) || !isFinite(it.lng)) return;
+      seen[it.id] = true;
+      var cur = walks[it.id];
+      if (cur && cur.text === it.text && cur.lat === it.lat && cur.lng === it.lng && cur.r === it.r) return;
+      if (cur) { map.removeLayer(cur.circle); map.removeLayer(cur.marker); }
+      var circle = L.circle([it.lat, it.lng], { radius: it.r, interactive: false, color: '#E8745A', weight: 2, dashArray: '5 6', fillColor: '#E8745A', fillOpacity: it.r > 100 ? 0.1 : 0.2 }).addTo(map);
+      var node = document.createElement('button');
+      node.type = 'button'; node.className = 'dj-walk'; node.setAttribute('data-walker', it.id); node.textContent = it.text;
+      if (it.aria) node.setAttribute('aria-label', it.aria);
+      node.addEventListener('click', function (e) { e.stopPropagation(); if (opts.onWalker) opts.onWalker(it.id); });
+      var marker = L.marker([it.lat, it.lng], { icon: L.divIcon({ className: 'dj-pin-wrap', html: node, iconSize: null, iconAnchor: [0, 0] }), keyboard: false, interactive: true }).addTo(map);
+      walks[it.id] = { circle: circle, marker: marker, text: it.text, lat: it.lat, lng: it.lng, r: it.r };
+    });
+    Object.keys(walks).forEach(function (id) { if (!seen[id]) { map.removeLayer(walks[id].circle); map.removeLayer(walks[id].marker); delete walks[id]; } });
+  }
   /** Ask the phone for its position once and move the map there. Resolves {lat, lng} or null (denied / failed). */
-  function locate() {
+  /** The phone's position once, without moving the map: {lat, lng} or null. Never stored here. */
+  function position() {
     var geo = api._geo || (navigator && navigator.geolocation);
     return new Promise(function (resolve) {
       if (!geo) { resolve(null); return; }
       try {
-        geo.getCurrentPosition(function (pos) {
-          var p = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          if (map) map.setView([p.lat, p.lng], 16, { animate: false });
-          resolve(p);
-        }, function () { resolve(null); }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
+        geo.getCurrentPosition(function (pos) { resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }); },
+          function () { resolve(null); }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
       } catch (e) { resolve(null); }
     });
+  }
+  function locate() {
+    return position().then(function (p) { if (p && map) map.setView([p.lat, p.lng], 16, { animate: false }); return p; });
   }
   function inView(p) { return !!(map && p && isFinite(p.lat) && isFinite(p.lng) && map.getBounds().contains([p.lat, p.lng])); }
   function zoom() { return map ? map.getZoom() : C.map.zoom; }
 
-  var api = App.map = { attach: attach, setLabels: setLabels, locate: locate, inView: inView, zoom: zoom, _geo: null, _tileOptions: tileOptions };
+  var api = App.map = { attach: attach, setLabels: setLabels, setWalks: setWalks, locate: locate, position: position, inView: inView, zoom: zoom, _geo: null, _tileOptions: tileOptions };
   Object.defineProperty(api, '_leaflet', { get: function () { return map; } });
+  api._walkCircles = function () { return Object.keys(walks).map(function (id) { return { id: id, r: walks[id].r }; }); };
 })(window.App = window.App || {});
 
 ;
@@ -5855,7 +5901,15 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     return upsert(privRef(), patch, {});
   }
   // ---- home park (家附近只顯示「在附近」): private. A small per-actor cache so screens can read it synchronously.
-  var homeCache = {}, homeLoading = {}, homeInfo = {};
+  var homeCache = {}, homeLoading = {}, homeInfo = {}, homeAtCache = {};
+  // 「家附近」 is decided on the FIXED 0.005° grid: the home's cell and the 8 cells around it (≥ ~500 m past home in
+  // every direction). A distance radius would leave a round hole of 100 m walks whose centre is the home.
+  /** A private home point {lat, lng} (rounded 0.0001°) or null. */
+  function homeAtOf(p) {
+    var h = p && p.homeAt;
+    var lat = h && Number(h.lat), lng = h && Number(h.lng);
+    return h && isFinite(lat) && isFinite(lng) && lat > 21 && lat < 26.5 && lng > 119 && lng < 123 ? { lat: lat, lng: lng } : null;
+  }
   /** The home park id from a private doc, or null. A home park that is not a legacy / registered park keeps its own
       private copy (homeParkInfo) — it is never written to the shared registry. Also fills homeInfo[who]. */
   function homeOf(p, who) {
@@ -5863,6 +5917,7 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     var known = id && App.content.park(id);
     var info = known ? { id: id, name: known.name } : (id && p.homeParkInfo && PARK_ID_RE.test(id) && cleanParkName(p.homeParkInfo.name) ? { id: id, name: cleanParkName(p.homeParkInfo.name) } : null);
     homeInfo[who] = info;
+    homeAtCache[who] = homeAtOf(p);
     return info ? id : null;
   }
   function loadHome(who) {
@@ -5879,6 +5934,8 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     if (!Object.prototype.hasOwnProperty.call(homeCache, who)) { loadHome(who); return null; }
     return homeCache[who];
   }
+  /** My private home point {lat, lng} or null (loads lazily like the home park). */
+  function myHomeAt() { var who = actor(); if (!Object.prototype.hasOwnProperty.call(homeCache, who)) { loadHome(who); return null; } return homeAtCache[who] || null; }
   /** {id, name} of my home park (works for a private, unregistered park) or null. */
   function myHomeParkInfo() { var id = myHomePark(); return id ? (homeInfo[actor()] || null) : null; }
   /** Boot: load the viewer's home park, and move an old shared people.privacy.homePark into the private doc once. */
@@ -5992,6 +6049,12 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
         homeCache[who] = homeOf({ homePark: hp, homeParkInfo: hinfo }, who); homeLoading[who] = true; emit('people');
         if (hp) return forgetParkInLogs(who, hp);
       }));
+    }
+    if (Object.prototype.hasOwnProperty.call(patch, 'homeAt')) {
+      var ha = homeAtOf({ homeAt: patch.homeAt });
+      if (ha) ha = { lat: Math.round(ha.lat * 1e4) / 1e4, lng: Math.round(ha.lng * 1e4) / 1e4 };
+      delete patch.homeAt;
+      jobs.push(setPrivate({ homeAt: ha }, who).then(function () { homeAtCache[who] = ha; if (!Object.prototype.hasOwnProperty.call(homeCache, who)) homeCache[who] = null; homeLoading[who] = true; emit('people'); }));
     }
     var shared = {};
     if (patch.checkinAudience !== undefined) shared.checkinAudience = patch.checkinAudience === 'public' ? 'public' : 'friends';
@@ -6693,11 +6756,21 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     var pv = (p && p.privacy) || {};
     return getPrivate(who).then(function (priv) {
       var home = homeOf(priv, who);
+      // the home point; people who only picked a home park the old way get that park's centre
+      var hp = home && (App.content.park(home) || (priv.homeParkInfo && { lat: Number(priv.homeParkInfo.lat), lng: Number(priv.homeParkInfo.lng) }));
+      var homeAt = homeAtOf(priv) || homeAtOf({ homeAt: hp && isFinite(hp.lat) ? { lat: hp.lat, lng: hp.lng } : null });
       homeCache[who] = home; homeLoading[who] = true;
+      function nearPoint(pt) { return !!(pv.hideNearHome && homeAt && pt && isFinite(pt.lat) && sameBlock(homeAt, pt)); }
       return {
         hours: pv.checkinHours === 2 ? 2 : 3,
         audience: pv.checkinAudience === 'public' ? 'public' : 'friends',
-        nearAt: function (parkId) { return !!(pv.hideNearHome && home && home === parkId); }
+        /** park: the park object when the caller has it (a park tapped on the map may not be registered yet) */
+        nearAt: function (parkId, park) {
+          if (pv.hideNearHome && home && home === parkId) return true;
+          var pk = park || App.content.park(parkId);
+          return nearPoint(pk && { lat: pk.lat, lng: pk.lng });
+        },
+        nearPoint: nearPoint
       };
     });
   }
@@ -6712,7 +6785,7 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     var parkId = park.id;
     var near = false, doc = null, t = now(), rules = null;
     return checkinRules(p, who).then(function (r) {
-      rules = r; near = r.nearAt(parkId);
+      rules = r; near = r.nearAt(parkId, park);
       // the registry is written first (so others can name the park) — but never for a 「在附近」 check-in at home
       return near ? null : ensurePark(park);
     }).then(function () {
@@ -6732,6 +6805,52 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     }).then(function () { return { near: near, until: doc.until }; });
   }
   function checkOut() { var who = actor(); return S().doc('checkins/' + who).delete(); }
+
+  // ===================================================================== 我出門遛狗 (walk check-in)
+  // One location fix → the park you are in (a normal check-in), or a FIXED grid cell: 0.001° (~100 m) or, near your
+  // private home point, 0.005° (~500 m) with only the district. Fixed cells, never random offsets (averaging many
+  // random offsets would give the real spot away). The exact point is never written anywhere.
+  var WALK_STEP = { 100: 1000, 500: 5000 }; // cell size in 1e-6°
+  /** The centre of the grid cell around a point: {lat, lng} (≤ 4 decimals). */
+  function cellOf(lat, lng, r) {
+    var st = WALK_STEP[r] || WALK_STEP[100];
+    function c(v) { var q = Math.floor(Math.round(Number(v) * 1e6) / st); return (q * st + st / 2) / 1e6; }
+    return { lat: c(lat), lng: c(lng) };
+  }
+  /** Are two points within one 0.005° cell of each other on the fixed grid (the 3×3 block around a's cell)? */
+  function sameBlock(a, b) {
+    var st = WALK_STEP[500];
+    function idx(v) { return Math.floor(Math.round(Number(v) * 1e6) / st); }
+    return Math.abs(idx(a.lat) - idx(b.lat)) <= 1 && Math.abs(idx(a.lng) - idx(b.lng)) <= 1;
+  }
+  /** Distance in metres (equirectangular: plenty for a few km). */
+  function distM(a, b) {
+    var k = Math.PI / 180, x = (b.lng - a.lng) * k * Math.cos(((a.lat + b.lat) / 2) * k), y = (b.lat - a.lat) * k;
+    return Math.sqrt(x * x + y * y) * 6371000;
+  }
+  /** 我出門遛狗 at a point {lat, lng} (from the phone once, or tapped on the map). Resolves
+      {kind:'park', park, near, until} or {kind:'walk', r, area, near, until}. */
+  function walkCheckIn(point) {
+    var who = actor();
+    var p = person(who);
+    need(p, '先建立狗狗名片');
+    var lat = Number(point && point.lat), lng = Number(point && point.lng);
+    need(isFinite(lat) && isFinite(lng) && lat > 21 && lat < 26.5 && lng > 119 && lng < 123, '這個位置不在台灣');
+    // the exact point is only used on the phone: if the park list is missing, the server gets the 100 m cell
+    var coarse = cellOf(lat, lng, 100);
+    return App.osm.loadLocal().then(function (ok) {
+      return ok ? App.osm.parkAt(lat, lng) : App.osm.parkAt(coarse.lat, coarse.lng);
+    }).then(function (park) {
+      if (park) return checkIn(park).then(function (r) { return { kind: 'park', park: park, near: r.near, until: r.until }; });
+      return checkinRules(p, who).then(function (rules) {
+        var near = rules.nearPoint({ lat: lat, lng: lng });
+        var r = near ? 500 : 100, area = near ? App.osm.districtNear(lat, lng) : '';
+        var cell = cellOf(lat, lng, r), t = now();
+        var doc = { kind: 'walk', cell: cell, r: r, area: area, parkId: null, near: near, at: t, until: t + rules.hours * HOUR, audience: rules.audience };
+        return S().doc('checkins/' + who).set(doc).then(function () { return { kind: 'walk', r: r, area: area, near: near, until: doc.until }; });
+      });
+    });
+  }
   /** Apply my CURRENT privacy (audience, hours, home park → 「在附近」) to my active check-in, keeping its check-in time.
       Logs no visit (常客榜 is not inflated). Resolves {near, until, expired} or null when there is nothing to re-apply
       (no active check-in, or it only says 「在附近」 so the park is unknown). */
@@ -6744,10 +6863,25 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
       var s = res[0], r = res[1];
       var c = s.exists ? s.data() : null;
       var t = now();
+      if (c && c.until > t && c.kind === 'walk' && c.cell) return reapplyWalk(ref, c, r, t);
       if (!c || !(c.until > t) || !c.parkId || !App.content.park(c.parkId)) return null;
       var near = r.nearAt(c.parkId);
       var at = typeof c.at === 'number' ? c.at : t;
       var doc = { parkId: near ? null : c.parkId, near: near, at: at, until: at + r.hours * HOUR, audience: r.audience };
+      var expired = !(doc.until > t);
+      return (expired ? ref.delete() : ref.set(doc)).then(function () { return { near: near, until: doc.until, expired: expired }; });
+    });
+  }
+  /** A walk in progress gets the current audience / hours / 家附近. Without the exact point, the stored cell centre
+      stands in for it: a 100 m walk can become a 500 m one, never the other way round. */
+  function reapplyWalk(ref, c, r, t) {
+    var pt = { lat: Number(c.cell.lat), lng: Number(c.cell.lng) };
+    return App.osm.loadLocal().then(function () {
+      var near = c.r > 100 || r.nearPoint(pt);
+      var rr = near ? 500 : 100;
+      var at = typeof c.at === 'number' ? c.at : t;
+      var doc = { kind: 'walk', cell: near ? cellOf(pt.lat, pt.lng, 500) : c.cell, r: rr, area: near ? (c.r > 100 ? (c.area || '') : App.osm.districtNear(pt.lat, pt.lng)) : '',
+        parkId: null, near: near, at: at, until: at + r.hours * HOUR, audience: r.audience };
       var expired = !(doc.until > t);
       return (expired ? ref.delete() : ref.set(doc)).then(function () { return { near: near, until: doc.until, expired: expired }; });
     });
@@ -6770,14 +6904,15 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
   }
   /** {byPark:{[parkId]: [checkins]}, near:[checkins], mine: checkin|null} */
   function presence(list) {
-    var byPark = {}, near = [], mine = null;
+    var byPark = {}, near = [], mine = null, walks = [];
     PARKS.forEach(function (p) { byPark[p.id] = []; });
     (list || []).forEach(function (c) {
       if (c.id === actor()) mine = c;
-      if (c.near || !c.parkId) near.push(c);
+      if (c.kind === 'walk' && c.cell && isFinite(c.cell.lat) && isFinite(c.cell.lng)) walks.push(c);
+      else if (c.near || !c.parkId) near.push(c);
       else if (typeof c.parkId === 'string' && ok(c.parkId)) (own(byPark, c.parkId) ? byPark[c.parkId] : (byPark[c.parkId] = [])).push(c);
     });
-    return { byPark: byPark, near: near, mine: mine };
+    return { byPark: byPark, near: near, mine: mine, walks: walks };
   }
   var VISIT_KEEP_DAYS = 35; // 常客榜 looks 28 days back; older visits are dropped when the next one is logged
   function watchVisits(cb) { return S().collection('visits').onSnapshot(function (qs) { cb(listOf(qs)); }, function () { cb([]); }); }
@@ -6876,7 +7011,7 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     var walk = { at: now(), parkId: park.id, laps: laps, km: park.lapKm ? Math.round(laps * park.lapKm * 10) / 10 : 0, minutes: Math.max(1, Math.round(Number(input.minutes) || 0)) };
     var ref = S().doc('territory/' + who);
     return checkinRules(p, who).then(function (r) {
-      if (r.nearAt(park.id)) { walk.parkId = null; walk.nearHome = true; return null; }
+      if (r.nearAt(park.id, park)) { walk.parkId = null; walk.nearHome = true; return null; }
       return ensurePark(park);
     }).then(function () { return ref.get(); }).then(function (s) {
       var keepFrom = walk.at - 62 * 24 * HOUR; // the screens use this week and this month (+ last month's ranking)
@@ -8447,7 +8582,7 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
       // recovery code, links, claim attempts, every health-card link (server; the mock emulates it)
       return S().backend === 'claude' ? null : S().rpc('forget_me').catch(function (e) { if (e && e.code !== 'not_configured') throw e; });
     }).then(function () {
-      memPrivate = {}; homeCache = {}; homeLoading = {}; memReads = {}; recP = {}; hUrls = {}; uploadOpen = {};
+      memPrivate = {}; homeCache = {}; homeLoading = {}; homeAtCache = {}; memReads = {}; recP = {}; hUrls = {}; uploadOpen = {};
       return App.me.signOutAndReload(C.deleteMine.done);
     });
   }
@@ -8717,7 +8852,7 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     sendStickers: sendStickers, withdrawStickers: withdrawStickers, watchEventStickers: watchEventStickers, watchMyStickers: watchMyStickers,
     sendReport: sendReport, watchReports: watchReports, setPlayAgain: setPlayAgain, getPlayAgain: getPlayAgain,
     // check-ins & visits
-    ensurePark: ensurePark, cleanParkName: cleanParkName, notePark: notePark, parkShared: parkShared, myHomeParkInfo: myHomeParkInfo,
+    ensurePark: ensurePark, cleanParkName: cleanParkName, cellOf: cellOf, distM: distM, walkCheckIn: walkCheckIn, notePark: notePark, parkShared: parkShared, myHomeParkInfo: myHomeParkInfo, myHomeAt: myHomeAt,
     checkIn: checkIn, checkOut: checkOut, reapplyCheckinPrivacy: reapplyCheckinPrivacy, watchCheckins: watchCheckins, presence: presence, canSeeCheckin: canSeeCheckin,
     watchVisits: watchVisits, getVisits: getVisits, regulars: regulars, favoritePark: favoritePark,
     // stamps
@@ -8776,7 +8911,7 @@ window.APP_BUILD = {"version":"2026-10-25.ead93ff0","seedUrl":"seed-data.json"};
     /** dev reseed only: forget cached private values (the mock was wiped) */
     /** tests: the pacing step in ms (default 340; the test suite runs faster and checks the real value once) */
     _pace: function (ms) { if (ms != null) { PACE_MS = Math.max(0, Number(ms) || 0); paceNext = 0; } return PACE_MS; },
-    _resetCaches: function () { homeCache = {}; homeLoading = {}; memPrivate = {}; memReads = {}; recP = {}; hUrls = {}; uploadOpen = {}; emit('people'); },
+    _resetCaches: function () { homeCache = {}; homeLoading = {}; homeAtCache = {}; memPrivate = {}; memReads = {}; recP = {}; hUrls = {}; uploadOpen = {}; emit('people'); },
     /** boot only: make sure a just-read profile is in the people cache before the first route */
     _prime: function (p) { if (p && p.id && !people.has(p.id)) { people.set(p.id, p); emit('people'); } }
   };
@@ -15645,23 +15780,37 @@ try {
     }).filter(Boolean);
   }
 
+  /** 我出門遛狗 circles: visible walkers (and me), on their grid cell. Near home: only the district. */
+  function walksOf(ctx) {
+    var pres = D.presence(ctx.state.checkins || []), me = App.me.actorId;
+    return pres.walks.filter(function (w) { return w.visible || w.id === me; }).map(function (w) {
+      var name = D.dogName(w.id) || '狗狗';
+      var where = w.r > 100 ? '在' + (w.area || '') + '附近' : '在這一帶';
+      return { id: w.id, lat: w.cell.lat, lng: w.cell.lng, r: w.r > 100 ? 500 : 100, text: '🐕 ' + name + where, aria: name + where + '散步' + (w.id === me ? '（你）' : '') };
+    });
+  }
+
   function mapSection(ctx) {
     var pres = D.presence(ctx.state.checkins || []);
     var mine = pres.mine;
     var minePark = mine && mine.parkId ? C.park(mine.parkId) : null;
-    var cta = mine ? (minePark ? '我在' + shortPark(minePark.name) : '我在附近') : '我在公園';
+    var walking = mine && mine.kind === 'walk';
+    var cta = mine ? (walking ? '散步中・' + (mine.r > 100 ? (mine.area || '附近') : '這一帶') : minePark ? '我在' + shortPark(minePark.name) : '我在附近') : '🐾 我出門遛狗';
     return html`
       <section class="map map-real px mt-8" aria-label="地圖：點公園可以打卡、揪團，標籤是現在有狗的公園">
         <div class="map-slot"></div>
         <button type="button" class="map-locate" data-act="locate">📍 回到我這裡</button>
-        <div class="map-cta">${ui.primaryBtn(cta, { act: 'checkin', block: false, ariaLabel: mine ? '打卡設定，' + cta : '我在公園，打卡' })}</div>
+        <div class="map-cta">${ui.primaryBtn(cta, { act: mine ? 'status' : 'walk', block: false, ariaLabel: mine ? '散步或打卡中：' + cta : '我出門遛狗：用手機的位置打卡一次' })}</div>
       </section>
+      <div class="px mt-4" style="text-align:right">${ui.textBtn('從公園清單打卡', { act: 'checkin', icon: 'chevronRight', iconAfter: true, iconSize: 16 })}</div>
       ${pres.near.length ? html`<p class="note px mt-8">另有 ${pres.near.length} 隻在附近（家附近不顯示公園）</p>` : ''}`;
   }
 
   /** A tap on the map: which park is here? (zoomed in enough → Overpass) */
   var looking = false; // one park lookup at a time (the public servers limit how many we may ask at once)
+  var pickWalk = false; // 我出門遛狗 without location: the next tap on the map is where I am
   function tapMap(ctx, latlng, zoom) {
+    if (pickWalk) { pickWalk = false; return startWalk(ctx, latlng); }
     if (zoom < C.map.tapZoom) { ui.toast('放大一點再點公園'); return; }
     if (looking) { ui.toast('查詢中，請稍等'); return; }
     looking = true;
@@ -15676,6 +15825,44 @@ try {
       }
       openPark(ctx, D.notePark(p) || p);
     }, function (e) { looking = false; throw e; });
+  }
+
+  /** 我出門遛狗 at a point: the park I am in, else a blurred walk circle. */
+  function startWalk(ctx, point) {
+    return D.walkCheckIn(point).then(function (r) {
+      if (r.kind === 'park') ui.toast(r.near ? '已打卡，顯示為「在附近」' : '已打卡：' + r.park.name);
+      else ui.toast(r.near ? '已開始散步（家附近，只顯示' + (r.area || '在附近') + '）' : '已開始散步，別人看到的是這一帶');
+    });
+  }
+  /** The button: ask for the position once; no position → let them tap the map. */
+  function walkNow(ctx) {
+    if (looking) return;
+    looking = true;
+    ui.toast('找位置中…');
+    return App.map.locate().then(function (p) {
+      looking = false;
+      if (ctx.dead) return;
+      if (!p) { pickWalk = true; ui.toast('沒有拿到位置，在地圖上點一下你大概在哪裡', { ms: 5000 }); return; }
+      return startWalk(ctx, p);
+    }, function (e) { looking = false; throw e; });
+  }
+  /** Already walking / checked in: how long, end it, or check in at a park instead. */
+  function openStatus(ctx) {
+    var mine = D.presence(ctx.state.checkins || []).mine;
+    if (!mine) return walkNow(ctx);
+    var walking = mine.kind === 'walk', park = !walking && mine.parkId ? C.park(mine.parkId) : null;
+    ui.sheet({
+      title: walking ? '散步中' : park ? '我在' + park.name : '我在附近',
+      render: function () {
+        var where = walking ? (mine.r > 100 ? '別人看到的是「' + (mine.area || '') + '附近」（家附近）' : '別人看到的是你在「這一帶」（約 100 公尺）') : '';
+        return html`<p class="sub">${where ? where + '・' : ''}${ui.fmt.time(mine.until)} 自動消失</p>
+          <div class="sheet-actions">${ui.quietBtn('改在公園打卡', { act: 'park' })}${ui.primaryBtn(walking ? '結束散步' : '離開公園', { act: 'end' })}</div>`;
+      },
+      actions: {
+        end: function (s) { return D.checkOut().then(function () { s.close(); ui.toast(walking ? '結束散步了' : '已離開公園'); }); },
+        park: function (s) { s.close(); openCheckin(ctx); }
+      }
+    });
   }
 
   /** The card of one park (tapped on the map, or its label). */
@@ -15815,6 +16002,7 @@ try {
     title: '地圖',
     tab: 'map',
     mount: function (ctx) {
+      pickWalk = false; // a 「tap where you are」 from an earlier visit never carries over
       ctx.state.weekly = D.weeklyMeetup();
       ctx.live('events', D.watchEvents);
       ctx.live('checkins', D.watchCheckins);
@@ -15828,9 +16016,11 @@ try {
       if (!slot) return;
       App.map.attach(slot, {
         onTap: function (latlng, zoom) { tapMap(ctx, latlng, zoom); },
-        onLabel: function (id) { var pk = C.park(id); if (pk) openPark(ctx, pk); }
+        onLabel: function (id) { var pk = C.park(id); if (pk) openPark(ctx, pk); },
+        onWalker: function (id) { if (id !== App.me.actorId) App.go('DM_Invite', { id: id }); }
       });
       App.map.setLabels(labelsOf(ctx));
+      App.map.setWalks(walksOf(ctx));
       // fetch the park list in the background, so the first tap answers at once (the test runner skips it)
       if (!window.DOGJU_NO_TILES) setTimeout(function () { App.osm.loadLocal(); }, 1500);
     },
@@ -15849,6 +16039,8 @@ try {
     },
     actions: {
       checkin: function (ctx) { openCheckin(ctx); },
+      walk: function (ctx) { return walkNow(ctx); },
+      status: function (ctx) { openStatus(ctx); },
       rsvp: function (ctx) {
         var m = ctx.state.meetup, wk = ctx.state.weekly;
         if (!m) return;
@@ -16122,6 +16314,23 @@ try {
     return diffs.length ? diffs : null;
   }
 
+  function saveHomeAt(p) {
+    return D.setPrivacy({ homeAt: { lat: p.lat, lng: p.lng }, hideNearHome: true }).then(function () { ui.toast('家的位置設好了，只有你知道'); });
+  }
+  /** Tap your home on the map (the one map moves into this sheet; the home screen takes it back on its next render). */
+  function openHomeMapSheet() {
+    var sh = ui.sheet({
+      title: '在地圖上點家的位置',
+      render: function () {
+        return html`<p class="sub">拖地圖、放大，點一下家大概的位置。只存在你自己的資料裡，別人看不到。</p>
+          <div class="pv-mapslot mt-12" style="position:relative;height:min(52vh,360px);border-radius:16px;overflow:hidden;isolation:isolate"></div>`;
+      }
+    });
+    var slot = sh && sh.el && sh.el.querySelector('.pv-mapslot');
+    var home = D.myHomeAt();
+    App.map.attach(slot, { onTap: function (latlng) { saveHomeAt(latlng).then(function () { sh.close(); }); } });
+    if (home && App.map._leaflet) App.map._leaflet.setView([home.lat, home.lng], 16, { animate: false });
+  }
   /** Parks to choose from; my current home park first when only my private copy knows it (not on this phone's list). */
   function homeChoices() {
     var list = App.parkPick.ordered(), info = D.myHomeParkInfo();
@@ -16244,6 +16453,7 @@ try {
       var pres = ctx.state.checkins ? D.presence(ctx.state.checkins) : { mine: null };
       var mine = pres.mine;
       var homePark = D.myHomeParkInfo(); // {id, name} — private (data/users/<me>), never in the shared profile
+      var homeAt = D.myHomeAt();         // private home point (我出門遛狗 near home → 500 m + district only)
 
       // Preview: my current check-in, else my usual park, else 大安森林公園.
       var previewPark = C.park((mine && mine.parkId) || ctx.state.fav || 'daan') || C.parks[0];
@@ -16299,6 +16509,12 @@ try {
               ${ui.switchCtl({ checked: !!v.hideNearHome, act: 'nearHome', labelledby: 'pv-home', describedby: 'pv-home-sub' })}
             </div>
             <span class="note">${homePark ? '家的範圍：' + homePark.name + (v.hideNearHome ? '' : '（開關關著，還沒生效）') : (v.hideNearHome ? '還沒設定家的範圍，這個保護還沒生效。' : '還沒設定家的範圍。')}</span>
+            <span class="note">${homeAt ? '家的位置：已設定（只有你知道）' + (v.hideNearHome ? '・家附近 600 公尺內的散步只顯示區名' : '（開關關著，還沒生效）') : '家的位置：還沒設定。設了以後，在家附近按「我出門遛狗」只會顯示區名。'}</span>
+            <div class="row-flex" style="flex-wrap:wrap;gap:8px">
+              ${ui.quietBtn('用我現在的位置', { act: 'homeHere', block: false })}
+              ${ui.quietBtn('在地圖上點', { act: 'homeMap', block: false })}
+              ${homeAt ? ui.textBtn('清除家的位置', { act: 'homeClear', muted: true }) : ''}
+            </div>
             ${ui.primaryBtn('設定家的範圍', { act: 'home', icon: 'home', block: false, cls: 'pv-home-btn' })}
           </div>
         </div>
@@ -16364,6 +16580,14 @@ try {
         });
       },
       home: function (ctx) { openHomeSheet(ctx); },
+      homeHere: function () {
+        return App.map.position().then(function (p) {
+          if (!p) { ui.toast('沒有拿到位置，可以改用「在地圖上點」'); return; }
+          return saveHomeAt(p);
+        });
+      },
+      homeMap: function () { openHomeMapSheet(); },
+      homeClear: function () { return D.setPrivacy({ homeAt: null }).then(function () { ui.toast('已清除家的位置'); }); },
       reapply: function (ctx) {
         var mine = ctx.state.checkins ? D.presence(ctx.state.checkins).mine : null;
         if (!mine || !mine.parkId) return;
