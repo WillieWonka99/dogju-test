@@ -1005,7 +1005,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-27.e8c6c9eb","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-27.f25622b0","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -16324,17 +16324,12 @@ try {
    - render(ctx) is pure; data arrives through ctx.live(...) into ctx.state; undefined = still loading.
    - every user-provided string goes through html`` (escaped); components come from App.ui.
    - navigation via data-go / data-tab attributes, behaviour via data-act + actions{}.
-   - sheets (App.ui.sheet) instead of alert/confirm/prompt. */
+   - sheets (App.ui.sheet) instead of alert/confirm/prompt.
+   Home = map + 我出門遛狗, lost-dog banner, 固定狗聚日 card (→ 狗聚日), 狗友動態. 2026-10-27（Willie：重複的都拿掉）:
+   no 附近狗聚 list here any more — the 狗聚 tab has the same list. */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, C = App.content;
-
-  (function () {
-    if (document.getElementById('css-Main')) return;
-    var s = document.createElement('style'); s.id = 'css-Main';
-    s.textContent = '.scr-Main .ev-row .h3 .unread-dot{margin-left:6px;vertical-align:2px}';
-    document.head.appendChild(s);
-  })();
 
   function shortPark(name) { return name.length > 5 ? name.replace('公園', '') : name; }
 
@@ -16527,47 +16522,6 @@ try {
       </section>`;
   }
 
-  function eventRow(ev) {
-    var r = D.roster(ev);
-    var st = D.eventStatus(ev);
-    var mine = D.myStatus(ev);
-    var host = D.person(ev.hostId);
-    var need = st === 'paused' ? '颱風暫停' : D.isHost(ev) ? '你是主揪' : st === 'live' ? '進行中' :
-      mine === 'going' ? '你已報名' : mine === 'waitlist' ? '你在候補' : mine === 'pending' ? '等主揪核准' : mine === 'rest' ? '這次休息' :
-      r.full ? '額滿・可候補' : '還缺 ' + r.spotsLeft + ' 隻';
-    return html`<li><button type="button" class="ev-row"${ui.go('Event', { id: ev.id })}>
-      ${ui.dateBlock(ev.startAt)}
-      <span class="row-main">
-        <span class="h3">${ev.title}${D.isUnreadEvent(ev) ? ui.dot({ label: '聊天室有新訊息' }) : ''}</span>
-        <span class="note">${ui.fmt.time(ev.startAt)}・${C.placeName(ev.place)}</span>
-        <span class="note">${D.eventTags(ev).join('・')}</span>
-      </span>
-      <span class="ev-side">${host ? ui.dogAvatar(host, { size: 36, label: false }) : ''}<span style="display:flex;flex-direction:column;align-items:center"><span class="cap">名額 ${r.count}/${r.capacity}</span><span class="need">${need}</span></span></span>
-    </button></li>`;
-  }
-
-  function nearby(ctx) {
-    var evs = ctx.state.events;
-    // same rule as the 狗聚 tab: 法定攻擊性犬種只會看到牽繩團 (events I host or joined always show)
-    var me = D.me();
-    var aggr = !!(me && App.dogs.isAggressive(me.dog && me.dog.breed));
-    var list = evs ? evs.filter(function (ev) {
-      var inv = D.isHost(ev) || (D.myStatus(ev) !== 'none' && D.myStatus(ev) !== 'left');
-      return inv || !aggr || ev.type === 'leash';
-    }) : evs;
-    var body;
-    if (!list) body = ui.loading();
-    else if (!list.length) body = html`<div class="mt-8">${ui.emptyState({ title: '附近還沒有狗聚', body: '揪一團，朋友點連結就能報名。', action: ui.secondaryBtn('我來揪', { go: 'Create_Event', block: false, icon: 'plus' }) })}</div>`;
-    else body = html`<ul class="ev-list mt-4">${list.slice(0, 6).map(eventRow)}</ul>`;
-    return html`
-      <section class="px mt-24" aria-labelledby="nearbyTitle">
-        ${ui.sectionHead('附近狗聚', ui.textBtn('我來揪', { icon: 'plus', iconSize: 16, go: 'Create_Event' }), { id: 'nearbyTitle' })}
-        ${body}
-        ${list && list.length > 6 ? ui.textBtn('看全部狗聚', { go: 'Event', icon: 'chevronRight', iconAfter: true }) : ''}
-        ${aggr ? html`<p class="note mt-8">${C.texts.aggressiveShort}</p>` : ''}
-      </section>`;
-  }
-
   function openCheckin(ctx) {
     var p = D.me() || {};
     var pv = p.privacy || {};
@@ -16641,7 +16595,6 @@ try {
         ${mapSection(ctx)}
         ${lostBanner(ctx)}
         ${fixedDay(ctx)}
-        ${nearby(ctx)}
         ${feedSection(ctx)}`;
     },
     actions: {
@@ -17274,9 +17227,10 @@ try {
 ;
 /* ---- screens/Profile.js ---- */
 try {
-/* Profile（我的・狗狗檔案）— dog card (real photo, edit / share), badges, received stickers, followed dogs (+ unread
-   DM dot), 私訊 row, 狗狗健康卡 row (+ dot for clinic uploads waiting), my events, 找回碼 (換手機用), and links to
-   今天需要空間 / 隱私 / 隱私說明 / 提醒 / 走失協尋 / 速查卡（狗語圖卡 2026-10-27 拿掉入口）. */
+/* Profile（我的・狗狗檔案）— dog card (real photo, edit / share), badges, received stickers, followed dogs,
+   狗狗健康卡 row (+ dot for clinic uploads waiting), 找回碼 (換手機用), and links to 今天需要空間 / 日記 / 隱私 /
+   隱私說明 / 提醒 / 走失協尋 / 速查卡. 2026-10-27（Willie：重複的都拿掉）: 私訊 and my events live in their own
+   tabs (訊息, 狗聚), so this screen no longer lists them; 狗語圖卡 has no entry. */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, C = App.content, dogs = App.dogs;
@@ -17313,7 +17267,6 @@ try {
       '.pf-rows .row-title{font-family:var(--font-head);font-size:17px;line-height:22px;font-weight:400}',
       '.pf-ring{position:relative;flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center}',
       '.pf-on{flex-shrink:0;height:24px;padding:0 10px;border-radius:12px;background:var(--teal-tint);color:var(--teal-ink);font-size:12px;line-height:24px;font-weight:700}',
-      '.pf-st{font-size:12px;line-height:16px;font-weight:700;color:var(--teal-ink);white-space:nowrap}',
       // photo picker on the dog card: the avatar itself is the button (a <label> around a hidden file input)
       '.photo-pick.pf-photo{flex-shrink:0;width:88px;height:88px;min-height:0;padding:0;border-radius:44px;background:transparent}',
       '.pf-photo .avatar{pointer-events:none}',
@@ -17376,61 +17329,14 @@ try {
     </section>`;
   }
 
-  function followBox(dmUnread, invites) {
+  function followBox() {
     var n = D.following().length;
-    var dot = dmUnread || invites > 0;
-    var sub = invites > 0 ? invites + ' 則私訊邀請待回覆' : n ? C.texts.followNote : '在名單或公園看板點狗狗，就能追蹤';
-    return html`<button type="button" class="pf-follow"${ui.go('DM_Invite')}${ui.attrs({ 'aria-label': '追蹤的狗友 ' + n + ' 隻' + (dmUnread ? '，有新私訊' : '') + (invites > 0 ? '，' + invites + ' 則私訊邀請待回覆' : '') + '，看狗友' })}>
-      <span class="pf-h" aria-hidden="true">追蹤的狗友${dot ? html`<span class="unread-dot"></span>` : ''}</span>
+    var sub = n ? C.texts.followNote : '在名單或公園看板點狗狗，就能追蹤';
+    return html`<button type="button" class="pf-follow"${ui.go('DM_Invite')}${ui.attrs({ 'aria-label': '追蹤的狗友 ' + n + ' 隻，看狗友' })}>
+      <span class="pf-h" aria-hidden="true">追蹤的狗友</span>
       <span class="num" aria-hidden="true">${n}</span>
       <span class="small mt-4" aria-hidden="true">${sub}</span>
     </button>`;
-  }
-
-  function statusLabel(ev) {
-    if (D.isHost(ev)) return '你是主揪';
-    var st = D.eventStatus(ev);
-    if (st === 'paused') return '颱風暫停';
-    var mine = D.myStatus(ev);
-    return mine === 'going' ? '已報名' : mine === 'waitlist' ? '候補中' : mine === 'pending' ? '等主揪核准' : mine === 'rest' ? '這次休息' : '';
-  }
-
-  function myEvents(ctx) {
-    var evs = ctx.state.myEvents;
-    var body;
-    if (evs === undefined) body = ui.loading();
-    else if (!evs.length) {
-      body = html`<div class="mt-8">${ui.emptyState({ title: '還沒有要去的狗聚', body: '在「狗聚」看附近的團，或自己揪一團。', action: ui.secondaryBtn('我來揪', { go: 'Create_Event', block: false, icon: 'plus' }) })}</div>`;
-    } else {
-      body = html`<ul class="ev-list mt-4">${evs.slice(0, 3).map(function (ev) {
-        return html`<li><button type="button" class="ev-row"${ui.go('Event', { id: ev.id })}>
-          ${ui.dateBlock(ev.startAt)}
-          <span class="row-main"><span class="h3">${ev.title}</span><span class="note">${ui.fmt.time(ev.startAt)}・${C.placeName(ev.place)}</span></span>
-          <span class="pf-st">${statusLabel(ev)}</span>
-        </button></li>`;
-      })}</ul>`;
-    }
-    return html`<section class="px mt-24" aria-labelledby="pf-events">
-      ${ui.sectionHead('我的狗聚', evs && evs.length > 3 ? ui.textBtn('看全部', { go: 'Event', icon: 'chevronRight', iconAfter: true }) : '', { id: 'pf-events' })}
-      ${body}
-    </section>`;
-  }
-
-  /** 訊息: always there (Willie 2026-10-27) — my DM conversations (cache-backed, no subscription), or how to start one. */
-  function dmRow() {
-    var list = D.dmThreads().filter(function (t) { return !D.isBlocked(t.otherId); });
-    if (!list.length) return ui.listRow({ icon: 'message', iconSize: 20, title: '訊息', sub: '跟狗友私訊：在狗狗名片按「想跟你家狗玩」，對方接受就能聊', go: 'DM_Invite' });
-    var fresh = list.filter(function (t) { return t.unread; });
-    // one conversation to open → straight into it; several → the 狗友 page (its rows carry the dots)
-    var target = fresh.length === 1 ? fresh[0] : (!fresh.length && list.length === 1 ? list[0] : null);
-    var sub = fresh.length === 1 ? D.dogName(fresh[0].otherId) + ' 傳了新訊息'
-      : fresh.length ? fresh.length + ' 個對話有新訊息'
-      : list.length + ' 個對話・' + ui.fmt.relative(list[0].lastMessageAt);
-    return ui.listRow({
-      icon: 'message', iconSize: 20, title: '訊息', sub: sub,
-      go: 'DM_Invite', params: target ? { chat: target.otherId } : null,
-      right: fresh.length ? ui.dot({ label: '有新私訊' }) : ''
-    });
   }
 
   /** 找回碼（換手機用）: real people only (not personas, not the claude.ai build). */
@@ -17495,7 +17401,6 @@ try {
 
     mount: function (ctx) {
       ctx.live('stickers', D.watchMyStickers, App.me.actorId);
-      ctx.live('myEvents', D.watchEvents, { when: 'upcoming', mine: true });
       ctx.state.code = undefined;   // undefined = loading, string = the code
       ctx.state.codeErr = false;
       ctx.state.photoBusy = false;
@@ -17515,8 +17420,6 @@ try {
       var spaceOn = D.spaceActive(dog);
       var spaceSub = spaceOn ? (dog.space && dog.space.mode === 'long' ? '開著・長期' : '開著・只限今天，半夜自動關') : '打開後頭像出現黃圈，不用寫原因';
       var hasPhoto = !!D.photoOf(p);
-      var dmUnread = D.unread().dmCount > 0;
-      var invites = D.unread().invites || 0;
       var healthInbox = ctx.state.health ? D.healthInbox(ctx.state.health).length : 0;
 
       var bell = html`<button type="button" class="iconbtn pf-bell"${ui.go('Reminders')}${ui.attrs({ 'aria-label': nRem ? '提醒中心，' + nRem + ' 則提醒' : '提醒中心，沒有新提醒' })}>${ui.icon('bell', { size: 22 })}${nRem ? html`<span class="cnt" aria-hidden="true">${nRem > 9 ? '9+' : nRem}</span>` : ''}</button>`;
@@ -17551,11 +17454,10 @@ try {
 
         <div class="pf-two px mt-24">
           ${stickerBox(ctx)}
-          ${followBox(dmUnread, invites)}
+          ${followBox()}
         </div>
 
         <ul class="list pf-rows px mt-24">
-          ${dmRow()}
           ${ui.listRow({ icon: 'hospital', iconSize: 20, title: C.health.entry, sub: healthInbox ? C.health.inbox.title + '（' + healthInbox + '）' : C.health.entrySub, go: 'Health_Card', right: healthInbox ? ui.dot({ label: C.health.inbox.title }) : '' })}
           ${ui.listRow({
             lead: html`<span class="pf-ring" aria-hidden="true">${ui.dogAvatar(p, { size: 36, ring: true, label: false })}</span>`,
@@ -17566,8 +17468,6 @@ try {
           ${ui.listRow({ icon: 'privacy', iconSize: 20, title: '我的隱私', sub: '打卡只顯示哪個公園，不露出住家', go: 'Privacy' })}
           ${ui.listRow({ icon: 'infoSmall', iconSize: 20, title: C.privacyNote.title, sub: '存了什麼、誰看得到、' + C.deleteMine.title, go: 'Privacy', params: { section: 'note' } })}
         </ul>
-
-        ${myEvents(ctx)}
 
         ${recoveryCard(ctx)}
 
@@ -18215,7 +18115,9 @@ try {
 /* ---- screens/Stamps.js ---- */
 try {
 /* Stamps（遛狗集章, tab 'stamps'）— my stamp card (live), simulated QR scan per shop, draws (prizes are 範例),
-   other stamps (請假章) and the shops not stamped yet. Sub-nav to 劃地盤 / 常客榜 / 狗聚日. */
+   other stamps (請假章) and the shops not stamped yet. 2026-10-27（Willie：重複的都拿掉）: no sub-nav any more —
+   劃地盤 has no entry (its drawn 3-park map does not match the real map), 常客榜 opens from a park on the map and
+   狗聚日 from the 固定狗聚日 card on the home page. */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, C = App.content;
@@ -18227,9 +18129,6 @@ try {
     if (document.getElementById('css-Stamps')) return;
     var s = document.createElement('style'); s.id = 'css-Stamps';
     s.textContent = [
-      '.stp-subnav{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}',
-      '.stp-subnav .stp-tab{min-height:44px;padding:0 14px;border:none;border-radius:22px;background:none;color:var(--muted);font-size:15px;font-weight:500;display:inline-flex;align-items:center}',
-      '.stp-subnav .stp-tab[aria-current="page"]{padding:0 16px;background:var(--teal-tint);color:var(--teal-ink);font-weight:700}',
       '.stp-card{padding:20px 16px}',
       '.stp-head{display:flex;align-items:center;gap:12px}',
       '.stp-head .grow{min-width:0}',
@@ -18436,12 +18335,6 @@ try {
       var p = D.me();
       return html`
         ${ui.appHead('遛狗集章', { right: html`<span class="note" style="white-space:nowrap">${C.mapArea}試辦（範例）</span>` })}
-        <nav class="stp-subnav px" aria-label="好玩的">
-          <span class="stp-tab" aria-current="page">集章</span>
-          <button type="button" class="stp-tab"${ui.go('Territory')}>劃地盤</button>
-          <button type="button" class="stp-tab"${ui.go('Park_Board', { park: C.parks[0] ? C.parks[0].id : '' })}>常客榜</button>
-          <button type="button" class="stp-tab"${ui.go('Theme_Day')}>狗聚日</button>
-        </nav>
         ${stampCard(ctx, p)}
         <div class="px mt-20">${ui.primaryBtn('掃 QR 蓋章', { act: 'scan', icon: 'qr' })}</div>
         <p class="note px mt-8" style="text-align:center">${T.lineScan}</p>
