@@ -866,9 +866,9 @@ button.row, a.row { cursor: pointer; }
 .dateblock .d { font-family: var(--font-head); font-size: 24px; line-height: 30px; color: var(--ink); }
 
 /* ---------- Bottom nav ---------- */
-.nav { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 430px; height: calc(var(--nav-h) + var(--safe-b)); padding-bottom: calc(4px + var(--safe-b)); border-top: 1px solid var(--hairline); background: var(--page); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); z-index: 20; }
+.nav { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 430px; height: calc(var(--nav-h) + var(--safe-b)); padding-bottom: calc(4px + var(--safe-b)); border-top: 1px solid var(--hairline); background: var(--page); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); z-index: 20; }
 .nav-item { border: none; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: 12px; line-height: 16px; font-weight: 500; }
-.nav-item .pill { width: 56px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+.nav-item .pill { width: 52px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
 .nav-item[aria-current="page"] { color: var(--teal-ink); font-weight: 700; }
 .nav-item[aria-current="page"] .pill { background: var(--teal-tint); }
 
@@ -1005,7 +1005,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-27.0d11f6b3","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-27.e8c6c9eb","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -9663,6 +9663,7 @@ window.APP_BUILD = {"version":"2026-10-27.0d11f6b3","seedUrl":"seed-data.json"};
   var TABS = [
     { id: 'map', screen: 'Main', label: '地圖', icon: 'navMap' },
     { id: 'events', screen: 'Event', label: '狗聚', icon: 'navEvents' },
+    { id: 'msgs', screen: 'Messages', label: '訊息', icon: 'message' },     // 2026-10-27: chats + DMs get their own tab
     { id: 'stamps', screen: 'Stamps', label: '集章', icon: 'navStamps' },
     { id: 'me', screen: 'Profile', label: '我的', icon: 'navMe' }
   ];
@@ -9858,11 +9859,11 @@ window.APP_BUILD = {"version":"2026-10-27.0d11f6b3","seedUrl":"seed-data.json"};
     if (!tab) { navEl.hidden = true; navEl.innerHTML = ''; return; }
     navEl.hidden = false;
     var ui = App.ui;
-    // unread dots: 狗聚 = a chat of an event I am in; 我的 = a DM conversation, an invite to answer, or files a clinic
-    // sent to the 狗狗健康卡 (App.data.unread)
+    // unread dots: 狗聚 = a chat of an event I am in; 訊息 = that too, or a DM conversation / an invite to answer;
+    // 我的 = files a clinic sent to the 狗狗健康卡 (App.data.unread)
     var u = App.data.unread ? App.data.unread() : {};
-    var dots = { events: u.eventCount > 0, me: u.dmCount > 0 || u.invites > 0 || u.healthInbox > 0 };
-    var onlyHealth = !(u.dmCount > 0 || u.invites > 0) && u.healthInbox > 0;
+    var dots = { events: u.eventCount > 0, msgs: u.eventCount > 0 || u.dmCount > 0 || u.invites > 0, me: u.healthInbox > 0 };
+    var onlyHealth = true;
     navEl.innerHTML = String(ui.join(TABS.map(function (t) {
       var d = !!dots[t.id];
       var why = t.id === 'me' && onlyHealth ? '（醫院傳來檔案）' : '（有新訊息）';
@@ -16663,6 +16664,62 @@ try {
 })(window.App);
 
 } catch (e) { console.error("[build] screens/Main.js failed to load", e); }
+;
+/* ---- screens/Messages.js ---- */
+try {
+/* Messages（訊息, a bottom tab since 2026-10-27）— the 狗聚 chat rooms I am in (signed up / waiting / host; only
+   signed-up dogs can talk there — the Chat screen enforces it) with unread dots, then DM invites waiting for me and
+   my DM conversations, and the way to my 狗友 list. */
+(function (App) {
+  'use strict';
+  var ui = App.ui, html = ui.html, D = App.data, fmt = ui.fmt;
+
+  function myChats(ctx) {
+    var me = App.me.actorId, t = D.now();
+    return (ctx.state.events || []).filter(function (ev) {
+      var st = D.myStatus(ev, me);
+      var mine = ev.hostId === me || ['going', 'waitlist', 'pending', 'rest'].indexOf(st) !== -1;
+      return mine && ev.status !== 'cancelled' && !D.chatState(ev, t).closed;
+    }).sort(function (a, b) { return (b.lastMessageAt || 0) - (a.lastMessageAt || 0) || a.startAt - b.startAt; });
+  }
+
+  App.register('Messages', {
+    title: '訊息',
+    tab: 'msgs',
+    mount: function (ctx) {
+      ctx.live('events', D.watchEvents);
+      ctx.live('reqs', D.watchDmRequests);
+    },
+    render: function (ctx) {
+      var u = D.unread(), chats = myChats(ctx);
+      var threads = D.dmThreads().filter(function (th) { return !D.isBlocked(th.otherId); });
+      var chatRows = chats.map(function (ev) {
+        var dot = !!u.events[ev.id];
+        return ui.listRow({ icon: 'chat', iconSize: 20, title: ev.title, sub: fmt.dayLabel(ev.startAt) + (ev.lastMessageAt ? '・最新 ' + fmt.relative(ev.lastMessageAt) : '・還沒有人說話'),
+          go: 'Chat', params: { id: ev.id }, right: dot ? ui.dot({ label: '有新訊息' }) : '' });
+      });
+      var dmRows = threads.map(function (th) {
+        return ui.listRow({ lead: html`<span aria-hidden="true">${ui.dogAvatar(D.person(th.otherId), { size: 40, label: false })}</span>`,
+          title: D.dogName(th.otherId), sub: th.lastMessageAt ? fmt.relative(th.lastMessageAt) : '', go: 'DM_Invite', params: { chat: th.otherId },
+          right: th.unread ? ui.dot({ label: '有新私訊' }) : '' });
+      });
+      return html`
+        ${ui.appHead('訊息', {})}
+        <section class="px mt-8" aria-labelledby="ms-chats">
+          <h2 class="h2" id="ms-chats">狗聚聊天室</h2>
+          ${chats.length ? html`<ul class="list mt-8">${chatRows}</ul>` : html`<p class="note mt-8">報名狗聚後，那一場的聊天室會在這裡。只有報名的狗可以在裡面聊，主揪的公告會釘在最上面。</p>`}
+        </section>
+        <section class="px mt-24" aria-labelledby="ms-dms">
+          <h2 class="h2" id="ms-dms">私訊</h2>
+          ${u.invites ? html`<ul class="list mt-8">${ui.listRow({ icon: 'message', iconSize: 20, title: u.invites + ' 則私訊邀請待回覆', go: 'DM_Invite', right: ui.dot({ label: '有私訊邀請' }) })}</ul>` : ''}
+          ${threads.length ? html`<ul class="list mt-8">${dmRows}</ul>` : html`<p class="note mt-8">在狗狗名片按「想跟你家狗玩」，對方接受就能私訊。</p>`}
+          <div class="mt-8">${ui.textBtn('看我的狗友', { go: 'DM_Invite', icon: 'chevronRight', iconAfter: true })}</div>
+        </section>`;
+    }
+  });
+})(window.App);
+
+} catch (e) { console.error("[build] screens/Messages.js failed to load", e); }
 ;
 /* ---- screens/Park_Board.js ---- */
 try {
