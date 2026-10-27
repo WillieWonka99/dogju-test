@@ -1005,7 +1005,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-27.70efc79c","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -4758,7 +4758,8 @@ window.APP_BUILD = {"version":"2026-10-27.70efc79c","seedUrl":"seed-data.json"};
       } else if (code === '42P01' || code === '42883' || code === 'PGRST202' || code === 'PGRST205' || code === 'PGRST106' || /does not exist|could not find the (table|function)/i.test(msg)) {
         e = dbError('not_configured', msg);
         e.userMessage = SB_SETUP_MSG;
-        setupProblem(msg);
+        // an OPTIONAL server function (newer than the SQL Willie pasted) is just not there yet: no banner
+        if (String(path || '').indexOf('rpc?:') !== 0) setupProblem(msg);
       } else if (code === '22P05' || /unicode|surrogate|\\u0000/i.test(msg)) {
         // jsonb refuses \u0000 and half an emoji (App.data cleans text; this is the backstop)
         e = dbError('invalid_argument', msg + ' (' + path + ')');
@@ -5403,8 +5404,9 @@ window.APP_BUILD = {"version":"2026-10-27.70efc79c","seedUrl":"seed-data.json"};
     }
     // ---------------------------------------------------------------- server functions (web/supabase.sql)
     /** rpc('claim_identity', {p_code}) etc. Resolves the function's result (data). */
-    function rpc(name, args) {
-      return run(function () { return sb.rpc(name, args || {}); }, 'rpc:' + name).then(function (r) { return r.data === undefined ? null : r.data; });
+    function rpc(name, args, opts) {
+      var path = (opts && opts.optional ? 'rpc?:' : 'rpc:') + name;
+      return run(function () { return sb.rpc(name, args || {}); }, path).then(function (r) { return r.data === undefined ? null : r.data; });
     }
 
     // ---------------------------------------------------------------- photos (Storage bucket 'photos', public read)
@@ -5764,10 +5766,12 @@ window.APP_BUILD = {"version":"2026-10-27.70efc79c","seedUrl":"seed-data.json"};
         'health_link_revoke' | 'health_revoke_all' | 'health_share_open' | 'health_upload_open' | 'health_upload_add' (SPEC §17.2).
         supabase: real RPC; mock: emulated (App.store._mockUid is the caller);
         claude: rejects not_configured. */
-    rpc: function (name, args) {
+    /** opts.optional: a function of a newer web/supabase.sql — when the database does not have it yet, the call rejects
+        (not_configured) WITHOUT the 「共用資料庫還沒設定好」 banner (the caller falls back). */
+    rpc: function (name, args, opts) {
       if (!backend || !backend.rpc) return Promise.reject(Object.assign(dbError('not_configured', 'no server functions in this backend'), { userMessage: '這個版本不支援這個功能' }));
       if (App.store.backend === 'mock') return backend.rpc(name, args, App.store._mockUid).catch(function (e) { throw handleError(e); });
-      return call(function () { return backend.rpc(name, args); });
+      return call(function () { return backend.rpc(name, args, opts); });
     },
     /** LINE (supabase only): open LINE to bind it ('link') or to sign in with it ('signin'); the page leaves. */
     oauthStart: function (kind, provider, redirectTo) {
@@ -7177,7 +7181,7 @@ window.APP_BUILD = {"version":"2026-10-27.70efc79c","seedUrl":"seed-data.json"};
       park_hidden_regulars). Mock / claude.ai: [] (every visit doc is readable there and regulars() marks them hidden). */
   function hiddenRegulars(parkId, days) {
     if (!ok(parkId) || S().backend !== 'supabase') return Promise.resolve([]);
-    return S().rpc('park_hidden_regulars', { p_park: parkId, p_days: days || 28 }).then(function (r) {
+    return S().rpc('park_hidden_regulars', { p_park: parkId, p_days: days || 28 }, { optional: true }).then(function (r) {
       return (Array.isArray(r) ? r : []).map(Number).filter(function (n) { return isFinite(n) && n >= 1; }).slice(0, 50);
     }, function (e) { console.warn('[data] hidden regulars', e && e.message); return []; });
   }
@@ -9956,7 +9960,7 @@ window.APP_BUILD = {"version":"2026-10-27.70efc79c","seedUrl":"seed-data.json"};
       }).then(function (sub) {
         var j = sub.toJSON ? sub.toJSON() : sub;
         if (!j || !j.endpoint || !j.keys) throw err(C.failed);
-        return App.store.rpc('push_subscribe', { p_endpoint: String(j.endpoint), p_p256dh: String(j.keys.p256dh || ''), p_auth: String(j.keys.auth || '') });
+        return App.store.rpc('push_subscribe', { p_endpoint: String(j.endpoint), p_p256dh: String(j.keys.p256dh || ''), p_auth: String(j.keys.auth || '') }, { optional: true });
       }).catch(function (x) {
         if (x && x.code === 'not_configured') throw err(C.notReady);
         throw x && x.userMessage ? x : err(C.failed);
@@ -9972,7 +9976,7 @@ window.APP_BUILD = {"version":"2026-10-27.70efc79c","seedUrl":"seed-data.json"};
         if (!sub) return false;
         var j = sub.toJSON ? sub.toJSON() : sub;
         if (!j || !j.endpoint || !j.keys) return false;
-        return App.store.rpc('push_subscribe', { p_endpoint: String(j.endpoint), p_p256dh: String(j.keys.p256dh || ''), p_auth: String(j.keys.auth || '') }).then(function () { return true; });
+        return App.store.rpc('push_subscribe', { p_endpoint: String(j.endpoint), p_p256dh: String(j.keys.p256dh || ''), p_auth: String(j.keys.auth || '') }, { optional: true }).then(function () { return true; });
       }).catch(function (e) { console.warn('[push] refresh', e && e.message); return false; });
     },
     /** Off on this phone (best effort: a failure here still removes the address on the server when it can). */
@@ -9981,7 +9985,7 @@ window.APP_BUILD = {"version":"2026-10-27.70efc79c","seedUrl":"seed-data.json"};
         if (!sub) return null;
         var endpoint = String((sub.toJSON ? sub.toJSON() : sub).endpoint || sub.endpoint || '');
         return Promise.resolve(sub.unsubscribe()).catch(function () { return null; }).then(function () {
-          return endpoint ? App.store.rpc('push_unsubscribe', { p_endpoint: endpoint }).catch(function (x) { if (x && x.code !== 'not_configured') throw x; }) : null;
+          return endpoint ? App.store.rpc('push_unsubscribe', { p_endpoint: endpoint }, { optional: true }).catch(function (x) { if (x && x.code !== 'not_configured') throw x; }) : null;
         });
       });
     }
