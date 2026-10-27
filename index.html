@@ -1005,7 +1005,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-27.cd8d88ed","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2350,6 +2350,8 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
     { id: 'yingfeng', name: '迎風狗公園', area: '台北市松山區', rule: '場地規定：未滿 6 個月、生病、發情的母狗不能入園', siteRule: true, riverside: true, pin: { x: 78.4, top: 60 }, lapKm: 1.4, lat: 25.07214, lng: 121.56538, osm: ['w/533280957', 'w/533280958'] },
     { id: 'youth', name: '青年公園', area: '台北市萬華區', rule: '公共場所要牽繩', pin: { x: 20.5, top: 168 }, lapKm: 1.4, lat: 25.02302, lng: 121.5055, osm: ['w/262721113'] }
   ];
+  // 公園即時狀況：大家順手回報的選項（最近 3 小時的才顯示，只顯示人數）
+  var PARK_STATUS = ['狗很多', '狗很少', '有大狗', '草地濕', '有水可以喝', '施工／關閉'];
   var PARKS_NOTE = '在地圖上點公園，或從下面選。'; // 選公園的清單上面那一句（我在公園、開團地點、家的範圍、劃地盤）
   var MAP_AREA = '台北市'; // 集章頁標題旁的「台北市試辦（範例）」（地圖本身是全台灣）
   PARKS.forEach(function (p) { p.legacy = true; });
@@ -2558,6 +2560,8 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
     heat: { tag: '今天下午', body: '怕熱體質建議改到清晨、傍晚或延期。一直喘、站不穩，先移到陰涼處，用涼的流動水沖身體。', link: { screen: 'First_Aid', params: { card: 'heat' }, label: '中暑先這樣做' }, icon: 'heat' },
     rain: { tag: '雨後 3 到 5 天', title: '別讓狗喝水坑的水', body: '回家洗腳擦乾。鉤端螺旋體會經積水傳染，人也會被傳染。打疫苗時，確認有含鉤端螺旋體。', icon: 'rain' },
     rabies: { body: '每年要補打，沒打可罰 3 萬到 15 萬元。', action: { act: 'rabiesDone', label: '我打過了' }, icon: 'alertCircle' },
+    deworm: { body: '體內驅蟲、體外除蚤照獸醫建議的間隔做，做完按「做好了」，下次到期前 3 天再提醒。', icon: 'tick' },
+    weigh: { body: '每月量一次，記在狗狗健康卡，比較看得出胖瘦變化。', icon: 'hospital' },
     tick: { tag: '每年 4 到 6 月', title: '壁蝨季：散步後摸一摸', body: '摸耳後和腳趾縫，看到壁蝨別硬拔。', icon: 'tick' }
   };
   var REMINDER_RULES = { rabiesDays: 30, tickMonths: [4, 5, 6] }; // remind 30 days before the rabies date; tick season months
@@ -2616,11 +2620,11 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
     title: '隱私說明',
     lead: '狗聚現在是試辦版，給朋友一起測試用。',
     sections: [
-      { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋。晶片號、家的範圍、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
+      { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
       { title: '誰看得到', body: '用狗聚的人都看得到狗狗名片、狗聚和聊天室；打卡照你的設定（狗友或公開）。上傳的照片，拿到網址的人都看得到。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
       { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位，位置只用來移動地圖，不會存起來。' },
       { title: '我出門遛狗', body: '按「我出門遛狗」才會用一次手機定位，不會一直追蹤。在公園裡就打卡在那座公園；在外面，別人只看到你大約在哪個 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。不存精確位置，也不送給任何人。家的位置只有你知道，存在你自己的資料裡。' },
-      { title: '還是測試', body: '試辦版的保護還不完整，懂技術的人可能讀得到、甚至改得到共用的資料（狗聚、聊天、協尋）；「只給狗友看」的打卡和散步的範圍，也只是在畫面上藏起來，懂技術的人還是讀得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
+      { title: '還是測試', body: '試辦版的保護還不完整，懂技術的人可能讀得到、甚至改得到共用的資料（狗聚、聊天、協尋）；「只給狗友看」的打卡、散步的範圍和狗狗日記，也只是在畫面上藏起來，懂技術的人還是讀得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
       { title: '沒有帳號', body: '不用註冊。你的身分記在這支手機的瀏覽器裡，清除瀏覽器資料、換手機、或從主畫面打開（iPhone），都會變成新的人。要變回同一隻狗，用「我的」裡的找回碼。' },
       { title: '回報問題', body: '按「回報問題」送出時，會一起附上你是哪隻狗、畫面名稱、App 版本、手機和瀏覽器的種類、時間，方便找出問題。私訊頁的「檢舉」也會用回報問題送給開這個 App 的人。' },
       { title: '怎麼刪掉', body: '「我的」→「隱私說明」→「刪除我的資料」。刪掉後，下次打開會變成新的人。' }
@@ -3063,7 +3067,7 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
     dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, neuter: NEUTER, ie: IE, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, aggressiveShort: TEXTS.aggressiveShort },
     privacyNote: PRIVACY_NOTE, recovery: RECOVERY, feedback: FEEDBACK, deleteMine: DELETE_MINE, updateBanner: UPDATE_BANNER, photo: PHOTO, firstRun: FIRST_RUN,
     freePlan: FREE_PLAN, health: HEALTH,
-    map: MAP,
+    map: MAP, parkStatus: PARK_STATUS,
     /** A park by id: the three legacy parks, then the shared registry (parks/<id>, installed by core/data.js). null = unknown. */
     park: function (id) { return PARKS.filter(function (p) { return p.id === id; })[0] || (registry && registry(id)) || null; },
     /** Legacy parks first, then registry parks by name. */
@@ -3455,7 +3459,19 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
     });
   }
 
-  App.parkPick = { rows: rows, open: open, ordered: ordered };
+  /** 公園即時狀況 chips (data-act="pstat" data-tag): counts of the last 3 hours, mine pressed. st: {counts, mine} */
+  function statusChips(st) {
+    st = st || { counts: {}, mine: [] };
+    return html`<div class="park-status mt-12" role="group" aria-label="公園現在怎麼樣">
+      <div class="h3">現在怎麼樣？<span class="note">（大家最近 3 小時的回報）</span></div>
+      <div class="chips mt-8">${C.parkStatus.map(function (tag) {
+        var n = st.counts[tag] || 0;
+        return ui.chip(tag + (n ? '・' + n : ''), { pressed: st.mine.indexOf(tag) !== -1, act: 'pstat', data: { tag: tag }, check: false });
+      })}</div>
+    </div>`;
+  }
+
+  App.parkPick = { rows: rows, open: open, ordered: ordered, statusChips: statusChips };
 })(window.App = window.App || {});
 
 ;
@@ -3756,8 +3772,8 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
   function ageText(dog, t) {
     var m = dog && typeof dog.birth === 'string' && dog.birth.match(BIRTH_RE);
     if (m) {
-      var now = new Date(t == null ? Date.now() : t);
-      var months = (now.getFullYear() - Number(m[1])) * 12 + (now.getMonth() + 1 - Number(m[2]));
+      var tw = App.ui.fmt.tw(t == null ? Date.now() : t); // Taiwan time, whatever the phone's zone (SPEC §8)
+      var months = (tw.y - Number(m[1])) * 12 + (tw.m - Number(m[2]));
       if (months >= 12) return Math.floor(months / 12) + ' 歲';
       if (months >= 1) return months + ' 個月';
       if (months === 0) return '未滿 1 個月';
@@ -6016,8 +6032,8 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
       if (src.birth !== undefined) {
         d.birth = src.birth ? String(src.birth) : null;
         if (d.birth) {
-          var bm = d.birth.match(App.dogs.birthRe), nowD = new Date(now());
-          need(bm && Number(bm[1]) >= 1990 && (Number(bm[1]) * 12 + Number(bm[2])) <= (nowD.getFullYear() * 12 + nowD.getMonth() + 1), '出生年月不對');
+          var bm = d.birth.match(App.dogs.birthRe), tw = fmt().tw(now());
+          need(bm && Number(bm[1]) >= 1990 && (Number(bm[1]) * 12 + Number(bm[2])) <= (tw.y * 12 + tw.m), '出生年月不能是以後的月份');
         }
       }
       if (src.neutered !== undefined) d.neutered = own(C.dogs.neuter, src.neutered) ? src.neutered : null;
@@ -7280,6 +7296,146 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
     }).then(function () { return prune(col, !!opts.full); });
   }
 
+  // ===================================================================== 狗狗日記 (diary)
+  // diary/<id> = {by, text, photos:[{url, path, thumb, thumbPath, w, h}], audience, at, likes:{<id>:true|null},
+  // commentCount, lastCommentAt}; comments in diary/<id>/comments. Friend-only posts are hidden on screen (the shared
+  // docs are readable by everyone signed in — the privacy note says so).
+  var DIARY_MAX_PHOTOS = 3, DIARY_MAX_TEXT = 500, DIARY_MAX_COMMENT = 300;
+  function diaryRef(id) { return S().doc('diary/' + needId(id, '找不到這篇日記')); }
+  function diaryComments(id) { return S().collection('diary/' + needId(id, '找不到這篇日記') + '/comments'); }
+  function makeDiaryPhoto(file) {
+    checkPhotoFile(file, 'diary');
+    return App.ui.resizeImage(file, photoSizes('diary')).then(function (big) {
+      if (S().photoMode() !== 'storage') return uploadResized(big, 'diary', '').then(function (r) { return { url: r.url, path: null, thumb: null, w: r.w, h: r.h }; });
+      return App.ui.resizeImage(big.blob, photoSizes('thumb')).then(function (small) {
+        return Promise.all([uploadResized(big, 'diary', ''), uploadResized(small, 'diary', '_s')]);
+      }).then(function (r) { return { url: r[0].url, path: r[0].path, thumb: r[1].url, thumbPath: r[1].path, w: r[0].w, h: r[0].h }; });
+    });
+  }
+  /** A post as screens see it (null when unusable or hidden from the viewer). */
+  function normDiary(d, viewer) {
+    if (!d || d.deleted || typeof d.by !== 'string' || !ok(d.by) || isHiddenId(d.by)) return null;
+    viewer = viewer || actor();
+    if (blockedEither(d.by, viewer)) return null;
+    var audience = d.audience === 'public' ? 'public' : 'friends';
+    if (!(d.by === viewer || audience === 'public' || isFriend(d.by, viewer))) return null;
+    var likes = isMap(d.likes) ? truthyKeys(d.likes) : [];
+    var photos = (Array.isArray(d.photos) ? d.photos : []).slice(0, DIARY_MAX_PHOTOS).map(function (ph) {
+      var r = photoRef(ph); return r ? { url: r.url, thumb: S().photoUrlOk(ph.thumb) ? ph.thumb : r.url, w: r.w, h: r.h } : null;
+    }).filter(Boolean);
+    return { id: d.id, by: d.by, text: typeof d.text === 'string' ? d.text.slice(0, DIARY_MAX_TEXT) : '', photos: photos, audience: audience,
+      at: num(d.at) || 0, woofs: likes.length, woofedByMe: likes.indexOf(viewer) !== -1, comments: Math.max(0, num(d.commentCount) || 0) };
+  }
+  function canSeeDiary(d, viewer) { return !!normDiary(d, viewer); }
+  /** a blocked b, or b blocked a */
+  function blockedEither(a, b) { return a !== b && (isBlocked(a, b) || isBlocked(b, a)); }
+  /** Write a post. input {text, files:[File…≤3], audience:'friends'|'public'} → id */
+  function createDiary(input) {
+    input = input || {};
+    var who = actor();
+    need(person(who), '先建立狗狗名片');
+    var raw = typeof input.text === 'string' ? input.text.trim() : '';
+    need(raw.length <= DIARY_MAX_TEXT, '日記最多 ' + DIARY_MAX_TEXT + ' 字');
+    var text = str(raw, DIARY_MAX_TEXT);
+    var files = Array.isArray(input.files) ? input.files.filter(Boolean) : [];
+    need(files.length <= DIARY_MAX_PHOTOS, '一篇最多 ' + DIARY_MAX_PHOTOS + ' 張照片');
+    need(text || files.length, '寫點字或放張照片');
+    var id = newId('d');
+    return Promise.all(files.map(makeDiaryPhoto)).then(function (photos) {
+      return diaryRef(id).set({ by: who, text: text, photos: photos, audience: input.audience === 'public' ? 'public' : 'friends', at: now(), likes: {}, commentCount: 0, lastCommentAt: null });
+    }).then(function () { return id; });
+  }
+  /** cb(posts of dogId the viewer may see, newest first) */
+  function watchDiary(dogId, cb) {
+    if (!ok(dogId)) return badWatch(cb, []);
+    var last = [];
+    function deliver() { cb(last.map(function (d) { return normDiary(d); }).filter(Boolean).sort(function (a, b) { return b.at - a.at; })); }
+    var unsub = S().collection('diary').where('by', '==', dogId).onSnapshot(function (qs) { last = listOf(qs); deliver(); }, function () { cb([]); });
+    var off = onChange(function (k) { if (k === 'follows' || k === 'people') deliver(); });
+    return function () { unsub(); off(); };
+  }
+  /** cb(post | null) */
+  function watchDiaryPost(id, cb) {
+    if (!ok(id)) return badWatch(cb, null);
+    var last = null;
+    function deliver() { cb(last ? normDiary(last) : null); }
+    var unsub = diaryRef(id).onSnapshot(function (s) { last = docData(s); deliver(); }, function () { cb(null); });
+    var off = onChange(function (k) { if (k === 'follows') deliver(); });
+    return function () { unsub(); off(); };
+  }
+  /** cb([{id, by, text, at}] oldest first) */
+  function watchDiaryComments(id, cb) {
+    if (!ok(id)) return badWatch(cb, []);
+    var last = [];
+    function deliver() {
+      var me = actor();
+      cb(last.filter(function (c) { return typeof c.by === 'string' && typeof c.text === 'string' && !isHiddenId(c.by) && !blockedEither(c.by, me); })
+        .map(function (c) { return { id: c.id, by: c.by, text: c.text.slice(0, DIARY_MAX_COMMENT), at: num(c.at) || 0 }; }).sort(function (a, b) { return a.at - b.at; }));
+    }
+    var unsub = diaryComments(id).onSnapshot(function (qs) { last = listOf(qs); deliver(); }, function () { cb([]); });
+    var off = onChange(function (k) { if (k === 'follows') deliver(); });
+    return function () { unsub(); off(); };
+  }
+  function seenPost(id) {
+    return diaryRef(id).get().then(function (s) {
+      var d = docData(s);
+      need(d && canSeeDiary(d), '找不到這篇日記');
+      return d;
+    });
+  }
+  /** 🐾 汪 on / off */
+  function toggleWoof(id) {
+    var who = actor();
+    return seenPost(id).then(function (d) {
+      var on = !(isMap(d.likes) && d.likes[who]);
+      return diaryRef(id).update({ likes: obj(who, on ? true : null) }).then(function () { return on; });
+    });
+  }
+  function addDiaryComment(id, text) {
+    var who = actor();
+    need(person(who), '先建立狗狗名片');
+    var raw = typeof text === 'string' ? text.trim() : '';
+    need(raw, '先打點字');
+    need(raw.length <= DIARY_MAX_COMMENT, '留言最多 ' + DIARY_MAX_COMMENT + ' 字');
+    return seenPost(id).then(function () {
+      var t = msgTime();
+      // commenters: lets 刪除我的資料 find my comments without reading every post's comments
+      return diaryComments(id).add({ by: who, text: str(raw, DIARY_MAX_COMMENT), at: t }).then(function () {
+        return diaryRef(id).update({ commenters: obj(who, true) });
+      }).then(function () { return recountComments(id, t); });
+    });
+  }
+  function recountComments(id, t) {
+    return diaryComments(id).get().then(function (qs) { return diaryRef(id).update({ commentCount: qs.docs.length, lastCommentAt: t || now() }); });
+  }
+  /** My comment, or any comment on my post. */
+  function deleteDiaryComment(id, cid) {
+    var who = actor();
+    needId(cid, '找不到這則留言');
+    return Promise.all([diaryRef(id).get(), S().doc('diary/' + id + '/comments/' + cid).get()]).then(function (r) {
+      var post = docData(r[0]), c = docData(r[1]);
+      need(post && c, '找不到這則留言');
+      need(c.by === who || post.by === who, '只能刪自己的留言');
+      return S().doc('diary/' + id + '/comments/' + cid).delete();
+    }).then(function () { return recountComments(id); });
+  }
+  /** My post: its comments, the post, its picture files. */
+  function deleteDiary(id) {
+    var who = actor();
+    return diaryRef(id).get().then(function (s) {
+      var d = docData(s);
+      need(d && d.by === who, '只能刪自己的日記');
+      // 「刪除中」 first: nobody can see or comment on it while its comments go (no orphan comments)
+      return diaryRef(id).update({ deleted: true }).then(function () { return diaryComments(id).get(); }).then(function (qs) {
+        return paced(qs.docs, function (c) { return S().doc('diary/' + id + '/comments/' + c.id).delete(); });
+      }).then(function () { return diaryRef(id).delete(); }).then(function () {
+        var paths = [];
+        (Array.isArray(d.photos) ? d.photos : []).forEach(function (ph) { if (ph) paths.push(ph.path, ph.thumbPath); });
+        return dropPhotoFiles(paths);
+      });
+    });
+  }
+
   // ===================================================================== lost dogs (走失協尋)
   function lostRef(id) { return S().doc('lost/' + needId(id, '找不到這則協尋')); }
   /** Shared docs can be written by anyone: safe shapes for a lost post (null if unusable). */
@@ -7387,6 +7543,58 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
     var m = (fmt().tw(t) || {}).m;  // Taiwan month
     var tickMonths = (C.reminderRules && C.reminderRules.tickMonths) || [4, 5, 6];
     if (tickMonths.indexOf(m) !== -1 || sim.tickSeason) out.push(Object.assign({ id: 'tick' }, R.tick));
+    if (p && p.id === actor()) out = out.concat(careReminders(dog, t));
+    return out;
+  }
+  // ---- 照顧提醒 (private: data/users/<id>/private.care = {deworm:{last, months}, weigh, weighedAt})
+  var careCache = {}, careLoading = {};
+  function cleanCare(c) {
+    c = isMap(c) ? c : {};
+    var dw = isMap(c.deworm) && DATE_KEY_RE.test(String(c.deworm.last)) ? { last: String(c.deworm.last), months: Number(c.deworm.months) === 3 ? 3 : 1 } : null;
+    return { deworm: dw, weigh: !!c.weigh, weighedAt: DATE_KEY_RE.test(String(c.weighedAt)) ? String(c.weighedAt) : null };
+  }
+  function myCare() {
+    var who = actor();
+    if (!own(careCache, who) && !careLoading[who]) {
+      careLoading[who] = true;
+      getPrivate(who).then(function (p) { careCache[who] = cleanCare(p && p.care); emit('people'); }, function () { careLoading[who] = false; });
+    }
+    return careCache[who] || null;
+  }
+  /** Merge into my care settings: {deworm:{last, months}|null, weigh:bool, weighedAt}. */
+  function setCare(patch) {
+    var who = actor();
+    need(person(who), '先建立狗狗名片');
+    patch = isMap(patch) ? patch : {};
+    if (patch.deworm) need(DATE_KEY_RE.test(String(patch.deworm.last)) && fmt().daysUntil(String(patch.deworm.last), now()) <= 0, '上次驅蟲的日期不對');
+    return getPrivate(who).then(function (p) {
+      var next = cleanCare(Object.assign({}, cleanCare(p && p.care), patch));
+      return setPrivate({ care: next }, who).then(function () { careCache[who] = next; emit('people'); return next; });
+    });
+  }
+  /** 做好了 / 量好了: today. */
+  function careDone(kind) {
+    var today = fmt().dateKey(now()), c = myCare() || cleanCare(null);
+    if (kind === 'deworm') { need(c.deworm, '還沒設定驅蟲提醒'); return setCare({ deworm: { last: today, months: c.deworm.months } }); }
+    need(kind === 'weigh', '沒有這個提醒');
+    return setCare({ weighedAt: today });
+  }
+  function addMonthsKey(key, n) {
+    var p = String(key).split('-').map(Number);
+    var d = new Date(Date.UTC(p[0], p[1] - 1 + n, 1));
+    var last = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate(); // 1/31 + 1 month → 2/28
+    return d.getUTCFullYear() + '-' + ('0' + (d.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + Math.min(p[2], last)).slice(-2);
+  }
+  function careReminders(dog, t) {
+    var c = myCare(), out = [], R = REMINDER_TEXT, name = (dog && dog.name) || '狗狗'; // loads once, then re-renders
+    if (!c) return out;
+    if (c.deworm) {
+      var days = fmt().daysUntil(addMonthsKey(c.deworm.last, c.deworm.months), t);
+      if (days <= 3) out.push(Object.assign({ id: 'deworm', title: name + '的驅蟲／除蚤', tag: days < 0 ? '已經過期' : days === 0 ? '今天到期' : days + ' 天後到期', action: { act: 'careDone', kind: 'deworm', label: '做好了' } }, R.deworm));
+    }
+    if (c.weigh && (!c.weighedAt || fmt().daysUntil(fmt().addDays(c.weighedAt, 30), t) <= 0)) {
+      out.push(Object.assign({ id: 'weigh', title: '量一下' + name + '的體重', tag: c.weighedAt ? '上次 ' + c.weighedAt.replace(/-/g, '/') : '還沒量過', action: { act: 'careDone', kind: 'weigh', label: '量好了' } }, R.weigh));
+    }
     return out;
   }
   /** Activity of dogs I follow: [{kind:'checkin'|'event', id, parkId?, eventId?, at}] newest first. */
@@ -7396,6 +7604,93 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
     var out = [];
     (checkins || []).forEach(function (c) { if (f.indexOf(c.id) !== -1 && c.visible && c.parkId) out.push({ kind: 'checkin', id: c.id, parkId: c.parkId, at: c.at }); });
     (events || []).forEach(function (ev) { if (f.indexOf(ev.hostId) !== -1 && ev.createdAt > t - 7 * 24 * HOUR) out.push({ kind: 'event', id: ev.hostId, eventId: ev.id, at: ev.createdAt }); });
+    return out.sort(function (a, b) { return b.at - a.at; });
+  }
+
+  // ===================================================================== 公園即時狀況
+  // parkStatus/<parkId>/reports/<random id> = {tags:[…], at}: NO actor id — only counts are ever shown. Which report
+  // is mine is kept in my private doc (pstat: {<parkId>: {rid, tags, at}}). Only the last 3 hours count.
+  var STATUS_HOURS = 3;
+  var pstatCache = {}, pstatLoading = {}, pstatChain = {};
+  function myPstat() {
+    var who = actor();
+    if (!own(pstatCache, who) && !pstatLoading[who]) {
+      pstatLoading[who] = true;
+      getPrivate(who).then(function (p) { pstatCache[who] = isMap(p && p.pstat) ? p.pstat : {}; emit('people'); }, function () { pstatLoading[who] = false; });
+    }
+    return pstatCache[who] || {};
+  }
+  function freshReport(r, t) { return isMap(r) && num(r.at) > t - STATUS_HOURS * HOUR && Array.isArray(r.tags); }
+  /** cb({counts:{tag:n}, mine:[tags]}) for a park; re-delivered every minute (reports fade after 3 h). */
+  function watchParkStatus(parkId, cb) {
+    if (!ok(parkId)) return badWatch(cb, { counts: {}, mine: [] });
+    var last = [];
+    function deliver() {
+      var t = now(), counts = {}, m = myPstat()[parkId];
+      last.forEach(function (r) { if (freshReport(r, t)) r.tags.forEach(function (tag) { if (C.parkStatus.indexOf(tag) !== -1) counts[tag] = (counts[tag] || 0) + 1; }); });
+      var mine = m && freshReport(m, t) && last.some(function (r) { return r.id === m.rid; }) ? m.tags.filter(function (tag) { return C.parkStatus.indexOf(tag) !== -1; }) : [];
+      cb({ counts: counts, mine: mine });
+    }
+    var unsub = S().collection('parkStatus/' + parkId + '/reports').onSnapshot(function (qs) { last = listOf(qs); deliver(); }, function () { cb({ counts: {}, mine: [] }); });
+    var off = onChange(function (k) { if (k === 'tick' || k === 'people') deliver(); });
+    return function () { unsub(); off(); };
+  }
+  /** Toggle one of my tags for a park. My taps on one park run one after the other (no lost tag). */
+  function reportParkStatus(parkId, tag) {
+    var who = actor();
+    need(person(who), '先建立狗狗名片');
+    needId(parkId, '找不到這個公園');
+    need(C.parkStatus.indexOf(tag) !== -1, '沒有這個選項');
+    var key = who + '|' + parkId;
+    var run = (pstatChain[key] || Promise.resolve()).catch(function () { return null; }).then(function () { return doReport(who, parkId, tag); });
+    pstatChain[key] = run;
+    return run;
+  }
+  function doReport(who, parkId, tag) {
+    var col = 'parkStatus/' + parkId + '/reports', t = now();
+    return Promise.all([getPrivate(who), S().collection(col).get()]).then(function (res) {
+      var pv = res[0] || {}, docs = res[1].docs;
+      var m = isMap(pv.pstat) && isMap(pv.pstat[parkId]) ? pv.pstat[parkId] : null;
+      var live = m && freshReport(m, t) && docs.some(function (d) { return d.id === m.rid; }) ? m : null;
+      var tags = live ? live.tags.slice() : [];
+      var i = tags.indexOf(tag);
+      if (i === -1) tags.push(tag); else tags.splice(i, 1);
+      var rid = live ? live.rid : newId('r');
+      var jobs = [];
+      // old reports (anyone's — they carry no name) are cleared on the way
+      docs.forEach(function (d) { if (d.id !== rid && !freshReport(d.data(), t)) jobs.push(S().doc(col + '/' + d.id).delete()); });
+      if (m && !live && ok(m.rid)) jobs.push(S().doc(col + '/' + m.rid).delete().catch(function () { return null; }));
+      jobs.push(tags.length ? S().doc(col + '/' + rid).set({ tags: tags, at: t }) : S().doc(col + '/' + rid).delete());
+      var entry = tags.length ? { rid: rid, tags: tags, at: t } : null;
+      jobs.push(setPrivate({ pstat: obj(parkId, entry) }, who).then(function () {
+        var c = Object.assign({}, pstatCache[who] || {}); c[parkId] = entry; pstatCache[who] = c; emit('people');
+      }));
+      return Promise.all(jobs);
+    });
+  }
+
+  /** cb(diary posts of the dogs I follow that I may see, last 7 days, newest first) — the 狗友動態 list. */
+  function watchFollowDiary(cb) {
+    var last = [];
+    function deliver() {
+      var f = following(), from = now() - 7 * 24 * HOUR;
+      cb(last.filter(function (d) { return f.indexOf(d.by) !== -1 && num(d.at) > from; }).map(function (d) { return normDiary(d); }).filter(Boolean)
+        .sort(function (a, b) { return b.at - a.at; }));
+    }
+    var unsub = S().collection('diary').onSnapshot(function (qs) { last = listOf(qs); deliver(); }, function () { cb([]); });
+    var off = onChange(function (k) { if (k === 'follows' || k === 'people') deliver(); });
+    return function () { unsub(); off(); };
+  }
+  /** 狗友動態: what the dogs I follow did (I may see): park check-ins, walks (never the cell), events they host
+      (7 days), diary posts — [{kind:'checkin'|'walk'|'event'|'diary', id, at, parkId?, area?, eventId?, post?}] newest first. */
+  function feedItems(checkins, events, posts, t) {
+    t = t == null ? now() : t;
+    var f = following();
+    var out = followActivity(checkins, events, t);
+    (checkins || []).forEach(function (c) {
+      if (c.kind === 'walk' && f.indexOf(c.id) !== -1 && c.visible) out.push({ kind: 'walk', id: c.id, at: c.at, area: c.r > 100 ? (c.area || '') : '' });
+    });
+    (posts || []).forEach(function (p) { out.push({ kind: 'diary', id: p.by, at: p.at, post: p }); });
     return out.sort(function (a, b) { return b.at - a.at; });
   }
 
@@ -7435,10 +7730,12 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
      local mock / claude → a small data: URL kept inside the document itself.
      A photo reference in a doc is {url, path (storage path or null), w, h}; a dog photo also has {thumb, thumbPath, at}.
      Shared docs can hold anything, so every URL is checked (App.store.photoUrlOk) before it is shown. */
-  var PHOTO_KINDS = ['dog', 'chat', 'dm', 'lost'];
+  var PHOTO_KINDS = ['dog', 'chat', 'dm', 'lost', 'diary'];
   function photoSizes(kind) {
     var inline = S().photoMode() !== 'storage'; // inline: the picture lives in the doc (256 KiB limit)
     if (kind === 'thumb') return inline ? { max: 160, quality: 0.7, square: true } : { max: 256, quality: 0.8, square: true };
+    // a diary post carries up to 3 pictures in one doc: inline mode keeps them small enough for the 256 KiB limit
+    if (kind === 'diary' && inline) return { max: 360, quality: 0.6, maxBytes: 55 * 1024 };
     return inline ? { max: 480, quality: 0.6, maxBytes: 90 * 1024 } : { max: 1024, quality: 0.82, maxBytes: 260 * 1024 };
   }
   function num(v) { return typeof v === 'number' && isFinite(v) ? v : null; }
@@ -8595,6 +8892,33 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
         if (isMap(d.sightings) && own(d.sightings, self) != null) return S().doc('lost/' + l.id).update({ sightings: obj(self, null) });
         return null;
       }));
+      // 公園即時狀況: my (nameless) reports, found through my private doc
+      jobs.push(getPrivate(self).then(function (pv) {
+        var ps = isMap(pv && pv.pstat) ? pv.pstat : {};
+        return each(Object.keys(ps), function (parkId) {
+          var m = ps[parkId];
+          return ok(parkId) && isMap(m) && ok(m.rid) ? S().doc('parkStatus/' + parkId + '/reports/' + m.rid).delete() : null;
+        });
+      }));
+      // 狗狗日記: my posts (with their comments); my comments and 汪 on other dogs' posts
+      jobs.push(getAll('diary').then(function (posts) {
+        return each(posts, function (pst) {
+          var d = pst.data || {};
+          var mayHaveMine = d.by === self || !isMap(d.commenters) || own(d.commenters, self) != null;
+          if (!mayHaveMine) return isMap(d.likes) && own(d.likes, self) != null ? S().doc('diary/' + pst.id).update({ likes: obj(self, null) }) : null;
+          return diaryComments(pst.id).get().then(function (qs) {
+            var dels = qs.docs.filter(function (c) { return d.by === self || c.data().by === self; });
+            return paced(dels, function (c) { return S().doc('diary/' + pst.id + '/comments/' + c.id).delete(); }).then(function () {
+              if (d.by === self) return S().doc('diary/' + pst.id).delete();
+              var patch = {};
+              if (dels.length) { patch.commentCount = qs.docs.length - dels.length; }
+              if (isMap(d.commenters) && own(d.commenters, self) != null) patch.commenters = obj(self, null);
+              if (isMap(d.likes) && own(d.likes, self) != null) patch.likes = obj(self, null);
+              return Object.keys(patch).length ? S().doc('diary/' + pst.id).update(patch) : null;
+            });
+          });
+        });
+      }));
       jobs.push(each(r[4].filter(function (m) { return isMap(m.data.going) && own(m.data.going, self) != null; }), function (m) {
         return S().doc('meetups/' + m.id).update({ going: obj(self, null) });
       }));
@@ -8617,7 +8941,7 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
       // recovery code, links, claim attempts, every health-card link (server; the mock emulates it)
       return S().backend === 'claude' ? null : S().rpc('forget_me').catch(function (e) { if (e && e.code !== 'not_configured') throw e; });
     }).then(function () {
-      memPrivate = {}; homeCache = {}; homeLoading = {}; homeAtCache = {}; memReads = {}; recP = {}; hUrls = {}; uploadOpen = {};
+      memPrivate = {}; homeCache = {}; homeLoading = {}; homeAtCache = {}; careCache = {}; careLoading = {}; pstatCache = {}; pstatLoading = {}; memReads = {}; recP = {}; hUrls = {}; uploadOpen = {};
       return App.me.signOutAndReload(C.deleteMine.done);
     });
   }
@@ -8865,6 +9189,8 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
   openHealthShare = safe(openHealthShare);
   openHealthUpload = safe(openHealthUpload);
   sendHealthUpload = safe(sendHealthUpload);
+  reportParkStatus = safe(reportParkStatus); setCare = safe(setCare); careDone = safe(careDone); createDiary = safe(createDiary); toggleWoof = safe(toggleWoof); addDiaryComment = safe(addDiaryComment);
+  deleteDiaryComment = safe(deleteDiaryComment); deleteDiary = safe(deleteDiary);
 
   App.data = {
     init: init, onChange: onChange, now: now,
@@ -8887,6 +9213,10 @@ window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
     sendStickers: sendStickers, withdrawStickers: withdrawStickers, watchEventStickers: watchEventStickers, watchMyStickers: watchMyStickers,
     sendReport: sendReport, watchReports: watchReports, setPlayAgain: setPlayAgain, getPlayAgain: getPlayAgain,
     // check-ins & visits
+    myCare: myCare, setCare: setCare, careDone: careDone,
+    watchParkStatus: watchParkStatus, reportParkStatus: reportParkStatus,
+    createDiary: createDiary, watchFollowDiary: watchFollowDiary, feedItems: feedItems, watchDiary: watchDiary, watchDiaryPost: watchDiaryPost, watchDiaryComments: watchDiaryComments,
+    toggleWoof: toggleWoof, addDiaryComment: addDiaryComment, deleteDiaryComment: deleteDiaryComment, deleteDiary: deleteDiary,
     ensurePark: ensurePark, cleanParkName: cleanParkName, cellOf: cellOf, distM: distM, walkCheckIn: walkCheckIn, notePark: notePark, parkShared: parkShared, myHomeParkInfo: myHomeParkInfo, myHomeAt: myHomeAt,
     checkIn: checkIn, checkOut: checkOut, reapplyCheckinPrivacy: reapplyCheckinPrivacy, watchCheckins: watchCheckins, presence: presence, canSeeCheckin: canSeeCheckin,
     watchVisits: watchVisits, getVisits: getVisits, regulars: regulars, favoritePark: favoritePark,
@@ -11636,6 +11966,7 @@ try {
         ${space ? html`<p class="note mt-12">${C.texts.yellowLegend}</p>` : ''}
         ${self ? html`<div class="mt-16">${ui.infoPanel({ icon: 'paw', title: '這是你家的狗', body: '別人點你的狗，會看到這張名片。', action: ui.textBtn('看狗狗檔案', { go: 'Profile', icon: 'chevronRight', iconAfter: true }) })}</div>` :
           html`${inviteBlock(ctx, id)}${followRow(id)}`}
+        <div class="mt-12">${ui.textBtn(self ? '看我的日記' : '看日記', { go: 'Diary', params: { id: id }, icon: 'chevronRight', iconAfter: true })}</div>
       </section>
       ${self ? '' : consentNote()}
       ${inbox(ctx, id)}
@@ -11997,6 +12328,214 @@ try {
 })(window.App);
 
 } catch (e) { console.error("[build] screens/DM_Invite.js failed to load", e); }
+;
+/* ---- screens/Diary.js ---- */
+try {
+/* Diary — 狗狗日記: one dog's posts ({id}, default: my dog). My own page has 「寫日記」 (up to 3 photos + 500 字,
+   狗友 / 公開). Each post shows its pictures, text, 🐾 汪 and the comment count; tapping opens Diary_Post.
+   Friend-only posts of other dogs are only listed for their 狗友 (App.data.watchDiary filters). */
+(function (App) {
+  'use strict';
+  var ui = App.ui, html = ui.html, D = App.data, fmt = ui.fmt;
+
+  (function () {
+    if (document.getElementById('css-Diary')) return;
+    var s = document.createElement('style'); s.id = 'css-Diary';
+    s.textContent = [
+      '.dy-post{padding:14px 0;border-bottom:1px solid var(--hairline)}',
+      '.dy-post:last-child{border-bottom:none}',
+      '.dy-pics{margin-top:10px;display:grid;gap:6px}',
+      '.dy-pics.n1{grid-template-columns:1fr}.dy-pics.n2{grid-template-columns:1fr 1fr}.dy-pics.n3{grid-template-columns:1fr 1fr 1fr}',
+      '.dy-pics img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px;background:var(--cream);display:block}',
+      '.dy-pics.n1 img{aspect-ratio:4/3}',
+      '.dy-text{margin-top:8px;font-size:15px;line-height:22px;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}',
+      '.dy-bar{margin-top:8px;display:flex;align-items:center;gap:8px}',
+      '.dy-woof{min-height:40px;padding:0 14px;border:none;border-radius:20px;background:var(--cream);color:var(--body);font:inherit;font-size:14px;display:inline-flex;align-items:center;gap:4px}',
+      '.dy-woof[aria-pressed="true"]{background:var(--teal-tint);color:var(--teal-ink);font-weight:700}',
+      '.dy-open{width:100%;padding:0;border:none;background:none;text-align:left;font:inherit;color:inherit}',
+      '.dy-new-pics{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}',
+      '.dy-new-pics img{width:72px;height:72px;border-radius:12px;object-fit:cover}'
+    ].join('');
+    document.head.appendChild(s);
+  })();
+
+  function dogId(ctx) { var id = ctx.params.id; return typeof id === 'string' && id ? id : App.me.actorId; }
+  function meta(p) { return fmt.relative(p.at) + '・' + (p.audience === 'public' ? '公開' : '只給狗友'); }
+
+  /** One post (shared by Diary and the 狗友動態 list): pictures, text, 汪, comments → Diary_Post. */
+  function postCard(p, o) {
+    o = o || {};
+    var pics = p.photos.length ? html`<div class="dy-pics n${p.photos.length}">${p.photos.map(function (ph) {
+      return html`<img src="${ph.thumb || ph.url}" alt="日記照片" loading="lazy">`;
+    })}</div>` : '';
+    return html`<article class="dy-post">
+      <button type="button" class="dy-open"${ui.go('Diary_Post', { id: p.id })}${ui.attrs({ 'aria-label': '打開這篇日記' })}>
+        <div class="row-flex" style="gap:10px">${o.withDog ? ui.dogAvatar(D.person(p.by), { size: 32, label: false }) : ''}
+          <span class="note">${o.withDog ? D.dogName(p.by) + '・' : ''}${meta(p)}</span></div>
+        ${pics}
+        ${p.text ? html`<div class="dy-text">${p.text}</div>` : ''}
+      </button>
+      <div class="dy-bar">
+        <button type="button" class="dy-woof"${ui.act('woof', { id: p.id })}${ui.attrs({ 'aria-pressed': String(p.woofedByMe), 'aria-label': '汪，' + p.woofs + ' 個' })}>🐾 汪 ${p.woofs}</button>
+        <button type="button" class="dy-woof"${ui.go('Diary_Post', { id: p.id })}>${ui.icon('chat', { size: 18 })} ${p.comments} 則留言</button>
+      </div>
+    </article>`;
+  }
+
+  function openComposer() {
+    var st = { files: [], previews: [], audience: 'friends', busy: false };
+    var sh = ui.sheet({
+      title: '寫日記',
+      state: st,
+      render: function () {
+        return html`
+          ${ui.field({ type: 'textarea', model: 'diaryText', value: st.text || '', placeholder: '今天發生什麼事？', maxlength: 500, rows: 4, label: '想說的話（最多 500 字）' })}
+          <div class="dy-new-pics">${st.previews}</div>
+          ${st.files.length < 3 ? html`<div class="mt-8">${ui.photoInput({ act: 'pick', label: '加照片（最多 3 張）' })}</div>` : html`<p class="note mt-8">最多 3 張照片</p>`}
+          <div class="chips mt-12" role="group" aria-label="誰看得到">
+            ${ui.chip('只給狗友', { pressed: st.audience === 'friends', act: 'aud', data: { v: 'friends' } })}
+            ${ui.chip('公開', { pressed: st.audience === 'public', act: 'aud', data: { v: 'public' } })}
+          </div>
+          <div class="sheet-actions">${ui.quietBtn('取消', { act: 'cancel' })}${ui.primaryBtn('發布', { act: 'post', disabled: st.busy })}</div>`;
+      },
+      actions: {
+        pick: function (s, d) {
+          if (!d.file || st.files.length >= 3) return;
+          st.text = readText(s);
+          st.files.push(d.file);
+          return ui.photoPreview(d.file, { size: 72, radius: 12, alt: '選好的照片' }).then(function (img) { st.previews.push(img); s.update(); }, function () { s.update(); });
+        },
+        aud: function (s, d) { st.text = readText(s); st.audience = d.v === 'public' ? 'public' : 'friends'; s.update(); },
+        cancel: function (s) { s.close(); },
+        post: function (s) {
+          if (st.busy) return;
+          st.text = readText(s);
+          st.busy = true; s.update();
+          return D.createDiary({ text: st.text, files: st.files, audience: st.audience }).then(function () {
+            s.close(); ui.toast('發布了');
+          }, function (e) { st.busy = false; s.update(); throw e; });
+        }
+      }
+    });
+    function readText(s) { var t = s.el && s.el.querySelector('[data-model="diaryText"]'); return t ? t.value : (st.text || ''); }
+    return sh;
+  }
+
+  App.register('Diary', {
+    title: '狗狗日記',
+    tab: null,
+    mount: function (ctx) { ctx.live('posts', D.watchDiary, dogId(ctx)); },
+    render: function (ctx) {
+      var id = dogId(ctx), mine = id === App.me.actorId, posts = ctx.state.posts;
+      var name = D.dogName(id);
+      var body = posts === undefined ? ui.loading() : !posts.length
+        ? ui.emptyState({ title: mine ? '還沒有日記' : '還沒有看得到的日記', body: mine ? '遛完狗、聚完會，記一下今天吧。預設只給狗友看。' : '有些日記只給狗友看，互相追蹤就看得到。' })
+        : html`<div>${posts.map(function (p) { return postCard(p); })}</div>`;
+      return html`
+        ${ui.topBar({ backLabel: '返回' })}
+        <h1 class="h1 px">${name}的日記</h1>
+        ${mine ? html`<div class="px mt-12">${ui.primaryBtn('寫日記', { act: 'compose', icon: 'edit' })}</div>` : ''}
+        <section class="px mt-8">${body}</section>`;
+    },
+    actions: {
+      compose: function () { openComposer(); },
+      woof: function (ctx, d) { return D.toggleWoof(d.id); }
+    }
+  });
+
+  App.diaryCard = postCard; // the 狗友動態 list on Main reuses the same card
+})(window.App);
+
+} catch (e) { console.error("[build] screens/Diary.js failed to load", e); }
+;
+/* ---- screens/Diary_Post.js ---- */
+try {
+/* Diary_Post — one 狗狗日記 post ({id}): full pictures, text, 🐾 汪, comments (add; delete my own, or any on my post),
+   delete my post, 檢舉 someone else's post. Missing / not allowed → 「找不到這篇日記」. */
+(function (App) {
+  'use strict';
+  var ui = App.ui, html = ui.html, D = App.data, fmt = ui.fmt;
+
+  (function () {
+    if (document.getElementById('css-Diary_Post')) return;
+    var s = document.createElement('style'); s.id = 'css-Diary_Post';
+    s.textContent = [
+      '.dp-pic{width:100%;border-radius:16px;background:var(--cream);display:block;margin-top:10px}',
+      '.dp-c{padding:10px 0;border-bottom:1px solid var(--hairline);display:flex;gap:10px;align-items:flex-start}',
+      '.dp-c:last-child{border-bottom:none}',
+      '.dp-c .txt{font-size:15px;line-height:21px;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}',
+      '.dp-compose{margin-top:12px;display:flex;gap:8px;align-items:center}',
+      '.dp-compose .field{flex:1;min-width:0;margin:0}'
+    ].join('');
+    document.head.appendChild(s);
+  })();
+
+  App.register('Diary_Post', {
+    title: '狗狗日記',
+    tab: null,
+    mount: function (ctx) {
+      ctx.state.comment = '';
+      ctx.live('post', D.watchDiaryPost, String(ctx.params.id || ''));
+      ctx.live('comments', D.watchDiaryComments, String(ctx.params.id || ''));
+    },
+    render: function (ctx) {
+      var p = ctx.state.post, me = App.me.actorId;
+      if (p === undefined) return html`${ui.topBar({ backLabel: '返回' })}${ui.loading()}`;
+      if (!p) return html`${ui.topBar({ backLabel: '返回' })}<div class="px">${ui.emptyState({ title: '找不到這篇日記', body: '可能被刪掉了，或是只給狗友看。' })}</div>`;
+      var mine = p.by === me, comments = ctx.state.comments || [];
+      return html`
+        ${ui.topBar({ backLabel: '返回' })}
+        <section class="px">
+          <button type="button" class="dy-open row-flex" style="gap:10px"${ui.go('DM_Invite', { id: p.by })}>
+            ${ui.dogAvatar(D.person(p.by), { size: 40, label: false })}
+            <span><span class="h3">${D.dogName(p.by)}</span><br><span class="note">${fmt.relative(p.at)}・${p.audience === 'public' ? '公開' : '只給狗友'}</span></span>
+          </button>
+          ${p.photos.map(function (ph) { return html`<img class="dp-pic" src="${ph.url}" alt="日記照片">`; })}
+          ${p.text ? html`<div class="dy-text">${p.text}</div>` : ''}
+          <div class="dy-bar">
+            <button type="button" class="dy-woof"${ui.act('woof')}${ui.attrs({ 'aria-pressed': String(p.woofedByMe), 'aria-label': '汪，' + p.woofs + ' 個' })}>🐾 汪 ${p.woofs}</button>
+            ${mine ? ui.textBtn('刪除這篇', { act: 'del', muted: true }) : ui.textBtn('檢舉', { act: 'report', muted: true })}
+          </div>
+        </section>
+        <section class="px mt-16" aria-label="留言">
+          <h2 class="h3">留言（${comments.length}）</h2>
+          <div class="mt-4">${comments.map(function (c) {
+            var canDel = c.by === me || mine;
+            return html`<div class="dp-c">${ui.dogAvatar(D.person(c.by), { size: 32, label: false })}
+              <div class="grow" style="min-width:0"><div class="note">${D.dogName(c.by)}・${fmt.relative(c.at)}</div><div class="txt">${c.text}</div></div>
+              ${canDel ? ui.textBtn('刪除', { act: 'delC', data: { cid: c.id }, muted: true }) : ''}</div>`;
+          })}</div>
+          <form class="dp-compose" data-act="send">
+            ${ui.field({ model: 'comment', value: ctx.state.comment, placeholder: '留言給' + D.dogName(p.by), maxlength: 300, id: 'dp-comment' })}
+            ${ui.quietBtn('送出', { type: 'submit', block: false })}
+          </form>
+        </section>`;
+    },
+    actions: {
+      woof: function (ctx) { return D.toggleWoof(String(ctx.params.id)); },
+      send: function (ctx) {
+        var inp = document.getElementById('dp-comment');
+        var text = String(inp ? inp.value : (ctx.state.comment || ''));
+        if (!text.trim()) { ui.toast('先打點字'); return; }
+        return D.addDiaryComment(String(ctx.params.id), text).then(function () { ctx.set({ comment: '' }); });
+      },
+      delC: function (ctx, d) { return D.deleteDiaryComment(String(ctx.params.id), d.cid).then(function () { ui.toast('留言刪掉了'); }); },
+      del: function (ctx) {
+        return ui.confirm({ title: '刪除這篇日記？', body: '照片和留言會一起刪掉，不能復原。', ok: '刪除', danger: true }).then(function (yes) {
+          if (!yes) return null;
+          return D.deleteDiary(String(ctx.params.id)).then(function () { ui.toast('刪掉了'); ctx.back(); });
+        });
+      },
+      report: function (ctx) {
+        var p = ctx.state.post;
+        if (!p) return;
+        return D.reportUser(p.by, '檢舉狗狗日記 ' + p.id).then(function () { ui.toast('已送出檢舉，謝謝你'); });
+      }
+    }
+  });
+})(window.App);
+
+} catch (e) { console.error("[build] screens/Diary_Post.js failed to load", e); }
 ;
 /* ---- screens/Dog_Language.js ---- */
 try {
@@ -15898,15 +16437,48 @@ try {
     });
   }
 
+  /** 狗友動態: what the dogs I follow did lately (no positions — a walk only says 出門散步了 / the district). */
+  function feedSection(ctx) {
+    var items = D.feedItems(ctx.state.checkins || [], ctx.state.events || [], ctx.state.feedPosts || []);
+    var evById = {};
+    (ctx.state.events || []).forEach(function (ev) { evById[ev.id] = ev; });
+    var shown = ctx.state.feedAll ? items : items.slice(0, 8);
+    var rows = shown.map(function (it) {
+      var name = D.dogName(it.id), lead = html`<span aria-hidden="true">${ui.dogAvatar(D.person(it.id), { size: 40, label: false })}</span>`;
+      var when = ui.fmt.relative(it.at);
+      if (it.kind === 'diary') {
+        var p = it.post, ph = p.photos[0];
+        return ui.listRow({ lead: lead, title: name + '寫了日記', sub: (p.text ? p.text.slice(0, 40) + (p.text.length > 40 ? '…' : '') + '・' : '') + when,
+          right: ph ? html`<img src="${ph.thumb || ph.url}" alt="" width="44" height="44" style="border-radius:10px;object-fit:cover">` : '', go: 'Diary_Post', params: { id: p.id } });
+      }
+      if (it.kind === 'checkin') {
+        var pk = C.park(it.parkId);
+        return pk ? ui.listRow({ lead: lead, title: name + '在' + pk.name, sub: when, go: 'Park_Board', params: { park: pk.id } }) : '';
+      }
+      if (it.kind === 'walk') return ui.listRow({ lead: lead, title: name + '出門散步了' + (it.area ? '（' + it.area + '附近）' : ''), sub: when, go: 'DM_Invite', params: { id: it.id } });
+      var ev = evById[it.eventId];
+      return ev ? ui.listRow({ lead: lead, title: name + '開了一場狗聚', sub: ev.title + '・' + when, go: 'Event', params: { id: ev.id } }) : '';
+    });
+    var none = !items.length;
+    return html`<section class="feed px mt-24" aria-labelledby="feed-h">
+      <h2 class="h2" id="feed-h">狗友動態</h2>
+      ${none ? html`<p class="note mt-8">追蹤的狗這 7 天的日記、打卡和散步會出現在這裡。去狗聚認識狗友，或點公園常客的頭像追蹤牠們。</p>`
+        : html`<ul class="list mt-8">${rows}</ul>${items.length > 8 && !ctx.state.feedAll ? ui.textBtn('看更多動態', { act: 'feedMore', icon: 'chevronRight', iconAfter: true }) : ''}`}
+    </section>`;
+  }
+
   /** The card of one park (tapped on the map, or its label). */
   function openPark(ctx, park) {
-    ui.sheet({
+    var pstat = null, unsub = null;
+    var sh = ui.sheet({
       title: park.name,
+      onClose: function () { if (unsub) unsub(); },
       render: function () {
         var n = (D.presence(ctx.state.checkins || []).byPark[park.id] || []).length;
         return html`
           <p class="sub">${park.area ? park.area + '・' : ''}${n ? '現在 ' + n + ' 隻' : '現在沒有狗'}</p>
           ${park.rule ? html`<p class="note mt-8">${park.rule}</p>` : ''}
+          ${App.parkPick.statusChips(pstat)}
           <div class="sheet-actions">
             ${D.parkShared(park.id) ? ui.quietBtn('常客榜', { act: 'board' }) : ''}
             ${ui.quietBtn('在這裡揪團', { act: 'host' })}
@@ -15921,9 +16493,11 @@ try {
           });
         },
         host: function (s) { s.close(); App.go('Create_Event', { park: park.id }); },
+        pstat: function (s, d) { return D.reportParkStatus(park.id, d.tag); },
         board: function (s) { s.close(); App.go('Park_Board', { park: park.id }); }
       }
     });
+    unsub = D.watchParkStatus(park.id, function (st) { pstat = st; if (sh && !sh.closed) sh.update(); });
   }
 
   function lostBanner(ctx) {
@@ -16041,6 +16615,7 @@ try {
       ctx.live('checkins', D.watchCheckins);
       ctx.live('meetup', D.watchMeetup, ctx.state.weekly.dateKey);
       ctx.live('lost', D.watchLostList);
+      ctx.live('feedPosts', D.watchFollowDiary);
       // the fixed meetup rolls over to next Saturday after 11:00 — re-subscribe if the page stays open
       ctx.every(60000, function () { if (D.weeklyMeetup().dateKey !== ctx.state.weekly.dateKey) App.router.remount(); });
     },
@@ -16068,11 +16643,13 @@ try {
         ${mapSection(ctx)}
         ${lostBanner(ctx)}
         ${fixedDay(ctx)}
-        ${nearby(ctx)}`;
+        ${nearby(ctx)}
+        ${feedSection(ctx)}`;
     },
     actions: {
       checkin: function (ctx) { openCheckin(ctx); },
       walk: function (ctx) { return walkNow(ctx); },
+      feedMore: function (ctx) { ctx.set({ feedAll: true }); },
       status: function (ctx) { openStatus(ctx); },
       rsvp: function (ctx) {
         var m = ctx.state.meetup, wk = ctx.state.weekly;
@@ -16250,6 +16827,7 @@ try {
       ctx.state.park = C.park(want) || (typeof want === 'string' && /^osm-[wr]-\d{1,12}$/.test(want)) ? want : C.parks[0].id;
       ctx.live('checkins', D.watchCheckins);
       ctx.live('visits', D.watchVisits);
+      ctx.live('pstat', D.watchParkStatus, ctx.state.park);
     },
     render: function (ctx) {
       var park = parkOf(ctx);
@@ -16267,12 +16845,15 @@ try {
           </div>
         </div>
         ${hereSection(ctx, park)}
+        <div class="px">${App.parkPick.statusChips(ctx.state.pstat)}</div>
         ${boardSection(ctx, park)}
         ${actionSection(ctx, park)}`;
     },
     actions: {
-      pick: function (ctx, d) { if (C.park(d.park)) ctx.set({ park: d.park }); },
-      other: function (ctx) { App.parkPick.open({ title: '看哪個公園的常客榜？', current: ctx.state.park, onPick: function (pk) { ctx.set({ park: pk.id }); } }); },
+      // another park: a fresh screen, so the live 公園狀況 follows it
+      pick: function (ctx, d) { if (C.park(d.park) && d.park !== ctx.state.park) App.go('Park_Board', { park: d.park }, { replace: true }); },
+      pstat: function (ctx, d) { return D.reportParkStatus(ctx.state.park, d.tag); },
+      other: function (ctx) { App.parkPick.open({ title: '看哪個公園的常客榜？', current: ctx.state.park, onPick: function (pk) { App.go('Park_Board', { park: pk.id }, { replace: true }); } }); },
       checkin: function (ctx) {
         var park = parkOf(ctx);
         return D.checkIn(C.park(park.id) || park.id).then(function (r) {
@@ -16930,6 +17511,7 @@ try {
             title: '今天需要空間', sub: spaceSub, go: 'Yellow_Space',
             right: spaceOn ? html`<span class="pf-on">開著</span>` : ''
           })}
+          ${ui.listRow({ icon: 'photo', iconSize: 20, title: '狗狗日記', sub: '照片和小故事，狗友可以汪和留言', go: 'Diary' })}
           ${ui.listRow({ icon: 'privacy', iconSize: 20, title: '我的隱私', sub: '打卡只顯示哪個公園，不露出住家', go: 'Privacy' })}
           ${ui.listRow({ icon: 'infoSmall', iconSize: 20, title: C.privacyNote.title, sub: '存了什麼、誰看得到、' + C.deleteMine.title, go: 'Privacy', params: { section: 'note' } })}
         </ul>
@@ -17121,7 +17703,7 @@ try {
           <span class="pc-group-label" id="pc-tags-label">個性標籤</span>
           <div class="chips">${dogs.tags.map(function (t) { return ui.chip(t, { pressed: tags.indexOf(t) !== -1, act: 'tag', data: { tag: t } }); })}</div>
         </div>
-        <div class="mt-16">${ui.field({ label: '出生年月（會自動算幾歲）', type: 'month', model: 'birth', value: s.birth, id: 'pc-birth' })}</div>
+        <div class="mt-16">${ui.field({ label: '出生年月（會自動算幾歲）', type: 'month', model: 'birth', value: s.birth, id: 'pc-birth', max: ui.fmt.dateKey(D.now()).slice(0, 7) })}</div>
         <div class="field mt-12" role="group" aria-labelledby="pc-neuter-label">
           <span class="pc-group-label" id="pc-neuter-label">結紮</span>
           <div class="chips">${Object.keys(C.dogs.neuter).map(function (k) { return ui.chip(C.dogs.neuter[k], { pressed: s.neutered === k, act: 'neuter', data: { v: k } }); })}</div>
@@ -17422,9 +18004,37 @@ try {
         ${rabies ? html`<p class="rm-fine">${ui.icon('alertCircle', { size: 18, color: 'var(--muted)' })}<span>${r.body}</span></p>`
           : html`<p class="rm-body">${r.body}</p>`}
         ${r.action && r.action.act === 'rabiesDone' ? html`<div class="rm-done">${ui.primaryBtn(r.action.label, { act: 'rabiesDone', icon: 'check', iconSize: 20, block: false })}</div>` : ''}
+        ${r.action && r.action.act === 'careDone' ? html`<div class="rm-done">${ui.quietBtn(r.action.label, { act: 'careDone', data: { kind: r.action.kind }, block: false })}</div>` : ''}
         ${linkBtn(r)}
       </div>
     </article>`;
+  }
+
+  /** The 照顧提醒 form: filled ONCE from my private care settings when they arrive (after that, what the person typed
+      stays — a re-render from shared data must not put the old date back into the box). */
+  function careForm(ctx) {
+    var c = D.myCare();
+    if (c && !ctx.state.careInit) {
+      ctx.state.careInit = true;
+      ctx.state.dewormLast = c.deworm ? c.deworm.last : '';
+      ctx.state.dewormMonths = c.deworm ? c.deworm.months : 1;
+      ctx.state.weigh = !!c.weigh;
+    }
+    return { dewormLast: ctx.state.dewormLast, dewormMonths: ctx.state.dewormMonths || 1, weigh: !!ctx.state.weigh };
+  }
+  function careSection(ctx) {
+    var f = careForm(ctx);
+    return html`<section class="px mt-24" aria-labelledby="rm-care-h">
+      <h2 class="h2" id="rm-care-h">照顧提醒</h2>
+      <p class="note mt-4">只有你看得到。到期前 3 天會出現在上面。</p>
+      <div class="mt-12">${ui.field({ label: '上次驅蟲／除蚤', type: 'date', model: 'dewormLast', value: f.dewormLast, id: 'rm-deworm' })}</div>
+      <div class="chips mt-8" role="group" aria-label="多久一次">
+        ${ui.chip('每 1 個月', { pressed: f.dewormMonths === 1, act: 'careMonths', data: { v: '1' } })}
+        ${ui.chip('每 3 個月', { pressed: f.dewormMonths === 3, act: 'careMonths', data: { v: '3' } })}
+      </div>
+      <div class="chips mt-12">${ui.chip('每月提醒量體重', { pressed: f.weigh, act: 'careWeigh' })}</div>
+      <div class="mt-12">${ui.quietBtn('儲存照顧提醒', { act: 'careSave', block: false })}</div>
+    </section>`;
   }
 
   function reminderList(p) {
@@ -17518,10 +18128,22 @@ try {
         </div>
         ${reminderList(p)}
         ${rabiesHint(p)}
+        ${careSection(ctx)}
         ${friendActivity(ctx)}`;
     },
 
     actions: {
+      careMonths: function (ctx, d) { ctx.set({ dewormMonths: d.v === '3' ? 3 : 1 }); },
+      careWeigh: function (ctx) { ctx.set({ weigh: !careForm(ctx).weigh }); },
+      careSave: function (ctx) {
+        var f = careForm(ctx), inp = document.getElementById('rm-deworm');
+        var last = String(inp ? inp.value : f.dewormLast || '').trim();
+        return D.setCare({ deworm: last ? { last: last, months: f.dewormMonths } : null, weigh: f.weigh }).then(function () {
+          ctx.set({ dewormLast: last });
+          ui.toast('照顧提醒存好了');
+        });
+      },
+      careDone: function (ctx, d) { return D.careDone(d.kind).then(function () { ui.toast('記下了，下次到期前再提醒你'); }); },
       rabiesDone: function () {
         return ui.confirm({ title: '狂犬病疫苗打過了？', body: C.badgeHow.rabiesDone, ok: '打過了' }).then(function (yes) {
           if (!yes) return;
