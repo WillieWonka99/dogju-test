@@ -1005,7 +1005,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2433,7 +2433,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
   var BREAK_EVERY_MIN = 10; // 主揪現場模式：每幾分鐘提醒一次中場休息（下面 TEXTS.breakVibrate 不寫數字，改這裡就好）
   var CHAT_CLOSE_DAYS = 7;  // 狗聚結束後幾天，聊天室自動收起（下面 TEXTS.chatCloses 的 {n} 會換成這個數字）
   var PACKING = '水・自己的碗・撿便袋';
-  var KIDS_TIPS = { title: '跟狗狗打招呼的三個步驟', lead: '摸狗之前，先這樣做：', steps: ['先問主人', '讓狗聞', '從下巴摸起'], note: '名單上可以看狗狗的「OK 小孩」「怕小孩」標籤。' };
+  var KIDS_TIPS = { title: '跟狗狗打招呼的三個步驟', lead: '摸狗之前，先這樣做：', steps: ['先問主人', '讓狗聞', '從下巴摸起'], note: '名單上可以看狗狗的「親小孩」「怕小孩」標籤。' };
 
   // =====================================================================================================
   // 狗語圖卡（5 張，看完拿「狗語畢業章」）
@@ -2612,9 +2612,18 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
   // 結紮、I 狗／E 狗（狗狗名片上，大家都看得到；都可以不填）
   var NEUTER = { yes: '已結紮', no: '未結紮', secret: '不想說' };
   var IE = { I: { label: 'I 狗', note: '慢熱、喜歡小團或一對一' }, E: { label: 'E 狗', note: '愛交朋友、喜歡大團' } };
-  var TAGS = ['慢熟', '怕大狗', '愛追球', '會護玩具', '需要空間', 'OK 小孩', '怕小孩'];
-  // 有這些標籤的狗，「今天需要空間」頁會建議打開黃圈（要跟上面 TAGS 的字一樣）
-  var YELLOW_SUGGEST_TAGS = ['慢熟', '怕大狗'];
+  // 個性標籤（2026-10-28 Willie：字短一點、分三組）。每個 2～3 個字；名片頁照這個順序、分組顯示。
+  // showFirst：別人看名片時，這組的標籤排最前面（名片只放得下幾個，「要注意」的不會被擠掉）
+  var TAG_GROUPS = [
+    { title: '怎麼玩', tags: ['愛追球', '護玩具', '愛拔河', '愛追逐', '愛摔角', '愛玩水', '愛聞聞', '體力好'] },
+    { title: '交朋友', tags: ['慢熟', '親小孩', '自來熟', '愛大狗', '愛小狗', '黏人'] },
+    { title: '要注意', tags: ['怕大狗', '怕小孩', '要空間', '護食', '怕吵', '會暴衝', '怕被摸', '學社交'], showFirst: true }
+  ];
+  var TAGS = [].concat.apply([], TAG_GROUPS.map(function (g) { return g.tags; }));
+  // 改短的舊名字：已經選過的狗，看到和存的都換成新名字（左邊是舊的、右邊是新的）
+  var TAG_RENAMES = { '會護玩具': '護玩具', 'OK 小孩': '親小孩', '需要空間': '要空間' };
+  // 有這些標籤的狗，「今天需要空間」頁會建議打開黃圈（要跟上面的字一樣）
+  var YELLOW_SUGGEST_TAGS = ['慢熟', '怕大狗', '怕吵', '怕被摸', '學社交'];
 
   // =====================================================================================================
   // 第一批新功能的文字：隱私說明、找回碼、回報問題、刪除我的資料、新版本
@@ -3131,7 +3140,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
     firstAid: FIRST_AID, texts: TEXTS, vet: VET, hotlines: HOTLINES,
     weekly: WEEKLY, themeDays: THEME_DAYS, prizes: PRIZES, stampsPerDraw: STAMPS_PER_DRAW, stampTexts: STAMP_TEXTS,
     reminderText: REMINDER_TEXT, reminderRules: REMINDER_RULES, heatLevels: HEAT_LEVELS, heatLabel: HEAT_LABEL,
-    dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, neuter: NEUTER, ie: IE, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, aggressiveShort: TEXTS.aggressiveShort },
+    dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, tagGroups: TAG_GROUPS, tagRenames: TAG_RENAMES, neuter: NEUTER, ie: IE, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, aggressiveShort: TEXTS.aggressiveShort },
     privacyNote: PRIVACY_NOTE, terms: TERMS, recovery: RECOVERY, login: LOGIN, push: PUSH, feedback: FEEDBACK, deleteMine: DELETE_MINE, updateBanner: UPDATE_BANNER, photo: PHOTO, firstRun: FIRST_RUN,
     freePlan: FREE_PLAN, health: HEALTH,
     map: MAP, parkStatus: PARK_STATUS,
@@ -3815,7 +3824,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
 
   // Sizes, breeds, personality tags and the legal aggressive-breed rules are CONTENT: core/content.js (App.content.dogs).
   var CD = App.content.dogs;
-  var SIZES = CD.sizes, SIZE_SHORT = CD.sizeShort, BREEDS = CD.breeds, TAGS = CD.tags;
+  var SIZES = CD.sizes, SIZE_SHORT = CD.sizeShort, BREEDS = CD.breeds, TAGS = CD.tags, TAG_RENAMES = CD.tagRenames || {};
   var AGGRESSIVE = CD.aggressive, AGGRESSIVE_NOTE = CD.aggressiveNote, AGGRESSIVE_RULE = CD.aggressiveRule, AGGRESSIVE_SHORT = CD.aggressiveShort;
 
   function has(obj, k) { return typeof k === 'string' && Object.prototype.hasOwnProperty.call(obj, k); }
@@ -3877,6 +3886,24 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
     aggressiveRule: AGGRESSIVE_RULE,
     aggressiveShort: AGGRESSIVE_SHORT,
     tags: TAGS,
+    tagGroups: CD.tagGroups,
+    /** 個性標籤 as stored → the current names: old long names renamed (TAG_RENAMES), unknown ones and repeats dropped,
+        the owner's order kept. Data from the store is untrusted. */
+    cleanTags: function (list) {
+      var out = [];
+      (Array.isArray(list) ? list : []).forEach(function (t) {
+        var n = has(TAG_RENAMES, t) ? TAG_RENAMES[t] : t;
+        if (typeof n === 'string' && TAGS.indexOf(n) !== -1 && out.indexOf(n) === -1) out.push(n);
+      });
+      return out;
+    },
+    /** The tags for others to see: a group marked showFirst (要注意) leads, so a short list never hides it; otherwise
+        the owner's order. */
+    showTags: function (list) {
+      var tags = App.dogs.cleanTags(list), first = [];
+      (CD.tagGroups || []).forEach(function (g) { if (g.showFirst) first = first.concat(g.tags); });
+      return tags.filter(function (t) { return first.indexOf(t) !== -1; }).concat(tags.filter(function (t) { return first.indexOf(t) === -1; }));
+    },
     sizes: SIZES,
     sizeShort: SIZE_SHORT,
     sizeLabel: function (s) { return has(SIZES, s) ? SIZES[s] : ''; },
@@ -3910,6 +3937,12 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function noop() {}
   function clone(v) { return v == null ? v : JSON.parse(JSON.stringify(v)); }
+  /** Shared documents are untrusted. A "__proto__" key in one (JSON keeps it as a plain key) would become the PROTOTYPE
+      of any copy made with Object.assign / spread — with a frozen one, the next key throws, and one crafted doc stops
+      a whole listener for everybody (審查 2026-10-28). Every document that comes in is copied without such keys. */
+  function noProto(k, v) { return k === '__proto__' ? undefined : v; }
+  function safeJson(text) { return JSON.parse(text, noProto); }
+  function safeCopy(v) { return v == null ? v : JSON.parse(JSON.stringify(v), noProto); }
   function deepFreeze(o) {
     if (o && typeof o === 'object' && !Object.isFrozen(o)) { Object.freeze(o); Object.keys(o).forEach(function (k) { deepFreeze(o[k]); }); }
     return o;
@@ -4209,7 +4242,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
       var curJson = cur ? JSON.stringify(cur.data) : null;
       if (curJson === json) return;
       if (json == null) docs.delete(path);
-      else { try { docs.set(path, { data: deepFreeze(JSON.parse(json)), v: ++gen }); } catch (e) { return; } }
+      else { try { docs.set(path, { data: deepFreeze(safeJson(json)), v: ++gen }); } catch (e) { return; } }
       markChanged(path);
     }
     /** Re-read everything from IndexedDB (first load, and after another tab reset the data). */
@@ -4262,7 +4295,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
         var g = st.get(path);
         g.onsuccess = function () {
           var base = null;
-          try { base = g.result == null ? null : JSON.parse(g.result); } catch (e) { base = null; }
+          try { base = g.result == null ? null : safeJson(g.result); } catch (e) { base = null; }
           if (!isPlain(base)) { out.err = dbError('invalid_argument', 'update() on a missing document: ' + path); t.abort(); return; }
           var merged = mergeDeep(base, patch);
           json = JSON.stringify(merged);
@@ -4353,7 +4386,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
     // ---------------------------------------------------------------- emulated server functions
     /* Same results as the SQL functions in web/supabase.sql, over reserved mock documents
        (_recovery/<sha256>, _links/<uid>, _attempts/<uid>). Local only: no real security (one browser). */
-    function mGet(path) { return readOne(path).then(function (j) { try { return j ? JSON.parse(j) : null; } catch (e) { return null; } }); }
+    function mGet(path) { return readOne(path).then(function (j) { try { return j ? safeJson(j) : null; } catch (e) { return null; } }); }
     function mPaths(col) { return Array.from(docs.keys()).filter(function (p) { return parentOf(p) === col; }); }
     function actorOf(uid) { return mGet('_links/' + uid).then(function (l) { return l && typeof l.actor === 'string' ? l.actor : uid; }); }
     function actorIds(uid) { return actorOf(uid).then(function (a) { return a === uid ? [uid] : [uid, a]; }); }
@@ -5005,7 +5038,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
       var json = stableJson(data);
       if (cur && cur.json === json) { cur.ver = Math.max(cur.ver, ver); cur.seq = Math.max(cur.seq, seq); return; }
       var copy;
-      try { copy = JSON.parse(JSON.stringify(data)); } catch (e) { return; }
+      try { copy = safeCopy(data); } catch (e) { return; }
       docs.set(path, { data: deepFreeze(copy), v: ++gen, json: json, ver: ver, seq: seq });
       if (t) tombs.delete(path);
       markChanged(path);
@@ -5307,7 +5340,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
           var startSeq = rx;
           return fetchOne(path).then(function (row) {
             settle(path, row, startSeq);
-            var data = row && isPlain(row.data) ? deepFreeze(row.data) : undefined;
+            var data = row && isPlain(row.data) ? deepFreeze(safeCopy(row.data)) : undefined;
             return { id: lastSeg(path), exists: data !== undefined, data: function () { return data; }, metadata: { fromCache: false, hasPendingWrites: false }, _v: 0 };
           });
         },
@@ -5368,7 +5401,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
             var bad = queryProblem(q); if (bad) throw dbError('invalid_argument', bad);
             return fetchColl(col).then(function (rows) {
               var tmp = new Map();
-              rows.forEach(function (r) { if (r && typeof r.path === 'string' && isPlain(r.data)) tmp.set(r.path, { data: deepFreeze(r.data), v: 1 }); });
+              rows.forEach(function (r) { if (r && typeof r.path === 'string' && isPlain(r.data)) tmp.set(r.path, { data: deepFreeze(safeCopy(r.data)), v: 1 }); });
               return querySnapIn(tmp, runQueryOn(tmp, col, q));
             });
           });
@@ -5985,6 +6018,12 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
   // ===================================================================== global caches (6 subscriptions, kept for the whole visit)
   // people, sim/state, follows — and (batch 1, for the unread dots) events, my DM threads (dms/*), my read marks
   var people = new Map();
+  /** 個性標籤 renamed 2026-10-28 (會護玩具 → 護玩具 …): every screen sees the current names, whatever is stored.
+      Returns a new person (p itself may be frozen); its dog and tags are frozen like the rest of the cache. */
+  function withTags(p) {
+    if (!p || !p.dog || !Array.isArray(p.dog.tags)) return p;
+    return Object.assign({}, p, { dog: Object.freeze(Object.assign({}, p.dog, { tags: Object.freeze(App.dogs.cleanTags(p.dog.tags)) })) });
+  }
   var parksReg = new Map();    // parks/<id>: the shared park registry (any park tapped on the map), see ensurePark
   var followsMap = new Map();
   var eventsAll = [];          // every event (normalised) — unread dots, delete-my-data, admin
@@ -6004,7 +6043,10 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
     var gotPeople, readyP = new Promise(function (r) { gotPeople = r; });
     S().collection('people').onSnapshot(function (qs) {
       var m = new Map();
-      qs.docs.forEach(function (d) { m.set(d.id, Object.assign({ id: d.id }, d.data())); });
+      qs.docs.forEach(function (d) {
+        // one broken profile is skipped, never the whole list (the store already drops "__proto__" keys)
+        try { m.set(d.id, withTags(Object.assign({ id: d.id }, d.data()))); } catch (e) { console.warn('[data] skipped a broken profile', d.id); }
+      });
       people = m; peopleOk = true; emit('people'); recomputeUnread(); gotPeople();
     }, function (e) { console.warn('[data] people listener', e); gotPeople(); });
     S().collection('parks').onSnapshot(function (qs) {
@@ -6179,7 +6221,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
       if (src.look !== undefined) d.look = own(App.dogs.looks, src.look) ? src.look : null;
       if (['S', 'M', 'L'].indexOf(src.size) !== -1) d.size = src.size;
       else if (src.size === null) d.size = null; // not known yet (a dog that joined through a LINE link)
-      if (Array.isArray(src.tags)) d.tags = src.tags.filter(function (x, i, a) { return App.dogs.tags.indexOf(x) !== -1 && a.indexOf(x) === i; });
+      if (Array.isArray(src.tags)) d.tags = App.dogs.cleanTags(src.tags);
       if (src.heatSensitive !== undefined) d.heatSensitive = !!src.heatSensitive;
       else if (d.breed && App.dogs.isBrachy(d.breed)) d.heatSensitive = true;
       if (src.rabiesExpiry !== undefined) {
@@ -6224,7 +6266,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
         // optimistic cache so the next screen sees the profile before the snapshot arrives (frozen like snapshots)
         var cached = mergeDeep(merged, { badges: patch.badges });
         if (!s.exists) cached.demo = false;
-        people.set(who, Object.assign({ id: who }, App.store._deepFreeze(cached))); emit('people');
+        people.set(who, withTags(Object.assign({ id: who }, App.store._deepFreeze(cached)))); emit('people');
         if (oldPhoto) dropPhotoFiles([oldPhoto.path, oldPhoto.thumbPath]);
       });
     });
@@ -9487,7 +9529,7 @@ window.APP_BUILD = {"version":"2026-10-27.42407296","seedUrl":"seed-data.json"};
     _pace: function (ms) { if (ms != null) { PACE_MS = Math.max(0, Number(ms) || 0); paceNext = 0; } return PACE_MS; },
     _resetCaches: function () { homeCache = {}; homeLoading = {}; homeAtCache = {}; memPrivate = {}; memReads = {}; recP = {}; hUrls = {}; uploadOpen = {}; emit('people'); },
     /** boot only: make sure a just-read profile is in the people cache before the first route */
-    _prime: function (p) { if (p && p.id && !people.has(p.id)) { people.set(p.id, p); emit('people'); } }
+    _prime: function (p) { if (p && p.id && !people.has(p.id)) { people.set(p.id, withTags(p)); emit('people'); } }
   };
 })(window.App = window.App || {});
 
@@ -12312,7 +12354,7 @@ try {
     if (!p || !p.dog) return html`${head}<div class="px mt-16">${ui.emptyState({ title: '找不到這隻狗', body: '牠可能刪掉了狗狗名片。', action: ui.secondaryBtn('看其他狗狗', { go: 'DM_Invite', block: false }) })}</div>`;
     var dog = p.dog;
     var self = id === meId();
-    var tags = (Array.isArray(dog.tags) ? dog.tags : []).filter(function (t) { return typeof t === 'string'; }).slice(0, 4);
+    var tags = App.dogs.showTags(dog.tags).slice(0, 6);   // 要注意 first, so a long list never hides it
     var space = D.spaceActive(dog);
     return html`${head}
       <section class="dm-card px" aria-labelledby="dm-name">
@@ -13256,7 +13298,7 @@ try {
     var dog = (p && p.dog) || {};
     var ring = D.spaceActive(dog);
     var arrived = r.checkedIn.indexOf(a.id) !== -1;
-    var sub = arrived ? '已到' : a.id === ev.hostId ? '主揪' : (Array.isArray(dog.tags) && dog.tags[0]) || App.dogs.sizeLabel(dog.size) || '';
+    var sub = arrived ? '已到' : a.id === ev.hostId ? '主揪' : App.dogs.showTags(dog.tags)[0] || App.dogs.sizeLabel(dog.size) || '';
     var name = dog.name || '狗狗';
     var label = name + (ring ? '，今天需要空間' : '') + (arrived ? '，已到' : '') + (a.id === ev.hostId ? '，主揪' : '');
     var inner = html`${ui.dogAvatar(p || { dog: {} }, { size: 48, label: false })}<span class="n">${name}</span><span class="t ${arrived ? 'on' : ''}">${sub}</span>`;
@@ -13465,7 +13507,7 @@ try {
           if (r.checkedIn.indexOf(a.id) !== -1) badges.push(ui.badge('已到', { icon: 'checkSmall' }));
           if (D.vaccineOk(dog)) badges.push(ui.badge(C.badges.vaccine, { icon: 'vaccine' }));
           if (dog.registered) badges.push(ui.badge(C.badges.chip, { icon: 'registered' }));
-          var sub = [App.dogs.describe(dog), Array.isArray(dog.tags) ? dog.tags.join('・') : ''].filter(Boolean).join('｜') || '還沒填體型';
+          var sub = [App.dogs.describe(dog), App.dogs.showTags(dog.tags).join('・')].filter(Boolean).join('｜') || '還沒填體型';
           var o = { lead: ui.dogAvatar(p, { size: 36, label: false }), title: (dog.name || '狗狗') + '・' + D.ownerName(a.id) + (a.id === ev.hostId ? '（主揪）' : '') + (extra || ''), sub: sub, right: badges.length ? html`<span class="ev-badges">${badges}</span>` : '' };
           if (a.id !== App.me.actorId) { o.go = 'DM_Invite'; o.params = { id: a.id }; }
           return ui.listRow(o);
@@ -17983,6 +18025,8 @@ try {
       '.pc-look{min-height:44px;padding:8px 2px;border:none;border-radius:18px;background:var(--cream);color:var(--body);font-size:12px;line-height:16px;display:flex;flex-direction:column;align-items:center;gap:4px}',
       '.pc-look[aria-pressed="true"]{background:var(--teal-tint);color:var(--teal-ink);font-weight:700}',
       '.pc-group-label{font-size:13px;line-height:18px;font-weight:700;color:var(--ink)}',
+      '.pc-tag-group{margin-top:10px}',
+      '.pc-tag-title{display:block;margin-bottom:6px;font-size:13px;line-height:18px;font-weight:700;color:var(--muted)}',
       '.pc-switch-icon{flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center}',
       '.pc-lead{margin-bottom:8px}'
     ].join('\n');
@@ -18082,7 +18126,12 @@ try {
         <div class="pc-more-head"><h2 class="h2" id="pc-more">想多寫一點（選填）</h2><span class="note" style="white-space:nowrap">不填也能報名</span></div>
         <div class="field mt-12" role="group" aria-labelledby="pc-tags-label">
           <span class="pc-group-label" id="pc-tags-label">個性標籤</span>
-          <div class="chips">${dogs.tags.map(function (t) { return ui.chip(t, { pressed: tags.indexOf(t) !== -1, act: 'tag', data: { tag: t } }); })}</div>
+          ${dogs.tagGroups.map(function (g, i) {
+            return html`<div class="pc-tag-group"${ui.attrs({ 'data-tag-group': String(i), role: 'group', 'aria-labelledby': 'pc-tg-' + i })}>
+              <span class="pc-tag-title"${ui.attrs({ id: 'pc-tg-' + i })}>${g.title}</span>
+              <div class="chips">${g.tags.map(function (t) { return ui.chip(t, { pressed: tags.indexOf(t) !== -1, act: 'tag', data: { tag: t } }); })}</div>
+            </div>`;
+          })}
         </div>
         <div class="mt-16">${ui.field({ label: '出生年月（會自動算幾歲）', type: 'month', model: 'birth', value: s.birth, id: 'pc-birth', max: ui.fmt.dateKey(D.now()).slice(0, 7) })}</div>
         <div class="field mt-12" role="group" aria-labelledby="pc-neuter-label">
@@ -18183,7 +18232,7 @@ try {
         size: SIZES.indexOf(dog.size) !== -1 ? dog.size : (p ? null : 'S'),
         breed: typeof dog.breed === 'string' ? dog.breed : '',   // an unknown breed string from older data is kept as text
         look: ui.own(dogs.looks, dog.look) ? dog.look : null,
-        tags: Array.isArray(dog.tags) ? dog.tags.filter(function (t) { return dogs.tags.indexOf(t) !== -1; }) : [],
+        tags: dogs.cleanTags(dog.tags),
         heat: !!dog.heatSensitive,
         space: spaceOn, spaceOrig: spaceOn, spaceMode: dog.space && dog.space.mode === 'long' ? 'long' : 'today',
         rabies: typeof dog.rabiesExpiry === 'string' ? dog.rabiesExpiry : '',
