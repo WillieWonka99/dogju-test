@@ -1011,7 +1011,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-28.db399167","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2511,7 +2511,7 @@ window.APP_BUILD = {"version":"2026-10-28.db399167","seedUrl":"seed-data.json"};
     loopRule: '繞一圈才算，直線來回不算',
     homeRoute: '家附近的路線不會畫出來',
     // Join_Link footer. There is no login: the visitor is remembered by this phone's browser.
-    joinNoApp: '不用下載 App、不用註冊，打開連結就能報名',
+    joinNoApp: '在 LINE 裡打開・不用下載 App、不用註冊',
     aggressiveShort: '法定攻擊性犬種只會看到牽繩團，並提醒戴口罩、短牽繩、成年人陪同。',
     aggressiveRemind: '記得戴口罩、短牽繩、成年人陪同',
     aggressiveNotLeash: '這團不是牽繩團，法定攻擊性犬種不能報名',
@@ -6124,7 +6124,8 @@ window.APP_BUILD = {"version":"2026-10-28.db399167","seedUrl":"seed-data.json"};
   function me() { return person(actor()); }
   function allPeople() { return Array.from(people.values()).filter(function (p) { return !isHiddenId(p.id); }); }
   function dogName(id) { var p = person(id); return (p && p.dog && p.dog.name) || '狗狗'; }
-  function ownerName(id) { var p = person(id); return (p && p.nickname) || '狗友'; }
+  /** The owner's 暱稱, else 「<dog>家」 (never 「狗友」: that word means a mutual follow, 2026-10-28). */
+  function ownerName(id) { var p = person(id); return (p && p.nickname) || (dogName(id) + '家'); }
   function defaultPerson() {
     var t = now();
     return {
@@ -12363,8 +12364,7 @@ try {
       </div>`;
     }
     if (st === 'pending-out') {
-      return html`<div class="mt-16">${ui.primaryBtn('已送出邀請', { icon: 'sent', disabled: true })}</div>
-        <div class="dm-hint"><span class="dm-pill">${ui.icon('sent', { size: 16 })}已送出邀請</span><span>等${fam}回覆</span></div>`;
+      return html`<div class="mt-16">${ui.primaryBtn('已送出邀請', { icon: 'sent', disabled: true })}</div><p class="note mt-8">等${fam}回覆。</p>`;
     }
     if (st === 'declined-out') {
       return html`<div class="mt-16">${ui.primaryBtn('想跟你家狗玩', { icon: 'invite', disabled: true })}</div><p class="note mt-8">對方這次婉拒了。</p>`;
@@ -12372,8 +12372,7 @@ try {
     if (st === 'declined-in') {
       return html`<div class="mt-16">${ui.infoPanel({ icon: 'invite', title: '你婉拒了' + name + '的邀請', body: '改變心意的話，還是可以接受。', action: ui.textBtn('改成接受', { act: 'respond', data: { id: id, ok: 1 } }) })}</div>`;
     }
-    return html`<div class="mt-16">${ui.primaryBtn('想跟你家狗玩', { act: 'invite', data: { id: id }, icon: 'invite' })}</div>
-      <div class="dm-hint"><span>按下後</span><span class="dm-pill">${ui.icon('sent', { size: 16 })}已送出邀請</span><span>等${fam}回覆</span></div>`;
+    return html`<div class="mt-16">${ui.primaryBtn('想跟你家狗玩', { act: 'invite', data: { id: id }, icon: 'invite' })}</div>`;
   }
 
   function followRow(id) {
@@ -15984,7 +15983,7 @@ try {
         <header class="px jl-head">
           <div class="grow">
             <h1 class="h1">報名狗聚</h1>
-            <span class="jl-pill">${ui.icon('line', { size: 14 })}在 LINE 裡打開・不用下載 App</span>
+            <span class="jl-pill">${ui.icon('line', { size: 14 })}${C.texts.joinNoApp}</span>
           </div>
           <span class="jl-hero">${ui.art('joinHero', { width: 78 })}</span>
         </header>
@@ -15995,7 +15994,7 @@ try {
       if (host) {
         return html`${head}
           <div class="px mt-16">${ui.infoPanel({ icon: 'announce', title: '這是你開的團', body: '把連結丟到 LINE 群組，朋友點開，填暱稱和狗名就能報名。', action: ui.textBtn('看狗聚資訊', { go: 'Event', params: { id: ev.id }, icon: 'chevronRight', iconAfter: true }) })}</div>
-          <div class="px jl-foot">${shareBtn(true)}<p class="small" style="text-align:center">${C.texts.joinNoApp}</p></div>`;
+          <div class="px jl-foot">${shareBtn(true)}</div>`;
       }
       if (block) {
         return html`${head}
@@ -16011,7 +16010,6 @@ try {
           <div class="px jl-foot">
             ${ui.primaryBtn(primaryLabel(ctx, ev), { type: 'submit' })}
             ${shareBtn(false)}
-            <p class="small" style="text-align:center">${C.texts.joinNoApp}</p>
             ${firstVisitLinks()}
           </div>
         </form>`;
