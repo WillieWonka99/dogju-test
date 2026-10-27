@@ -1005,7 +1005,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-25.39ea7680","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-27.25ca5bdf","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2602,6 +2602,9 @@ window.APP_BUILD = {"version":"2026-10-25.39ea7680","seedUrl":"seed-data.json"};
     { name: '哈士奇', size: 'L', look: 'husky' },
     { name: '其他', size: 'M', look: 'mix' }
   ].concat(AGGRESSIVE.map(function (n) { return { name: n, size: 'L', look: 'mix', aggressive: true }; }));
+  // 結紮、I 狗／E 狗（狗狗名片上，大家都看得到；都可以不填）
+  var NEUTER = { yes: '已結紮', no: '未結紮', secret: '不想說' };
+  var IE = { I: { label: 'I 狗', note: '慢熱、喜歡小團或一對一' }, E: { label: 'E 狗', note: '愛交朋友、喜歡大團' } };
   var TAGS = ['慢熟', '怕大狗', '愛追球', '會護玩具', '需要空間', 'OK 小孩', '怕小孩'];
   // 有這些標籤的狗，「今天需要空間」頁會建議打開黃圈（要跟上面 TAGS 的字一樣）
   var YELLOW_SUGGEST_TAGS = ['慢熟', '怕大狗'];
@@ -3057,7 +3060,7 @@ window.APP_BUILD = {"version":"2026-10-25.39ea7680","seedUrl":"seed-data.json"};
     firstAid: FIRST_AID, texts: TEXTS, vet: VET, hotlines: HOTLINES,
     weekly: WEEKLY, themeDays: THEME_DAYS, prizes: PRIZES, stampsPerDraw: STAMPS_PER_DRAW, stampTexts: STAMP_TEXTS,
     reminderText: REMINDER_TEXT, reminderRules: REMINDER_RULES, heatLevels: HEAT_LEVELS, heatLabel: HEAT_LABEL,
-    dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, aggressiveShort: TEXTS.aggressiveShort },
+    dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, neuter: NEUTER, ie: IE, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, aggressiveShort: TEXTS.aggressiveShort },
     privacyNote: PRIVACY_NOTE, recovery: RECOVERY, feedback: FEEDBACK, deleteMine: DELETE_MINE, updateBanner: UPDATE_BANNER, photo: PHOTO, firstRun: FIRST_RUN,
     freePlan: FREE_PLAN, health: HEALTH,
     map: MAP,
@@ -3748,7 +3751,30 @@ window.APP_BUILD = {"version":"2026-10-25.39ea7680","seedUrl":"seed-data.json"};
     return '<svg class="dogface ' + App.ui.esc(cls || '') + '" width="' + size + '" height="' + size + '" viewBox="0 0 48 48" aria-hidden="true">' + TEMPLATES[L.t]() + '</svg>';
   }
 
+  var BIRTH_RE = /^(\d{4})-(0[1-9]|1[0-2])$/;
+  /** '4 歲' / '8 個月' / '未滿 1 個月' from dog.birth ('YYYY-MM'); older profiles: dog.age (years); else ''. */
+  function ageText(dog, t) {
+    var m = dog && typeof dog.birth === 'string' && dog.birth.match(BIRTH_RE);
+    if (m) {
+      var now = new Date(t == null ? Date.now() : t);
+      var months = (now.getFullYear() - Number(m[1])) * 12 + (now.getMonth() + 1 - Number(m[2]));
+      if (months >= 12) return Math.floor(months / 12) + ' 歲';
+      if (months >= 1) return months + ' 個月';
+      if (months === 0) return '未滿 1 個月';
+    }
+    var age = dog && dog.age;
+    return typeof age === 'number' && isFinite(age) && age >= 0 ? age + ' 歲' : '';
+  }
+  /** '柴犬・4 歲・已結紮・E 狗' (blank parts left out; 「不想說」 is not shown). */
+  function metaLine(dog, t) {
+    dog = dog || {};
+    var n = dog.neutered === 'yes' || dog.neutered === 'no' ? CD.neuter[dog.neutered] : '';
+    var ie = has(CD.ie, dog.ie) ? CD.ie[dog.ie].label : '';
+    return [typeof dog.breed === 'string' ? dog.breed : '', ageText(dog, t), n, ie].filter(Boolean).join('・');
+  }
+
   App.dogs = {
+    ageText: ageText, metaLine: metaLine, birthRe: BIRTH_RE,
     /** SafeHtml <svg> face for a dog object ({look?, breed?}) or a look key string. */
     face: function (dogOrLook, o) {
       o = o || {};
@@ -5875,7 +5901,7 @@ window.APP_BUILD = {"version":"2026-10-25.39ea7680","seedUrl":"seed-data.json"};
     var t = now();
     return {
       nickname: '', demo: false,
-      dog: { name: '', breed: '', look: null, size: 'S', tags: [], heatSensitive: false, space: { on: false, mode: 'today', since: null }, rabiesExpiry: null, registered: false, age: null },
+      dog: { name: '', breed: '', look: null, size: 'S', tags: [], heatSensitive: false, space: { on: false, mode: 'today', since: null }, rabiesExpiry: null, registered: false, age: null, birth: null, neutered: null, ie: null },
       badges: { vaccine: false, registered: false, dogLanguage: false },
       // the home park itself is PRIVATE (data/users/<viewer>/private.homePark); only the switch is shared
       privacy: { checkinAudience: 'friends', checkinHours: 3, hideNearHome: true },
@@ -5987,6 +6013,15 @@ window.APP_BUILD = {"version":"2026-10-25.39ea7680","seedUrl":"seed-data.json"};
         d.rabiesExpiry = src.rabiesExpiry ? String(src.rabiesExpiry) : null;
         need(!d.rabiesExpiry || DATE_KEY_RE.test(d.rabiesExpiry), '疫苗到期日格式不對');
       }
+      if (src.birth !== undefined) {
+        d.birth = src.birth ? String(src.birth) : null;
+        if (d.birth) {
+          var bm = d.birth.match(App.dogs.birthRe), nowD = new Date(now());
+          need(bm && Number(bm[1]) >= 1990 && (Number(bm[1]) * 12 + Number(bm[2])) <= (nowD.getFullYear() * 12 + nowD.getMonth() + 1), '出生年月不對');
+        }
+      }
+      if (src.neutered !== undefined) d.neutered = own(C.dogs.neuter, src.neutered) ? src.neutered : null;
+      if (src.ie !== undefined) d.ie = own(C.dogs.ie, src.ie) ? src.ie : null;
       if (src.age !== undefined) { var age = src.age === '' || src.age == null ? null : Number(src.age); d.age = age != null && isFinite(age) && age >= 0 && age < 40 ? age : null; }
       if (src.photo === null) d.photo = null;
       patch.dog = d;
@@ -11409,11 +11444,9 @@ try {
     var pk = fav[id] ? C.park(fav[id]) : null;
     return pk ? '常去' + pk.name : '';
   }
-  /** '柯基・3 歲・常去迎風狗公園' */
+  /** '柯基・3 歲・已結紮・E 狗・常去迎風狗公園' */
   function dogMeta(ctx, id) {
-    var d = dogOf(id);
-    var age = typeof d.age === 'number' && isFinite(d.age) ? d.age + ' 歲' : '';
-    return [typeof d.breed === 'string' ? d.breed : '', age, favPark(ctx, id)].filter(Boolean).join('・');
+    return [App.dogs.metaLine(dogOf(id)), favPark(ctx, id)].filter(Boolean).join('・');
   }
   function avatar(id, size) { return ui.dogAvatar(D.person(id), { size: size || 44, bg: 'cream', label: false }); }
   function dayName(t) { var n = fmt.daysUntil(t); return n === 0 ? '今天' : n === -1 ? '昨天' : fmt.date(t); }
@@ -17088,6 +17121,16 @@ try {
           <span class="pc-group-label" id="pc-tags-label">個性標籤</span>
           <div class="chips">${dogs.tags.map(function (t) { return ui.chip(t, { pressed: tags.indexOf(t) !== -1, act: 'tag', data: { tag: t } }); })}</div>
         </div>
+        <div class="mt-16">${ui.field({ label: '出生年月（會自動算幾歲）', type: 'month', model: 'birth', value: s.birth, id: 'pc-birth' })}</div>
+        <div class="field mt-12" role="group" aria-labelledby="pc-neuter-label">
+          <span class="pc-group-label" id="pc-neuter-label">結紮</span>
+          <div class="chips">${Object.keys(C.dogs.neuter).map(function (k) { return ui.chip(C.dogs.neuter[k], { pressed: s.neutered === k, act: 'neuter', data: { v: k } }); })}</div>
+        </div>
+        <div class="field mt-12" role="group" aria-labelledby="pc-ie-label">
+          <span class="pc-group-label" id="pc-ie-label">個性</span>
+          <div class="chips">${Object.keys(C.dogs.ie).map(function (k) { return ui.chip(C.dogs.ie[k].label, { pressed: s.ie === k, act: 'ie', data: { v: k } }); })}</div>
+          <span class="field-note">${Object.keys(C.dogs.ie).map(function (k) { return C.dogs.ie[k].label + '：' + C.dogs.ie[k].note; }).join('　')}</span>
+        </div>
         <ul class="list mt-12">
           ${ui.listRow({
             lead: html`<span class="row-icon warn" aria-hidden="true">${ui.icon('heat', { size: 20 })}</span>`,
@@ -17181,6 +17224,9 @@ try {
         heat: !!dog.heatSensitive,
         space: spaceOn, spaceOrig: spaceOn, spaceMode: dog.space && dog.space.mode === 'long' ? 'long' : 'today',
         rabies: typeof dog.rabiesExpiry === 'string' ? dog.rabiesExpiry : '',
+        birth: typeof dog.birth === 'string' ? dog.birth : '',
+        neutered: ui.own(C.dogs.neuter, dog.neutered) ? dog.neutered : null,
+        ie: ui.own(C.dogs.ie, dog.ie) ? dog.ie : null,
         chip: '', chipOrig: '', chipLoading: false,
         sizeTouched: !!p, heatTouched: !!p, heatAuto: false,
         // photo: the saved one (edit), a newly chosen File + its local preview, or a removal
@@ -17247,6 +17293,9 @@ try {
       privacyNote: function () { App.openPrivacyNote(); },
       breed: function (ctx) { openBreedSheet(ctx); },
       size: function (ctx, d) { if (SIZES.indexOf(d.size) !== -1) ctx.set({ size: d.size, sizeTouched: true }); },
+      // tap again to clear (both are optional)
+      neuter: function (ctx, d) { if (ui.own(C.dogs.neuter, d.v)) ctx.set({ neutered: ctx.state.neutered === d.v ? null : d.v }); },
+      ie: function (ctx, d) { if (ui.own(C.dogs.ie, d.v)) ctx.set({ ie: ctx.state.ie === d.v ? null : d.v }); },
       tag: function (ctx, d) {
         if (dogs.tags.indexOf(d.tag) === -1) return;
         var tags = ctx.state.tags.slice();
@@ -17270,9 +17319,12 @@ try {
         if (chip && !CHIP_RE.test(chip)) { ui.toast('晶片號是 10 或 15 碼數字'); return; }
         var rabies = String(s.rabies || '').trim();
         if (rabies && !/^\d{4}-\d{2}-\d{2}$/.test(rabies)) { ui.toast('疫苗到期日格式不對'); return; }
+        var birth = String(s.birth || '').trim();
+        if (birth && !dogs.birthRe.test(birth)) { ui.toast('出生年月格式不對'); return; }
         var input = {
           nickname: String(s.nickname || '').trim(),
-          dog: { name: name, breed: s.breed || '', look: s.look || null, size: SIZES.indexOf(s.size) !== -1 ? s.size : null, tags: s.tags.slice(), heatSensitive: !!s.heat, rabiesExpiry: rabies || null }
+          dog: { name: name, breed: s.breed || '', look: s.look || null, size: SIZES.indexOf(s.size) !== -1 ? s.size : null, tags: s.tags.slice(), heatSensitive: !!s.heat, rabiesExpiry: rabies || null,
+            birth: birth || null, neutered: s.neutered || null, ie: s.ie || null }
         };
         // send the chip only when it changed (edit mode keeps the stored number otherwise)
         if (edit ? (!s.chipLoading && chip !== String(s.chipOrig || '')) : !!chip) input.chip = chip;
