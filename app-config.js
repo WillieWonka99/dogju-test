@@ -5,9 +5,13 @@
      supabaseAnonKey  「anon public」或「Publishable key」（sb_publishable_…）— 這把本來就是公開的
    千萬不要放 service_role / secret key。
    兩個都空著 = 本機模式：資料只存在那支手機，別人看不到。
-   adminTokenHash = 管理連結的指紋（不是密碼本身），由 tools/build_web.py 自動填，不用動。 */
+   adminTokenHash = 管理連結的指紋（不是密碼本身），由 tools/build_web.py 自動填，不用動。
+   lineLogin = 綁定 LINE（.env 的 LINE_LOGIN=on 才是 true；要先在 LINE Developers 和 Supabase 後台設定好）。
+   vapidPublicKey = 推播通知的公鑰（.env 的 VAPID_PUBLIC_KEY；公開的那一把。私鑰只放 Supabase，不會在這裡）。 */
 window.APP_CONFIG = {
   supabaseUrl: 'https://bxoaolzovbcdulqacaur.supabase.co',
   supabaseAnonKey: 'sb_publishable_G9rinvl00nX_2jGGOH7GTQ_333VVTA6',
-  adminTokenHash: 'b6730da825b7942f538815f52185885e52cb08c5e260dc806bb9be0708f576f9'
+  adminTokenHash: 'b6730da825b7942f538815f52185885e52cb08c5e260dc806bb9be0708f576f9',
+  lineLogin: false,
+  vapidPublicKey: ''
 };

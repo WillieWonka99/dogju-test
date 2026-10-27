@@ -1005,7 +1005,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-27.70efc79c","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2402,7 +2402,8 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
   // weekday: 0=週日 … 6=週六；time: 'HH:MM'；parkId: 上面公園的 id
   // 主題日：date 'YYYY-MM-DD'；time 可以不寫（不寫就用固定狗聚日的時間）
   // =====================================================================================================
-  var WEEKLY = { weekday: 6, time: '09:00', parkId: 'daan', title: '固定狗聚日（範例）' };
+  // on: false = 首頁不顯示固定狗聚日卡片（Willie 2026-10-27：beta 先收起來；要打開改成 true）
+  var WEEKLY = { on: false, weekday: 6, time: '09:00', parkId: 'daan', title: '固定狗聚日（範例）' };
   var THEME_DAYS = [
     { date: '2026-11-21', title: '柯基日', parkId: 'daan', example: true, note: '不是柯基也來，其他狗一律當「榮譽柯基」' }
   ];
@@ -2557,6 +2558,8 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
   // =====================================================================================================
   var REMINDER_TEXT = {
     typhoon: { tag: '颱風警報', title: '這週的固定狗聚日已自動暫停', body: '主揪不用設定，大家打開狗聚就會看到。開車的話，車別停河濱堤外，會被拖吊。', link: { screen: 'Theme_Day', label: '看固定狗聚日' }, icon: 'typhoon' },
+    // 固定狗聚日收起來的時候（WEEKLY.on: false），颱風提醒用這一則
+    typhoonNoWeekly: { tag: '颱風警報', title: '狗聚自動暫停', body: '主揪不用設定，大家打開狗聚就會看到。開車的話，車別停河濱堤外，會被拖吊。', link: { screen: 'Event', label: '看狗聚' }, icon: 'typhoon' },
     heat: { tag: '今天下午', body: '怕熱體質建議改到清晨、傍晚或延期。一直喘、站不穩，先移到陰涼處，用涼的流動水沖身體。', link: { screen: 'First_Aid', params: { card: 'heat' }, label: '中暑先這樣做' }, icon: 'heat' },
     rain: { tag: '雨後 3 到 5 天', title: '別讓狗喝水坑的水', body: '回家洗腳擦乾。鉤端螺旋體會經積水傳染，人也會被傳染。打疫苗時，確認有含鉤端螺旋體。', icon: 'rain' },
     rabies: { body: '每年要補打，沒打可罰 3 萬到 15 萬元。', action: { act: 'rabiesDone', label: '我打過了' }, icon: 'alertCircle' },
@@ -2621,15 +2624,79 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
     lead: '狗聚現在是試辦版，給朋友一起測試用。',
     sections: [
       { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
-      { title: '誰看得到', body: '用狗聚的人都看得到狗狗名片、狗聚和聊天室；打卡照你的設定（狗友或公開）。上傳的照片，拿到網址的人都看得到。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
+      { title: '誰看得到', body: '用狗聚的人都看得到狗狗名片、狗聚（誰報名哪一場）和聊天室。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
       { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位，位置只用來移動地圖，不會存起來。' },
       { title: '我出門遛狗', body: '按「我出門遛狗」才會用一次手機定位，不會一直追蹤。在公園裡就打卡在那座公園；在外面，別人只看到你大約在哪個 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。不存精確位置，也不送給任何人。家的位置只有你知道，存在你自己的資料裡。' },
-      { title: '還是測試', body: '試辦版的保護還不完整，懂技術的人可能讀得到、甚至改得到共用的資料（狗聚、聊天、協尋）；「只給狗友看」的打卡、散步的範圍和狗狗日記，也只是在畫面上藏起來，懂技術的人還是讀得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
+      { title: '還是測試', body: '試辦版的保護還不完整：狗聚、聊天和協尋這些共用的資料，懂技術的人可能改得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
+      { title: '通知（選用）', body: '在「我的」打開通知，手機會給狗聚一個推播地址，由 Google、Apple、Mozilla 或 Microsoft 的推播服務轉送。有人在你的狗聚聊天室說話、私訊你或邀請你時，手機會跳出狗聚名稱或狗狗名字，不會有訊息內容。關掉通知或刪除我的資料，這個地址就刪掉。' },
       { title: '沒有帳號', body: '不用註冊。你的身分記在這支手機的瀏覽器裡，清除瀏覽器資料、換手機、或從主畫面打開（iPhone），都會變成新的人。要變回同一隻狗，用「我的」裡的找回碼。' },
-      { title: '回報問題', body: '按「回報問題」送出時，會一起附上你是哪隻狗、畫面名稱、App 版本、手機和瀏覽器的種類、時間，方便找出問題。私訊頁的「檢舉」也會用回報問題送給開這個 App 的人。' },
+      { title: '綁定 LINE（選用）', body: '有開放時，「我的」可以綁定 LINE，換手機或換瀏覽器時用 LINE 登入就能找回同一隻狗。綁定時，登入系統會存 LINE 給的帳號編號、名字和大頭貼，只用來登入，不給別人看；不拿 email，也不會傳 LINE 訊息給你。刪除我的資料時會一起刪掉。' },
+      { title: '回報問題', body: '按「回報問題」送出時，會一起附上你是哪隻狗、畫面名稱、App 版本、手機和瀏覽器的種類、時間，方便找出問題。私訊頁的「檢舉」也會用回報問題送給開這個 App 的人。只有你和開這個 App 的人看得到。' },
       { title: '怎麼刪掉', body: '「我的」→「隱私說明」→「刪除我的資料」。刪掉後，下次打開會變成新的人。' }
     ]
   };
+  // =====================================================================================================
+  // 綁定 LINE（beta 2026-10-27）。有沒有打開看 app-config 的 lineLogin（Willie 接好 LINE 和 Supabase 才打開）
+  // {dog} = 狗狗名字
+  // =====================================================================================================
+  var LOGIN = {
+    provider: 'custom:line',                 // Supabase 後台自訂登入的名字（Custom OAuth/OIDC Providers）
+    linkTitle: '綁定 LINE',
+    linkBody: '綁了以後，換手機、換瀏覽器或從 LINE 打開，用 LINE 登入就能找回{dog}。',
+    linked: '已綁定 LINE',
+    linkedBody: '換手機時，在建立名片頁按「用 LINE 登入」就能找回{dog}。',
+    signIn: '用 LINE 登入',
+    linkedOk: '已綁定 LINE，換手機時用 LINE 登入就能找回狗狗',
+    welcome: '歡迎回來，已經用 LINE 登入',
+    newHere: '這個 LINE 還沒綁定狗狗，先建立名片吧，建好就會綁定這個 LINE',
+    taken: {
+      title: '這個 LINE 已經綁定另一隻狗',
+      body: '要用那隻狗的話，按「改用那隻狗」。這支手機上的{dog}會離開這支手機，之後要用找回碼才找得回來，請先在「我的」複製找回碼。',
+      ok: '改用那隻狗', cancel: '留在這隻狗'
+    },
+    cancelled: '已取消 LINE 登入',
+    failed: 'LINE 登入沒有完成，請再試一次'
+  };
+
+  // =====================================================================================================
+  // 使用條款（beta 2026-10-27 草稿：Willie 看過再上，之後建議請律師看）。隱私說明頁和第一次建立名片頁看得到
+  // =====================================================================================================
+  var TERMS = {
+    title: '使用條款',
+    lead: '狗聚是 Willie 做的試辦服務，免費讓飼主約狗狗一起散步、玩。用狗聚就表示同意下面這些事。（2026-10-27 版）',
+    agree: '建立名片就表示同意',
+    sections: [
+      { title: '這是試辦版', body: '功能和規則可能會改，也可能暫停或結束，重要的改變會在 App 裡說。資料可能因為技術問題遺失，重要的東西請自己另外留一份。' },
+      { title: '你的狗你負責', body: '帶狗出門請遵守各縣市的規定（公共場所牽繩、清理便便、攻擊性犬種的規定），按時打疫苗，看好自己的狗。狗狗對別的狗或人造成的傷害和損失，依法由飼主負責（民法第 190 條）。' },
+      { title: '狗聚是大家自己約的', body: '狗聚由飼主自己發起、自己參加。狗聚這個 App 不辦活動、不在現場，也不保證每個人、每隻狗的狀況。去之前看清楚規則，覺得不對就不要去，或提早離開。' },
+      { title: '不可以做的事', body: '不可以買賣狗、徵求配種、打廣告、騷擾或威脅別人、冒用別人的身分、貼出別人的住址或電話，也不可以發違法或讓人不舒服的內容。' },
+      { title: '檢舉和處理', body: '看到不對的內容或人，可以檢舉或封鎖。Willie 可能會把內容藏起來，或限制、停用帳號，不一定會先通知。' },
+      { title: '你寫的和你拍的', body: '你寫的字、上傳的照片還是你的；你同意它們在狗聚裡照你選的範圍給別人看。你可以隨時刪掉，或用「刪除我的資料」全部刪掉。' },
+      { title: '健康卡和速查卡', body: '狗狗健康卡是你自己填的資料，不是醫院的病歷；出事了速查卡只是先應急，不能取代獸醫。狗狗不舒服，請直接找獸醫。' },
+      { title: '有問題怎麼辦', body: '有問題或要申訴，用每一頁最下面的「回報問題」。' }
+    ]
+  };
+
+  // =====================================================================================================
+  // 推播通知（beta 2026-10-27）。有沒有打開看 app-config 的 vapidPublicKey（Willie 接好推播才有）
+  // =====================================================================================================
+  var PUSH = {
+    title: '通知',
+    onSub: '開著・有人在你的狗聚聊天室說話、私訊你、邀請你時通知你',
+    offSub: '關著・打開後，有人回你時手機會跳通知',
+    on: '開著', off: '關著',
+    needInstall: 'iPhone 要先在 Safari 按「分享」→「加入主畫面」，從主畫面打開狗聚，才能打開通知',
+    denied: '通知被手機擋住了，要到手機的設定裡打開狗聚的通知',
+    unsupported: '這支手機或瀏覽器不能收通知',
+    notReady: '通知還沒在後台設定好，請告訴開這個 App 的人',
+    failed: '通知沒有打開，請再試一次',
+    enabled: '通知打開了',
+    offTitle: '關掉通知？',
+    offBody: '關掉後，有人回你時手機不會跳通知，打開狗聚還是看得到紅點。',
+    offOk: '關掉',
+    disabled: '通知關掉了'
+  };
+
   var RECOVERY = {
     title: '找回碼（換手機用）',
     body: '換手機、從主畫面打開、或清掉瀏覽器資料時，輸入這組碼就會變回同一隻狗。請自己保存，不要給別人。',
@@ -3065,7 +3132,7 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
     weekly: WEEKLY, themeDays: THEME_DAYS, prizes: PRIZES, stampsPerDraw: STAMPS_PER_DRAW, stampTexts: STAMP_TEXTS,
     reminderText: REMINDER_TEXT, reminderRules: REMINDER_RULES, heatLevels: HEAT_LEVELS, heatLabel: HEAT_LABEL,
     dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, neuter: NEUTER, ie: IE, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, aggressiveShort: TEXTS.aggressiveShort },
-    privacyNote: PRIVACY_NOTE, recovery: RECOVERY, feedback: FEEDBACK, deleteMine: DELETE_MINE, updateBanner: UPDATE_BANNER, photo: PHOTO, firstRun: FIRST_RUN,
+    privacyNote: PRIVACY_NOTE, terms: TERMS, recovery: RECOVERY, login: LOGIN, push: PUSH, feedback: FEEDBACK, deleteMine: DELETE_MINE, updateBanner: UPDATE_BANNER, photo: PHOTO, firstRun: FIRST_RUN,
     freePlan: FREE_PLAN, health: HEALTH,
     map: MAP, parkStatus: PARK_STATUS,
     /** A park by id: the three legacy parks, then the shared registry (parks/<id>, installed by core/data.js). null = unknown. */
@@ -4657,10 +4724,11 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
 
   function createSupabase(cfg) {
     var sb = window.supabase.createClient(cfg.url, cfg.key, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storage: pickStorage(cfg.tab), storageKey: cfg.tab ? tabAuthKey(cfg.tab) : nsKey('dogju.auth') },
+      // pkce: coming back from LINE puts ?code=… in the query (the app's routes live in #/…); oauthReturn() exchanges it
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, flowType: 'pkce', storage: pickStorage(cfg.tab), storageKey: cfg.tab ? tabAuthKey(cfg.tab) : nsKey('dogju.auth') },
       db: { timeout: 20000 }
     });
-    var uid = null, authP = null;
+    var uid = null, authP = null, providers = [], oauthP = null, oauthRes = null;
     var docs = new Map();      // path -> {data (frozen), v, json, ver, seq}
     var docSubs = new Map();   // path -> Set(listener)
     var querySubs = new Set();
@@ -4760,6 +4828,64 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
         sleep(8000).then(function () { return false; })
       ]);
     }
+    // ---------------------------------------------------------------- LINE (beta 2026-10-27: 綁定 / 用 LINE 登入)
+    /** Back from LINE: ?code=… (PKCE) → this browser's session (the bound sign-in, or this one with LINE linked);
+        ?error=… (cancelled, LINE already linked to another dog) → oauthRes. The address bar is cleaned first: the
+        router only knows #/…, and a code must never be shared in a screenshot or link. Runs once, before sign-in. */
+    function oauthReturn() {
+      if (oauthP) return oauthP;
+      var q = null, hq = null;
+      try { q = new URLSearchParams(window.location.search); } catch (e) { q = null; }
+      try { if (/^#(error|error_code|error_description)=/.test(window.location.hash)) hq = new URLSearchParams(window.location.hash.slice(1)); } catch (e) { hq = null; }
+      var code = q && q.get('code');
+      var err = (q && (q.get('error_code') || q.get('error'))) || (hq && (hq.get('error_code') || hq.get('error')));
+      if (!code && !err) return (oauthP = Promise.resolve(null));
+      // only when THIS tab went to LINE (App.me.lineGo left a note): a link someone else made with ?code= / ?error= is
+      // only cleaned from the address bar — no exchange, no message (審查 2026-10-27)
+      var pending = null;
+      try { pending = window.sessionStorage.getItem(nsKey('dogju.oauth')); } catch (e) { pending = null; }
+      try {
+        var u = new URL(window.location.href);
+        ['code', 'state', 'error', 'error_code', 'error_description'].forEach(function (k) { u.searchParams.delete(k); });
+        window.history.replaceState(null, '', u.pathname + u.search + (hq ? '' : u.hash));
+      } catch (e) { /* sandboxed: ignore */ }
+      if (!pending) return (oauthP = Promise.resolve(null));
+      if (err) return (oauthP = Promise.resolve(oauthRes = { ok: false, code: String(err).slice(0, 60) }));
+      oauthP = Promise.resolve().then(function () { return sb.auth.exchangeCodeForSession(code); }).then(function (r) {
+        oauthRes = r && r.error ? { ok: false, code: String(r.error.code || 'exchange').slice(0, 60) } : { ok: true };
+        return oauthRes;
+      }, function (e) {
+        console.warn('[store] LINE sign-in did not finish', e);
+        return (oauthRes = { ok: false, code: 'exchange' });
+      });
+      return oauthP;
+    }
+    /** Open LINE: kind 'link' (bind it to this sign-in) or 'signin' (become the sign-in it is bound to). The library
+        only builds the URL (skipBrowserRedirect); this page goes there itself. Resolves when the page is leaving. */
+    function oauthStart(kind, provider, redirectTo) {
+      return ready().then(function () {
+        var cred = { provider: provider, options: { redirectTo: redirectTo, skipBrowserRedirect: true } };
+        return kind === 'link' ? sb.auth.linkIdentity(cred) : sb.auth.signInWithOAuth(cred);
+      }).then(function (r) {
+        var url = r && r.data && r.data.url;
+        if ((r && r.error) || !url) {
+          var e = dbError('unavailable', 'oauth: ' + String((r && r.error && (r.error.code || r.error.message)) || 'no url'));
+          e.userMessage = /manual.?linking|disabled|not enabled|unsupported|validation/i.test(String(r && r.error && (r.error.message + ' ' + r.error.code)))
+            ? 'LINE 登入還沒在後台打開，請告訴開這個 App 的人。' : SB_NET_MSG;
+          e._dg = true;
+          throw e;
+        }
+        window.location.assign(url);
+        return url;
+      });
+    }
+    function readProviders(s) {
+      var ids = s && s.user && Array.isArray(s.user.identities) ? s.user.identities : [];
+      var list = ids.map(function (i) { return i && typeof i.provider === 'string' ? i.provider : ''; });
+      var meta = s && s.user && s.user.app_metadata && Array.isArray(s.user.app_metadata.providers) ? s.user.app_metadata.providers : [];
+      providers = list.concat(meta).filter(function (x, i, a) { return x && x !== 'anonymous' && a.indexOf(x) === i; });
+    }
+
     /** Resolves the viewer's uid. Reuses the stored session (same phone + browser = same person). */
     function signIn() {
       if (uid) return Promise.resolve(uid);
@@ -4769,7 +4895,7 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       var probe = saved.raw && isFinite(exp) && exp * 1000 < Date.now() + 10000 ? authHealthy() : Promise.resolve(true);
       authP = probe.then(function (healthy) {
         if (!healthy) { var off = dbError('unavailable', 'sign-in: Supabase is not answering'); off.userMessage = SB_OFFLINE_MSG; off._dg = true; throw off; }
-        return sb.auth.getSession();
+        return oauthReturn().then(function () { return sb.auth.getSession(); });
       }).then(function (r) {
         var s = r && r.data && r.data.session;
         if (s && s.user && s.user.id) return s;
@@ -4799,6 +4925,7 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       }).then(function (s) {
         if (!SEG_RE.test(String(s.user.id))) throw authError(new Error('unexpected user id'));
         uid = String(s.user.id);
+        readProviders(s);
         // realtime must carry this visitor's token before the first channel joins (row level security)
         return Promise.resolve(sb.realtime.setAuth()).catch(noop).then(function () { return uid; });
       }).catch(function (e) { authP = null; throw authError(e); });
@@ -5069,6 +5196,9 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       });
     }
     var lastAll = 0;
+    /** Read the collections whose key matches again now (beta 隱私鎖: what this viewer may read changed — e.g. a new
+        狗友 — but those rows did not change, so realtime brings nothing). */
+    function refetch(match) { feeds.forEach(function (f) { if (f.kind === 'c' && !f.dead && !f.error && match(f.key)) fetchFeed(f); }); }
     function refetchAll(force) {
       if (!force && Date.now() - lastAll < 2000) return;
       lastAll = Date.now();
@@ -5410,6 +5540,10 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       photoUrlOk: photoUrlOk,
       health: { mode: 'storage', upload: healthUpload, urls: healthUrls, remove: healthRemove, list: healthList, listInfo: healthListInfo, move: healthMove, urlOk: healthUrlOk },
       uid: function () { return uid; },
+      oauthStart: oauthStart,
+      refetch: refetch,
+      oauthResult: function () { return oauthRes; },
+      loginProviders: function () { return providers.slice(); },
       client: sb,
       _count: function () { return docs.size; },
       _paths: function () { return Array.from(docs.keys()); },
@@ -5635,6 +5769,17 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       if (App.store.backend === 'mock') return backend.rpc(name, args, App.store._mockUid).catch(function (e) { throw handleError(e); });
       return call(function () { return backend.rpc(name, args); });
     },
+    /** LINE (supabase only): open LINE to bind it ('link') or to sign in with it ('signin'); the page leaves. */
+    oauthStart: function (kind, provider, redirectTo) {
+      if (!backend || !backend.oauthStart) return Promise.reject(Object.assign(dbError('not_configured', 'no LINE in this backend'), { userMessage: '這個版本不能用 LINE 登入' }));
+      return backend.oauthStart(kind, provider, redirectTo).catch(function (e) { throw handleError(e); });
+    },
+    /** Supabase: read the watched collections whose key matches (fn(key) → bool) again; other backends: nothing to do. */
+    refetch: function (match) { if (backend && backend.refetch && typeof match === 'function') backend.refetch(match); },
+    /** What came back from LINE at this page load: null, {ok:true} or {ok:false, code}. */
+    oauthResult: function () { return backend && backend.oauthResult ? backend.oauthResult() : null; },
+    /** Login providers bound to this sign-in (e.g. ['custom:line']); [] for an anonymous one. */
+    loginProviders: function () { return backend && backend.loginProviders ? backend.loginProviders() : []; },
     /** 'storage' (supabase: public bucket 'photos') | 'inline' (mock / claude: a small data: URL kept in the doc) */
     photoMode: function () { return backend && backend.photoMode === 'storage' ? 'storage' : 'inline'; },
     /** Upload a picture (Blob) to '<folder>/<kind>/<file>' → Promise<url> (supabase: public URL; inline: data URL). */
@@ -5872,6 +6017,14 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       var m = new Map();
       qs.docs.forEach(function (d) { m.set(d.id, d.data()); });
       followsMap = m; emit('follows'); recomputeUnread();
+      // beta 隱私鎖: the server shows friends-only check-ins / diary posts / visits to 狗友 only. A new (or lost) 狗友
+      // changes what we may read, though those rows did not change: read them again.
+      var sig = friendSig();
+      if (sig !== lastFriendSig) {
+        var first = lastFriendSig === null;
+        lastFriendSig = sig;
+        if (!first) S().refetch(function (k) { return /^(checkins|visits|territory|diary)(\/|$)/.test(k); });
+      }
     }, function (e) { console.warn('[data] follows listener', e); });
     // unread dots: events carry lastMessageAt/lastMessageBy, DM threads lastMessageAt/lastBy, my read marks are private
     S().collection('events').onSnapshot(function (qs) { eventsAll = listOf(qs).map(normEvent).filter(Boolean); recomputeUnread(); },
@@ -6855,7 +7008,15 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       });
     }).then(function () { return { near: near, until: doc.until }; });
   }
-  function checkOut() { var who = actor(); return S().doc('checkins/' + who).delete(); }
+  /** 離開公園 / 結束散步: the check-in is marked ENDED, not deleted (審查 2026-10-27). A delete reaches every phone's
+      realtime with the path — with presence/<parkId> changing at the same moment, a stranger could tell which park a
+      friends-only dog had been at. An update only reaches the phones allowed to read the row. */
+  function endedCheckin(who) {
+    var p = person(who), t = now();
+    var aud = p && p.privacy && p.privacy.checkinAudience === 'public' ? 'public' : 'friends';
+    return { parkId: null, near: false, at: t, until: t, audience: aud, ended: true };
+  }
+  function checkOut() { var who = actor(); return S().doc('checkins/' + who).set(endedCheckin(who)); }
 
   // ===================================================================== 我出門遛狗 (walk check-in)
   // One location fix → the park you are in (a normal check-in), or a FIXED grid cell: 0.001° (~100 m) or, near your
@@ -6920,7 +7081,7 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       var at = typeof c.at === 'number' ? c.at : t;
       var doc = { parkId: near ? null : c.parkId, near: near, at: at, until: at + r.hours * HOUR, audience: r.audience };
       var expired = !(doc.until > t);
-      return (expired ? ref.delete() : ref.set(doc)).then(function () { return { near: near, until: doc.until, expired: expired }; });
+      return ref.set(expired ? endedCheckin(actor()) : doc).then(function () { return { near: near, until: doc.until, expired: expired }; });
     });
   }
   /** A walk in progress gets the current audience / hours / 家附近. Without the exact point, the stored cell centre
@@ -6934,7 +7095,7 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       var doc = { kind: 'walk', cell: near ? cellOf(pt.lat, pt.lng, 500) : c.cell, r: rr, area: near ? (c.r > 100 ? (c.area || '') : App.osm.districtNear(pt.lat, pt.lng)) : '',
         parkId: null, near: near, at: at, until: at + r.hours * HOUR, audience: r.audience };
       var expired = !(doc.until > t);
-      return (expired ? ref.delete() : ref.set(doc)).then(function () { return { near: near, until: doc.until, expired: expired }; });
+      return ref.set(expired ? endedCheckin(actor()) : doc).then(function () { return { near: near, until: doc.until, expired: expired }; });
     });
   }
   function canSeeCheckin(c, viewer) {
@@ -6942,16 +7103,33 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
     return c.id === viewer || c.audience === 'public' || isFriend(c.id, viewer);
   }
   /** cb(list of active check-ins [{id, parkId|null, near, at, until, audience, visible}]) — expires live (minute tick). */
+  /** cb(check-ins that have not ended, newest first; visible = may the viewer see WHO it is). Supabase (beta 隱私鎖):
+      friends-only check-ins of other dogs never reach a stranger, but presence/<parkId> (written only by the database)
+      lists them as {t: {<tok>: until}} — they come back here as anonymous entries {id:'anon_<tok>', anon:true, parkId,
+      until, visible:false}, so the map and the boards still count them without saying which dog. A check-in this viewer
+      CAN read carries the same tok, so it is never counted twice. */
   function watchCheckins(cb) {
-    var last = [];
+    var last = [], anon = [];
     function deliver() {
-      var t = now();
+      var t = now(), toks = {};
+      last.forEach(function (c) { if (typeof c.tok === 'string' && c.tok) toks[c.tok] = true; });
+      var extra = anon.filter(function (a) { return a.until > t && !toks[a.tok]; }).map(function (a) {
+        return { id: 'anon_' + a.tok, anon: true, parkId: a.parkId, until: a.until, at: 0, audience: 'friends', near: false, visible: false };
+      });
       cb(last.filter(function (c) { return c.until > t; }).map(function (c) { return Object.assign({}, c, { visible: canSeeCheckin(c) }); })
-        .sort(function (a, b) { return b.at - a.at; }));
+        .sort(function (a, b) { return b.at - a.at; }).concat(extra));
     }
     var unsub = S().collection('checkins').onSnapshot(function (qs) { last = listOf(qs); deliver(); }, function () { cb([]); });
+    var unsub2 = S().collection('presence').onSnapshot(function (qs) {
+      anon = [];
+      listOf(qs).forEach(function (d) {
+        if (!ok(d.id) || !isMap(d.t)) return;
+        Object.keys(d.t).forEach(function (tok) { var u = Number(d.t[tok]); if (/^[A-Za-z0-9_-]{4,40}$/.test(tok) && isFinite(u)) anon.push({ tok: tok, parkId: d.id, until: u }); });
+      });
+      deliver();
+    }, function () { anon = []; deliver(); });
     var off = onChange(function (k) { if (k === 'tick' || k === 'follows') deliver(); });
-    return function () { unsub(); off(); };
+    return function () { unsub(); unsub2(); off(); };
   }
   /** {byPark:{[parkId]: [checkins]}, near:[checkins], mine: checkin|null} */
   function presence(list) {
@@ -6994,6 +7172,15 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
     return best;
   }
   function getVisits(id) { if (id && !ok(id)) return Promise.resolve(null); return S().doc('visits/' + (id || actor())).get().then(docData); }
+  /** 常客榜 (Supabase, 偷看測試 2026-10-27): the visit history of a dog whose check-ins are only for its 狗友 is closed to
+      everyone else, so the server gives just the day counts of those dogs at this park — no names, no times (rpc
+      park_hidden_regulars). Mock / claude.ai: [] (every visit doc is readable there and regulars() marks them hidden). */
+  function hiddenRegulars(parkId, days) {
+    if (!ok(parkId) || S().backend !== 'supabase') return Promise.resolve([]);
+    return S().rpc('park_hidden_regulars', { p_park: parkId, p_days: days || 28 }).then(function (r) {
+      return (Array.isArray(r) ? r : []).map(Number).filter(function (n) { return isFinite(n) && n >= 1; }).slice(0, 50);
+    }, function (e) { console.warn('[data] hidden regulars', e && e.message); return []; });
+  }
 
   // ===================================================================== stamps (遛狗集章)
   var STAMPS_PER_DRAW = C.stampsPerDraw || 6;
@@ -7167,6 +7354,13 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
   function followers(id) { id = id || actor(); var out = []; followsMap.forEach(function (d, k) { if (d && own(d.following, id) && exists(k)) out.push(k); }); return out; }
   function isFollowing(other, id) { return !!own(followDoc(id).following, other); }
   function isBlocked(other, id) { return !!own(followDoc(id).blocked, other); }
+  var lastFriendSig = null;
+  /** The 狗友 of the acting dog, as one string (changes when one is added or lost). */
+  function friendSig() {
+    var me = actor(), out = [];
+    followsMap.forEach(function (v, id) { if (id !== me && isFriend(me, id)) out.push(id); });
+    return out.sort().join(',');
+  }
   /** 狗友 = mutual follow. Used for check-in visibility ('friends'). */
   function isFriend(a, b) { return isFollowing(b, a) && isFollowing(a, b); }
   function follow(otherId, on) {
@@ -7298,8 +7492,9 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
 
   // ===================================================================== 狗狗日記 (diary)
   // diary/<id> = {by, text, photos:[{url, path, thumb, thumbPath, w, h}], audience, at, likes:{<id>:true|null},
-  // commentCount, lastCommentAt}; comments in diary/<id>/comments. Friend-only posts are hidden on screen (the shared
-  // docs are readable by everyone signed in — the privacy note says so).
+  // commentCount, lastCommentAt}; comments in diary/<id>/comments. Friend-only posts: the server (web/supabase.sql
+  // docs_can_read, beta 隱私鎖) gives them and their comments to the author and the author's 狗友 only; normDiary hides
+  // them on screen too (the mock has no server rules).
   var DIARY_MAX_PHOTOS = 3, DIARY_MAX_TEXT = 500, DIARY_MAX_COMMENT = 300;
   function diaryRef(id) { return S().doc('diary/' + needId(id, '找不到這篇日記')); }
   function diaryComments(id) { return S().collection('diary/' + needId(id, '找不到這篇日記') + '/comments'); }
@@ -7525,13 +7720,18 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
     if (i > 0 && dog && dog.heatSensitive) i = Math.min(HEAT_LEVELS.length - 1, i + 1);
     return HEAT_LEVELS[i];
   }
+  /** The typhoon card: about the 固定狗聚日 only while that card is on the home page (App.content.weekly.on). */
+  function typhoonReminder() {
+    var R = REMINDER_TEXT, wk = App.content.weekly;
+    return Object.assign({ id: 'typhoon' }, wk && wk.on === false && R.typhoonNoWeekly ? R.typhoonNoWeekly : R.typhoon);
+  }
   /** Reminder cards for Reminders / Profile badge: [{id, tag, title, body, icon, link?:{screen, params, label}, action?:{act, label}}] */
   function computeReminders(p, t) {
     t = t == null ? now() : t;
     p = p || me();
     var out = [];
     var R = REMINDER_TEXT;
-    if (sim.typhoon) out.push(Object.assign({ id: 'typhoon' }, R.typhoon));
+    if (sim.typhoon) out.push(typhoonReminder());
     var hl = heatLevel(p);
     if (hl !== 'normal') out.push(Object.assign({ id: 'heat', title: '熱指數「' + HEAT_LABEL[hl] + '」', level: hl }, R.heat));
     if (sim.rainRecent) out.push(Object.assign({ id: 'rain' }, R.rain));
@@ -8933,12 +9133,17 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       return Promise.all(jobs);
     }).then(function () {
       // my own documents last (the steps above did not need them)
-      return paced(['people/', 'checkins/', 'visits/', 'stamps/', 'territory/', 'follows/'].map(function (p) { return p + self; })
+      // end the check-in first (an update, see checkOut): the delete below then changes no park count
+      return step(S().doc('checkins/' + self).get().then(function (s) { return s.exists ? S().doc('checkins/' + self).set(endedCheckin(self)) : null; }))
+        .then(function () { return paced(['people/', 'checkins/', 'visits/', 'stamps/', 'territory/', 'follows/'].map(function (p) { return p + self; })
         .concat(['data/users/' + self + '/private', 'data/users/' + self + '/reads', 'data/users/' + self + '/health', 'data/users/' + self + '/healthLinks']),
-        function (path) { return step(S().doc(path).delete()); });
+        function (path) { return step(S().doc(path).delete()); }); });
     }).then(function () {
       if (failed) throw userError('有些資料沒有刪完，請再按一次「刪除我的資料」');
-      // recovery code, links, claim attempts, every health-card link (server; the mock emulates it)
+      // 推播通知 off on this phone (best effort; forget_me removes every address of this dog on the server anyway)
+      return App.push && App.push.supported() ? App.push.disable().catch(function (e) { console.warn('[data] push off', e); }) : null;
+    }).then(function () {
+      // recovery code, links, claim attempts, every health-card link, push addresses, logins (server; the mock emulates it)
       return S().backend === 'claude' ? null : S().rpc('forget_me').catch(function (e) { if (e && e.code !== 'not_configured') throw e; });
     }).then(function () {
       memPrivate = {}; homeCache = {}; homeLoading = {}; homeAtCache = {}; careCache = {}; careLoading = {}; pstatCache = {}; pstatLoading = {}; memReads = {}; recP = {}; hUrls = {}; uploadOpen = {};
@@ -9219,7 +9424,7 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
     toggleWoof: toggleWoof, addDiaryComment: addDiaryComment, deleteDiaryComment: deleteDiaryComment, deleteDiary: deleteDiary,
     ensurePark: ensurePark, cleanParkName: cleanParkName, cellOf: cellOf, distM: distM, walkCheckIn: walkCheckIn, notePark: notePark, parkShared: parkShared, myHomeParkInfo: myHomeParkInfo, myHomeAt: myHomeAt,
     checkIn: checkIn, checkOut: checkOut, reapplyCheckinPrivacy: reapplyCheckinPrivacy, watchCheckins: watchCheckins, presence: presence, canSeeCheckin: canSeeCheckin,
-    watchVisits: watchVisits, getVisits: getVisits, regulars: regulars, favoritePark: favoritePark,
+    watchVisits: watchVisits, getVisits: getVisits, regulars: regulars, hiddenRegulars: hiddenRegulars, favoritePark: favoritePark,
     // stamps
     watchStamps: watchStamps, addStamp: addStamp, stampSummary: stampSummary, useDraw: useDraw, addLeaveStamp: addLeaveStamp,
     // territory
@@ -9235,7 +9440,7 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
     createLost: createLost, watchLostList: watchLostList, watchLost: watchLost, addSighting: addSighting, markFound: markFound, getLostSecret: getLostSecret,
     lostColorLabel: lostColorLabel,
     // sim & reminders
-    sim: getSim, setSim: setSim, heatLevel: heatLevel, computeReminders: computeReminders, followActivity: followActivity,
+    sim: getSim, setSim: setSim, heatLevel: heatLevel, computeReminders: computeReminders, typhoonReminder: typhoonReminder, followActivity: followActivity,
     watchSim: function (cb) { return cacheWatch(['sim'], getSim, cb); },
     // misc
     resetMyData: resetMyData, writeRows: writeRows, userError: userError, newId: newId,
@@ -9303,6 +9508,7 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
   var LS_VIEWER = 'dogapp.viewer';
   var LS_ADMIN = 'dogju.admin';
   var SS_AFTER = 'dogju.afterReload';
+  var SS_OAUTH = 'dogju.oauth';  // {kind:'link'|'signin', hash} while the page is away at LINE
   function K(k) { return App.store && App.store.nsKey ? App.store.nsKey(k) : k; }
   function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { if (v == null) window.localStorage.removeItem(k); else window.localStorage.setItem(k, v); } catch (e) { /* ignore */ } }
@@ -9416,6 +9622,7 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
         return resolveSelf();
       }).then(function (self) {
         me.selfId = self;
+        afterOAuth();
         checkAdmin();
         // A remembered persona is only a hint: it is re-checked by validatePersona() once people are loaded.
         var persona = me.isAdmin ? ssGet(K('dogapp.actAs.' + me.selfId)) : null;
@@ -9468,6 +9675,23 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
         return { ok: true, actor: r.actor };
       });
     },
+    /** LINE 綁定 (beta 2026-10-27): on in this build (APP_CONFIG.lineLogin, set once LINE and Supabase are connected),
+        Supabase only, real people only (not a demo persona). */
+    lineOn: function () {
+      var c = window.APP_CONFIG;
+      return !!(c && c.lineLogin === true) && App.store.backend === 'supabase' && !me.isPersona && !me.anonymous;
+    },
+    /** This sign-in has LINE bound (Supabase keeps the identity; we only read its provider name). */
+    lineLinked: function () { return App.store.loginProviders().indexOf(App.content.login.provider) !== -1; },
+    /** Go to LINE: 'link' = bind LINE to this dog; 'signin' = become the dog this LINE is bound to (first run / after
+        「改用那隻狗」). Remembers where to come back (#/…) and what for; the page leaves. */
+    lineGo: function (kind) {
+      if (!me.lineOn()) return Promise.reject(App.data.userError('這個版本還不能用 LINE 登入'));
+      ssSet(K(SS_OAUTH), JSON.stringify({ kind: kind === 'signin' ? 'signin' : 'link', hash: String(location.hash || '').slice(0, 600) }));
+      var back = location.origin + location.pathname + location.search;
+      return App.store.oauthStart(kind === 'signin' ? 'signin' : 'link', App.content.login.provider, back)
+        .catch(function (e) { ssSet(K(SS_OAUTH), null); throw e; });
+    },
     /** 刪除我的資料 (last step): forget this browser's identity, then reload as a new person. */
     signOutAndReload: function (msg) {
       var slot = viewerSlot(App.store.mode === 'cloud');
@@ -9492,6 +9716,14 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       var msg = ssGet(K(SS_AFTER));
       if (msg) { ssSet(K(SS_AFTER), null); App.ui.toast(msg, { ms: 3600 }); }
       if (me._adminNote) { App.ui.toast(me._adminNote); me._adminNote = null; }
+      var o = me._oauth; me._oauth = null;
+      if (!o) return;
+      var L = App.content.login;
+      if (!o.ok) {
+        if (o.code === 'identity_already_exists') openTaken();
+        else App.ui.toast(/access_denied|cancel/i.test(o.code) ? L.cancelled : L.failed, { ms: 3600 });
+      } else if (o.kind === 'link') App.ui.toast(L.linkedOk, { ms: 3600 });
+      else App.ui.toast(App.data.me() ? L.welcome : L.newHere, { ms: 4200 });
     },
     openTestSheet: function () { if (me.isAdmin) openTestSheet(); },
     mountPill: mountPill
@@ -9508,6 +9740,28 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
       var h = ok ? App.router.hashFor(n.name, n.params && typeof n.params === 'object' ? n.params : {}) : '#/Main';
       history.replaceState(null, '', h);
     } catch (e) { /* sandboxed frame: Profile_Create handles an existing profile itself */ }
+  }
+  /** Back from LINE (App.store.oauthResult): put the screen they left from back in the address bar (#/…) before the
+      router starts, and keep what to tell them for afterBoot(). Nothing came back (they used the back button): forget it. */
+  function afterOAuth() {
+    var raw = ssGet(K(SS_OAUTH)), res = App.store.oauthResult ? App.store.oauthResult() : null;
+    if (!res) return;
+    ssSet(K(SS_OAUTH), null);
+    var saved = null;
+    try { saved = JSON.parse(raw || 'null'); } catch (e) { saved = null; }
+    if (saved && typeof saved.hash === 'string' && /^#\//.test(saved.hash)) {
+      try { history.replaceState(null, '', location.pathname + location.search + saved.hash); } catch (e) { /* sandboxed */ }
+    }
+    me._oauth = { ok: !!res.ok, code: res.code || '', kind: saved && saved.kind === 'signin' ? 'signin' : 'link' };
+  }
+  /** LINE is already bound to another dog: explain, and offer to become that dog (this phone's dog then needs its
+      recovery code to come back). */
+  function openTaken() {
+    var L = App.content.login, ui = App.ui, p = App.data.me();
+    var name = (p && p.dog && p.dog.name) || '現在的狗狗';
+    ui.confirm({ title: L.taken.title, body: L.taken.body.replace('{dog}', name), ok: L.taken.ok, cancel: L.taken.cancel }).then(function (yes) {
+      if (yes) return me.lineGo('signin').catch(function (e) { ui.toast((e && e.userMessage) || L.failed); });
+    });
   }
   /** Reload the page, showing `msg` as a toast once it is back. */
   function reloadWith(msg) {
@@ -9644,6 +9898,95 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
 
   App.me = me;
   App._updateTestPill = updatePill;
+})(window.App = window.App || {});
+
+;
+/* ---- core/push.js ---- */
+/* App.push — 推播通知 on this phone (beta 2026-10-27). The database decides who is notified and sends it (web/supabase.sql
+   docs_push → Edge Function 'push'); this file only turns notifications on / off here:
+     on  = permission → sw.js registered → pushManager.subscribe(VAPID public key) → rpc push_subscribe (the address is
+           stored in push_subs, which nobody can read — only the database's own trigger uses it)
+     off = unsubscribe here → rpc push_unsubscribe
+   Only in a build with a VAPID public key (APP_CONFIG.vapidPublicKey) and Supabase. iPhone: only from the home screen
+   (Add to Home Screen) — Safari tabs have no push. _env is the browser (tests replace it). */
+(function (App) {
+  'use strict';
+  var env = {
+    get Notification() { return window.Notification; },
+    get sw() { return navigator.serviceWorker || null; },
+    get ios() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); },
+    get standalone() { return navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches); }
+  };
+  function E() { return api._env || env; }
+  function key() { var c = window.APP_CONFIG; return c && typeof c.vapidPublicKey === 'string' && /^B[A-Za-z0-9_-]{86}$/.test(c.vapidPublicKey) ? c.vapidPublicKey : ''; }
+  function base() { return !!key() && App.store.backend === 'supabase' && !App.me.isPersona && !App.me.anonymous; }
+  function b64(s) {
+    var pad = '='.repeat((4 - s.length % 4) % 4), raw = atob((s + pad).replace(/-/g, '+').replace(/_/g, '/'));
+    var out = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+  }
+  function err(msg) { return App.data.userError(msg); }
+  function registration() { var sw = E().sw; return sw && sw.getRegistration ? Promise.resolve(sw.getRegistration()).catch(function () { return null; }) : Promise.resolve(null); }
+  function current() { return registration().then(function (reg) { return reg && reg.pushManager ? reg.pushManager.getSubscription() : null; }).catch(function () { return null; }); }
+
+  var api = {
+    _env: null,
+    /** Notifications can be turned on here. */
+    supported: function () { var e = E(); return base() && !!(e.sw && e.Notification) && !(e.ios && !e.standalone); },
+    /** iPhone / iPad in a Safari tab: push needs 「加入主畫面」 first (the row says so). */
+    needInstall: function () { var e = E(); return base() && !!e.ios && !e.standalone; },
+    /** 'on' | 'off' | 'denied' (blocked in the phone's settings) | 'unsupported' */
+    state: function () {
+      if (!api.supported()) return Promise.resolve('unsupported');
+      var N = E().Notification;
+      if (N && N.permission === 'denied') return Promise.resolve('denied');
+      return current().then(function (sub) { return sub && N && N.permission === 'granted' ? 'on' : 'off'; });
+    },
+    enable: function () {
+      var C = App.content.push, e = E();
+      if (!api.supported()) return Promise.reject(err(api.needInstall() ? C.needInstall : C.unsupported));
+      return Promise.resolve(e.Notification.requestPermission()).then(function (p) {
+        if (p !== 'granted') throw err(C.denied);
+        return e.sw.register('sw.js');
+      }).then(function (reg) {
+        return reg.pushManager.getSubscription().then(function (old) {
+          return old || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(key()) });
+        });
+      }).then(function (sub) {
+        var j = sub.toJSON ? sub.toJSON() : sub;
+        if (!j || !j.endpoint || !j.keys) throw err(C.failed);
+        return App.store.rpc('push_subscribe', { p_endpoint: String(j.endpoint), p_p256dh: String(j.keys.p256dh || ''), p_auth: String(j.keys.auth || '') });
+      }).catch(function (x) {
+        if (x && x.code === 'not_configured') throw err(C.notReady);
+        throw x && x.userMessage ? x : err(C.failed);
+      });
+    },
+    /** At every start (core/app.js): when 通知 is on here, store the address again — it then belongs to the dog this
+        phone is NOW (after 我有找回碼 / 用 LINE 登入 the old dog's notifications stop, the new dog's come). No prompt. */
+    refresh: function () {
+      if (!api.supported()) return Promise.resolve(false);
+      var N = E().Notification;
+      if (!N || N.permission !== 'granted') return Promise.resolve(false);
+      return current().then(function (sub) {
+        if (!sub) return false;
+        var j = sub.toJSON ? sub.toJSON() : sub;
+        if (!j || !j.endpoint || !j.keys) return false;
+        return App.store.rpc('push_subscribe', { p_endpoint: String(j.endpoint), p_p256dh: String(j.keys.p256dh || ''), p_auth: String(j.keys.auth || '') }).then(function () { return true; });
+      }).catch(function (e) { console.warn('[push] refresh', e && e.message); return false; });
+    },
+    /** Off on this phone (best effort: a failure here still removes the address on the server when it can). */
+    disable: function () {
+      return current().then(function (sub) {
+        if (!sub) return null;
+        var endpoint = String((sub.toJSON ? sub.toJSON() : sub).endpoint || sub.endpoint || '');
+        return Promise.resolve(sub.unsubscribe()).catch(function () { return null; }).then(function () {
+          return endpoint ? App.store.rpc('push_unsubscribe', { p_endpoint: endpoint }).catch(function (x) { if (x && x.code !== 'not_configured') throw x; }) : null;
+        });
+      });
+    }
+  };
+  App.push = api;
 })(window.App = window.App || {});
 
 ;
@@ -10071,6 +10414,20 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
     });
   };
 
+  /** 使用條款 (beta 2026-10-27, App.content.terms) as a sheet — the first-run form's 「建立名片就表示同意」 link. */
+  App.openTerms = function () {
+    var ui = App.ui, html = ui.html, T = App.content.terms;
+    ui.sheet({
+      title: T.title,
+      render: function () {
+        return html`<p class="sub">${T.lead}</p>
+          ${T.sections.map(function (sec) { return html`<h3 class="h3 mt-16">${sec.title}</h3><p class="note mt-4">${sec.body}</p>`; })}
+          <div class="sheet-actions">${ui.secondaryBtn('知道了', { act: 'ok' })}</div>`;
+      },
+      actions: { ok: function (s) { s.close(); } }
+    });
+  };
+
   // ------------------------------------------------------------------ new version (web build)
   /* tools/build_web.py writes APP_BUILD.version into the page and the same value into version.json. The page reads
      version.json (cache-busted) when it comes back to the foreground and every 5 minutes; when it differs, a quiet
@@ -10154,6 +10511,7 @@ window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
         App.data.onChange(function (k) { if (k === 'people') App._updateTestPill(); });
         App.me.afterBoot();
         App.version.start();
+        if (App.push && App.push.refresh) App.push.refresh(); // 通知: the address follows the dog this phone is now
       })
       .catch(function (e) {
         clearTimeout(slow); clearTimeout(slower);
@@ -10196,6 +10554,8 @@ try {
       '.scr-Admin .adm-row .grow{min-width:0}',
       '.adm-t{font-size:15px;line-height:20px;font-weight:700;color:var(--ink);overflow-wrap:anywhere}',
       '.adm-s{font-size:13px;line-height:18px;color:var(--muted);overflow-wrap:anywhere}',
+      '.adm-id{padding:16px;margin-bottom:12px}',
+      '.adm-sql{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:18px;color:var(--ink);overflow-wrap:anywhere;user-select:all;-webkit-user-select:all}',
       '.scr-Admin .adm-acts{margin-top:4px;display:flex;flex-wrap:wrap;gap:0 12px;align-items:center}',
       '.scr-Admin .adm-acts .btn-text{min-height:44px;padding-left:0;padding-right:0}',
       '.scr-Admin .adm-fb-text{font-size:16px;line-height:23px;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}',
@@ -10268,9 +10628,23 @@ try {
   function byId(list, id) { return (list || []).filter(function (x) { return x && x.id === id; })[0] || null; }
 
   // ------------------------------------------------------------------ 回報問題
+  /** 回報問題只給你看 (偷看測試 2026-10-27): the SQL line that puts THIS phone's sign-in into public.admins. Until a row is
+      there, every signed-in visitor can read 回報問題 (so this page keeps working); after it, only the writer and the
+      phones listed. Supabase only. */
+  function adminSql() { return "insert into public.admins (uid) values ('" + App.me.viewerId + "') on conflict do nothing;"; }
+  function adminIdCard() {
+    if (App.store.backend !== 'supabase' || !App.me.viewerId) return '';
+    return html`<div class="card cream adm-id">
+      <h2 class="h3">回報問題只給你看</h2>
+      <p class="note mt-4">回報問題和檢舉只有寫的人和管理員看得到。把下面這一行貼到 Supabase 的 SQL Editor 按 Run，這支手機就是管理員，看得到大家的回報（還沒貼之前這裡是空的）。用別支手機管理，就在那支手機也貼一次。</p>
+      <p class="adm-sql mt-8">${adminSql()}</p>
+      <div class="mt-8">${ui.secondaryBtn('複製這一行', { act: 'copyAdminSql', block: false })}</div>
+      <p class="small mt-4">這支手機的管理編號：${App.me.viewerId}</p>
+    </div>`;
+  }
   function feedbackSection(ctx) {
     var list = ctx.state.feedback;
-    if (list === undefined) return ui.loading();
+    if (list === undefined) return html`${adminIdCard()}${ui.loading()}`;
     var open = list.filter(function (f) { return !f.done; });
     var all = ctx.state.fbAll;
     var pool = all ? list : open;
@@ -10284,7 +10658,7 @@ try {
     else if (!shown.length) body = html`<div class="mt-12">${ui.emptyState({ icon: 'check', title: '都處理完了', body: '按「全部」看處理過的回報。' })}</div>`;
     else body = html`<ul class="adm-list mt-8">${shown.map(feedbackItem)}</ul>
       ${pool.length > shown.length ? html`<div class="mt-8">${ui.quietBtn('看更多', { act: 'more', data: { k: 'fbMore' } })}</div>` : ''}`;
-    return html`${filter}${body}`;
+    return html`${adminIdCard()}${filter}${body}`;
   }
   function feedbackItem(f, i) {
     var target = fbTarget(f);
@@ -10596,6 +10970,7 @@ try {
         <div class="px mt-24">${ui.quietBtn('關閉管理模式', { act: 'adminOff', icon: 'lockAlt' })}</div>`;
     },
     actions: {
+      copyAdminSql: function () { return ui.copyText(adminSql(), '已複製，貼到 Supabase 的 SQL Editor 按 Run'); },
       tab: function (ctx, d) {
         if (!tabOk(d.id)) return;
         ssSet(d.id);
@@ -16305,7 +16680,7 @@ try {
    - every user-provided string goes through html`` (escaped); components come from App.ui.
    - navigation via data-go / data-tab attributes, behaviour via data-act + actions{}.
    - sheets (App.ui.sheet) instead of alert/confirm/prompt.
-   Home = map + 我出門遛狗, lost-dog banner, 固定狗聚日 card (→ 狗聚日), 狗友動態. 2026-10-27（Willie：重複的都拿掉）:
+   Home = map + 我出門遛狗, lost-dog banner, 固定狗聚日 card (→ 狗聚日; off while C.weekly.on is false), 狗友動態. 2026-10-27（Willie：重複的都拿掉）:
    no 附近狗聚 list here any more — the 狗聚 tab has the same list. */
 (function (App) {
   'use strict';
@@ -16486,6 +16861,7 @@ try {
   }
 
   function fixedDay(ctx) {
+    if (C.weekly.on === false) return ''; // beta: put away (Willie 2026-10-27, App.content.weekly.on)
     var wk = ctx.state.weekly, m = ctx.state.meetup;
     var park = C.park(wk.parkId);
     var faces = m ? m.going.slice(0, 3).map(function (id) { return ui.dogAvatar(D.person(id), { size: 28, bg: 'white', label: false, ring: false }); }) : [];
@@ -16755,7 +17131,9 @@ try {
     var visits = ctx.state.visits;
     var head = html`<div class="sec-head"><h2 class="h3" id="boardTitle" style="font-size:18px;line-height:24px">常客榜</h2><span class="small">${C.texts.regularsRule}</span></div>`;
     if (visits === undefined) return html`<section class="px mt-20" aria-labelledby="boardTitle">${head}${ui.loading()}</section>`;
-    var regs = D.regulars(visits, park.id);
+    // + the dogs whose visits are only for their 狗友: day counts from the server, no names (偷看測試 2026-10-27)
+    var regs = D.regulars(visits, park.id).concat((ctx.state.anonRegs || []).map(function (n, i) { return { id: 'anon_' + i, count: n, hidden: true, anon: true }; }))
+      .sort(function (a, b) { return b.count - a.count || (a.anon ? 1 : 0) - (b.anon ? 1 : 0); });
     var me = myId();
     var myIdx = -1;
     regs.forEach(function (r, i) { if (r.id === me) myIdx = i; });
@@ -16825,6 +17203,10 @@ try {
       ctx.state.park = C.park(want) || (typeof want === 'string' && /^osm-[wr]-\d{1,12}$/.test(want)) ? want : C.parks[0].id;
       ctx.live('checkins', D.watchCheckins);
       ctx.live('visits', D.watchVisits);
+      ctx.state.anonRegs = [];
+      function anon() { D.hiddenRegulars(ctx.state.park).then(function (list) { if (!ctx.dead) ctx.set({ anonRegs: list }); }); }
+      anon();
+      ctx.every(120000, anon);
       ctx.live('pstat', D.watchParkStatus, ctx.state.park);
     },
     render: function (ctx) {
@@ -17027,6 +17409,18 @@ try {
   }
 
   /** 刪除我的資料 (C.deleteMine): the person only — a test persona sees why it cannot. */
+  /** 使用條款 (beta 2026-10-27, C.terms): right after the privacy note, same card style. */
+  function termsSection() {
+    var T = C.terms;
+    return html`<section class="pv-note px mt-16" id="pv-terms" aria-labelledby="pv-terms-h">
+      <div class="card cream">
+        <h2 class="h2" id="pv-terms-h">${T.title}</h2>
+        <p class="note mt-4">${T.lead}</p>
+        ${T.sections.map(function (sec) { return html`<h3>${sec.title}</h3><p class="pv-p">${sec.body}</p>`; })}
+      </div>
+    </section>`;
+  }
+
   function deleteSection(ctx) {
     var X = C.deleteMine;
     var body;
@@ -17139,14 +17533,15 @@ try {
         <p class="pv-why px">${ui.icon('infoSmall', { size: 18 })}<span><strong>為什麼：</strong>${C.texts.homeWhy}</span></p>
 
         ${noteSection()}
+        ${termsSection()}
         ${deleteSection(ctx)}`;
     },
 
     // 「隱私說明」 / 「刪除我的資料」 links land here with params.section: scroll there once
     afterRender: function (ctx, el) {
       var sec = ctx.params.section;
-      if (ctx.state.scrolled || (sec !== 'note' && sec !== 'delete') || !D.me()) return;
-      var sel = sec === 'delete' ? '#pv-delete' : '#pv-note';
+      if (ctx.state.scrolled || (sec !== 'note' && sec !== 'delete' && sec !== 'terms') || !D.me()) return;
+      var sel = sec === 'delete' ? '#pv-delete' : sec === 'terms' ? '#pv-terms' : '#pv-note';
       if (!el.querySelector(sel)) return;
       ctx.state.scrolled = true;
       // after the router's scrollTo(0, 0); look the section up again (live data may have re-rendered the page)
@@ -17268,7 +17663,11 @@ try {
       '.pf-rec-head{display:flex;align-items:center;gap:8px;color:var(--teal-ink)}',
       '.pf-code{margin:4px 0 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:24px;line-height:32px;font-weight:700;letter-spacing:2px;color:var(--ink);overflow-wrap:anywhere;user-select:all;-webkit-user-select:all}',
       '.pf-rec-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}',
-      '.pf-rec .btn-text{font-size:14px}'
+      '.pf-rec .btn-text{font-size:14px}',
+      // 綁定 LINE (beta): inside the 找回碼 card — both are about 換手機
+      '.pf-line{display:flex;flex-direction:column;align-items:flex-start;gap:6px}',
+      '.pf-line-on{margin:0;display:flex;align-items:flex-start;gap:6px;font-size:14px;line-height:20px;color:var(--teal-ink)}',
+      '.pf-line-on .ic{flex-shrink:0;margin-top:1px}'
     ].join('\n');
     document.head.appendChild(s);
   })();
@@ -17354,6 +17753,22 @@ try {
       });
     }, function (e) { console.info('[Profile] health links', e && (e.userMessage || e.message)); return null; });
   }
+  /** 通知 (beta 2026-10-27; only when this build has a push key — App.push): on / off, or how to get it on an iPhone. */
+  function pushRow(ctx) {
+    var P = C.push;
+    if (App.push.needInstall()) return ui.listRow({ icon: 'bell', iconSize: 20, title: P.title, sub: P.needInstall });
+    if (!App.push.supported()) return '';
+    var st = ctx.state.push;
+    var sub = st === 'on' ? P.onSub : st === 'denied' ? P.denied : P.offSub;
+    return ui.listRow({ icon: 'bell', iconSize: 20, title: P.title, sub: sub, act: 'push', right: st === 'on' ? html`<span class="pf-on">${P.on}</span>` : '' });
+  }
+  /** 綁定 LINE (beta 2026-10-27; only when this build has it on — App.me.lineOn): bind, or say it is bound. */
+  function lineBlock() {
+    if (!App.me.lineOn()) return '';
+    var L = C.login, p = D.me(), name = (p && p.dog && p.dog.name) || '狗狗';
+    if (App.me.lineLinked()) return html`<p class="pf-line-on">${ui.icon('checkSmall', { size: 18 })}<span><strong>${L.linked}</strong>・${L.linkedBody.replace('{dog}', name)}</span></p>`;
+    return html`<div class="pf-line">${ui.secondaryBtn(L.linkTitle, { act: 'linkLine', block: false })}<p class="note">${L.linkBody.replace('{dog}', name)}</p></div>`;
+  }
   function recoveryCard(ctx) {
     if (!recoveryOn()) return '';
     var R = C.recovery, code = ctx.state.code, body;
@@ -17370,6 +17785,7 @@ try {
     return html`<section class="px mt-24" aria-labelledby="pf-rec">
       <div class="card cream pf-rec">
         <div class="pf-rec-head">${ui.icon('lockAlt', { size: 20 })}<h2 class="pf-h" id="pf-rec">${R.title}</h2></div>
+        ${lineBlock()}
         ${body}
         <p class="note">${R.body}</p>
       </div>
@@ -17397,6 +17813,9 @@ try {
       ctx.state.photoBusy = false;
       // 狗狗健康卡: only for the dot on its row (clinic uploads waiting in 醫院傳來的，待確認)
       if (D.healthSupport().card) ctx.live('health', D.watchHealth);
+      // 推播通知 (beta): on / off on this phone (async: the browser's subscription)
+      ctx.state.push = undefined;
+      if (App.push.supported() || App.push.needInstall()) App.push.state().then(function (v) { if (!ctx.dead) ctx.set({ push: v }); });
       // created on first use (one write); later visits only read it back (the router only shows this screen with a profile)
       if (recoveryOn()) loadCode(ctx);
     },
@@ -17449,6 +17868,7 @@ try {
         </div>
 
         <ul class="list pf-rows px mt-24">
+          ${pushRow(ctx)}
           ${ui.listRow({ icon: 'hospital', iconSize: 20, title: C.health.entry, sub: healthInbox ? C.health.inbox.title + '（' + healthInbox + '）' : C.health.entrySub, go: 'Health_Card', right: healthInbox ? ui.dot({ label: C.health.inbox.title }) : '' })}
           ${ui.listRow({
             lead: html`<span class="pf-ring" aria-hidden="true">${ui.dogAvatar(p, { size: 36, ring: true, label: false })}</span>`,
@@ -17457,7 +17877,7 @@ try {
           })}
           ${ui.listRow({ icon: 'photo', iconSize: 20, title: '狗狗日記', sub: '照片和小故事，狗友可以汪和留言', go: 'Diary' })}
           ${ui.listRow({ icon: 'privacy', iconSize: 20, title: '我的隱私', sub: '打卡只顯示哪個公園，不露出住家', go: 'Privacy' })}
-          ${ui.listRow({ icon: 'infoSmall', iconSize: 20, title: C.privacyNote.title, sub: '存了什麼、誰看得到、' + C.deleteMine.title, go: 'Privacy', params: { section: 'note' } })}
+          ${ui.listRow({ icon: 'infoSmall', iconSize: 20, title: C.privacyNote.title, sub: '存了什麼、誰看得到、' + C.terms.title + '、' + C.deleteMine.title, go: 'Privacy', params: { section: 'note' } })}
         </ul>
 
         ${recoveryCard(ctx)}
@@ -17489,6 +17909,18 @@ try {
           if (!ctx.dead) ctx.set({ photoBusy: false });
           throw e;
         });
+      },
+      linkLine: function () { return App.me.lineGo('link'); },
+      push: function (ctx) {
+        var P = C.push;
+        if (ctx.state.push === 'on') {
+          return ui.confirm({ title: P.offTitle, body: P.offBody, ok: P.offOk }).then(function (yes) {
+            if (!yes) return;
+            return App.push.disable().then(function () { ctx.set({ push: 'off' }); ui.toast(P.disabled); });
+          });
+        }
+        if (ctx.state.push === 'denied') { ui.toast(P.denied); return; }
+        return App.push.enable().then(function () { ctx.set({ push: 'on' }); ui.toast(P.enabled); });
       },
       copyCode: function (ctx) {
         if (!ctx.state.code) return;
@@ -17533,6 +17965,8 @@ try {
       '.pc-photo-acts .btn-text{font-size:14px}',
       '.pc-claim{margin-top:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}',
       '.pc-claim .btn-text{font-size:14px}',
+      '.pc-terms{display:flex;align-items:center;gap:2px;flex-wrap:wrap}',
+      '.pc-terms .btn-text{font-size:14px;min-height:44px}',
       '.pc-code{text-transform:uppercase;letter-spacing:2px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:20px}',
       '.pc-code::placeholder{text-transform:none;letter-spacing:0;font-family:var(--font-body);font-size:16px}',
       '.pc-claim-msg{margin-top:8px;font-size:14px;line-height:20px;font-weight:700;color:var(--ink)}',
@@ -17580,6 +18014,8 @@ try {
 
   /** First run on a new phone: 「我有找回碼」 → become the same dog (the page reloads by itself on success). */
   function claimOn(s) { return !s.edit && !D.me() && D.recoverySupported() && !App.me.isPersona; }
+  /** First run with LINE on in this build: 「用 LINE 登入」 → the dog this LINE is bound to (or a new one bound to it). */
+  function lineIn(s) { return !s.edit && !D.me() && App.me.lineOn(); }
   function openClaimSheet() {
     var R = C.recovery;
     ui.sheet({
@@ -17776,7 +18212,7 @@ try {
         ${!edit && !D.me() ? html`<p class="note teal px pc-lead">${C.firstRun.lead}</p>` : ''}
         <h1 class="h1 px">${edit ? '編輯狗狗名片' : '30 秒建立狗狗名片'}</h1>
         <p class="sub px mt-4">${edit ? '改完按「儲存」。' : C.firstRun.sub}</p>
-        ${claimOn(s) ? html`<div class="pc-claim px"><span class="note">${C.recovery.askNewPhone}</span>${ui.textBtn(C.recovery.claimTitle, { act: 'claim', icon: 'chevronRight', iconAfter: true, iconSize: 16 })}</div>` : ''}
+        ${claimOn(s) || lineIn(s) ? html`<div class="pc-claim px"><span class="note">${C.recovery.askNewPhone}</span>${claimOn(s) ? ui.textBtn(C.recovery.claimTitle, { act: 'claim', icon: 'chevronRight', iconAfter: true, iconSize: 16 }) : ''}${lineIn(s) ? ui.textBtn(C.login.signIn, { act: 'lineIn', icon: 'chevronRight', iconAfter: true, iconSize: 16 }) : ''}</div>` : ''}
 
         <section class="px mt-20" aria-label="基本資料">
           <div class="pc-top">
@@ -17791,7 +18227,8 @@ try {
 
         ${moreSection(s, ctx)}
 
-        ${edit ? '' : html`<div class="px mt-16">${ui.textBtn(C.privacyNote.title, { act: 'privacyNote', icon: 'infoSmall', iconSize: 18 })}</div>`}
+        ${edit ? '' : html`<div class="px mt-16">${ui.textBtn(C.privacyNote.title, { act: 'privacyNote', icon: 'infoSmall', iconSize: 18 })}</div>
+          <p class="note px mt-4 pc-terms">${C.terms.agree}${ui.textBtn(C.terms.title, { act: 'terms' })}</p>`}
 
         <div class="bottom-actions">${ui.primaryBtn(edit ? '儲存' : '完成，去逛逛', { act: 'save', disabled: !!s.saving })}</div>`;
     },
@@ -17813,7 +18250,9 @@ try {
         ctx.set({ photoFile: null, preview: null, removePhoto: !!ctx.state.keepPhoto });
       },
       claim: function () { openClaimSheet(); },
+      lineIn: function () { return App.me.lineGo('signin'); },
       privacyNote: function () { App.openPrivacyNote(); },
+      terms: function () { App.openTerms(); },
       breed: function (ctx) { openBreedSheet(ctx); },
       size: function (ctx, d) { if (SIZES.indexOf(d.size) !== -1) ctx.set({ size: d.size, sizeTouched: true }); },
       // tap again to clear (both are optional)
