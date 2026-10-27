@@ -1005,7 +1005,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-27.cd8d88ed","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-27.0d11f6b3","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -15605,10 +15605,7 @@ try {
               res.status === 'pending' ? '已送出，等主揪核准' :
               res.status === 'rest' ? C.texts.restSuggest + '，送你一枚' + C.badges.leave : '已送出';
             ui.toast(msg);
-            if (res.firstJoin) {
-              ui.toast('第一次參加，先花 1 分鐘看懂狗狗在說什麼');
-              App.go('Dog_Language', { next: { name: 'Event', params: { id: id } } }, { replace: true });
-            } else App.go('Event', { id: id }, { replace: true });
+            App.go('Event', { id: id }, { replace: true }); // (狗語圖卡 no longer comes first — 2026-10-27)
           });
       }
     }
@@ -17222,7 +17219,7 @@ try {
 try {
 /* Profile（我的・狗狗檔案）— dog card (real photo, edit / share), badges, received stickers, followed dogs (+ unread
    DM dot), 私訊 row, 狗狗健康卡 row (+ dot for clinic uploads waiting), my events, 找回碼 (換手機用), and links to
-   今天需要空間 / 隱私 / 隱私說明 / 提醒 / 走失協尋 / 速查卡 / 狗語圖卡. */
+   今天需要空間 / 隱私 / 隱私說明 / 提醒 / 走失協尋 / 速查卡（狗語圖卡 2026-10-27 拿掉入口）. */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, C = App.content, dogs = App.dogs;
@@ -17280,21 +17277,18 @@ try {
     var badges = p.badges || {};
     var vaccine = D.vaccineOk(dog);
     var registered = !!dog.registered;
-    var lang = !!badges.dogLanguage;
     var expired = !!dog.rabiesExpiry && !vaccine;
     var B = C.badges, H = C.badgeHow;
     var items = [
       { on: vaccine, icon: 'vaccine', label: B.vaccine },
-      { on: registered, icon: 'registered', label: B.chip },
-      { on: lang, icon: 'chat', label: B.dogLanguage }
-    ];
+      { on: registered, icon: 'registered', label: B.chip }
+    ]; // 狗語畢業章 removed from the app (2026-10-27, Willie); the Dog_Language screen stays, unlinked
     var how = [];
     if (!vaccine) {
       how.push(expired ? ui.textBtn(H.vaccineExpired, { go: 'Reminders', icon: 'chevronRight', iconAfter: true, iconSize: 16 })
         : ui.textBtn(H.vaccine, { go: 'Profile_Create', params: { mode: 'edit' }, icon: 'chevronRight', iconAfter: true, iconSize: 16 }));
     }
     if (!registered) how.push(ui.textBtn(H.chip, { go: 'Profile_Create', params: { mode: 'edit' }, icon: 'chevronRight', iconAfter: true, iconSize: 16 }));
-    if (!lang) how.push(ui.textBtn(H.dogLanguage, { go: 'Dog_Language', icon: 'chevronRight', iconAfter: true, iconSize: 16 }));
     return html`
       <section class="px mt-24" aria-labelledby="pf-badges">
         <h2 class="h2" id="pf-badges">徽章</h2>
@@ -17365,10 +17359,10 @@ try {
     </section>`;
   }
 
-  /** 私訊: my DM conversations (cache-backed, no subscription). Shown only when there is at least one. */
+  /** 訊息: always there (Willie 2026-10-27) — my DM conversations (cache-backed, no subscription), or how to start one. */
   function dmRow() {
     var list = D.dmThreads().filter(function (t) { return !D.isBlocked(t.otherId); });
-    if (!list.length) return '';
+    if (!list.length) return ui.listRow({ icon: 'message', iconSize: 20, title: '訊息', sub: '跟狗友私訊：在狗狗名片按「想跟你家狗玩」，對方接受就能聊', go: 'DM_Invite' });
     var fresh = list.filter(function (t) { return t.unread; });
     // one conversation to open → straight into it; several → the 狗友 page (its rows carry the dots)
     var target = fresh.length === 1 ? fresh[0] : (!fresh.length && list.length === 1 ? list[0] : null);
@@ -17376,7 +17370,7 @@ try {
       : fresh.length ? fresh.length + ' 個對話有新訊息'
       : list.length + ' 個對話・' + ui.fmt.relative(list[0].lastMessageAt);
     return ui.listRow({
-      icon: 'message', iconSize: 20, title: '私訊', sub: sub,
+      icon: 'message', iconSize: 20, title: '訊息', sub: sub,
       go: 'DM_Invite', params: target ? { chat: target.otherId } : null,
       right: fresh.length ? ui.dot({ label: '有新私訊' }) : ''
     });
@@ -17525,7 +17519,6 @@ try {
           <ul class="list pf-rows mt-8">
             ${ui.listRow({ icon: 'megaphone', iconSize: 20, iconKind: 'warn', title: '走失協尋', sub: '發協尋、看附近走失的狗', go: 'Lost_Dog' })}
             ${ui.listRow({ icon: 'alertCircle', iconSize: 20, iconKind: 'warn', title: '出事了速查卡', sub: C.texts.firstAidOffline, go: 'First_Aid' })}
-            ${ui.listRow({ icon: 'chat', iconSize: 20, title: '狗語圖卡', sub: C.dogLanguage.length + ' 張圖卡，滑完拿「' + C.badges.dogLanguage + '」', go: 'Dog_Language' })}
           </ul>
         </section>`;
     },
@@ -18165,7 +18158,7 @@ try {
 /* ---- screens/Stamps.js ---- */
 try {
 /* Stamps（遛狗集章, tab 'stamps'）— my stamp card (live), simulated QR scan per shop, draws (prizes are 範例),
-   other stamps (請假章 / 狗語畢業章) and the shops not stamped yet. Sub-nav to 劃地盤 / 常客榜 / 狗聚日. */
+   other stamps (請假章) and the shops not stamped yet. Sub-nav to 劃地盤 / 常客榜 / 狗聚日. */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, C = App.content;
@@ -18275,15 +18268,12 @@ try {
   function otherStamps(ctx, p) {
     var doc = ctx.state.stamps;
     var leave = doc ? view(doc).sum.leave : 0;
-    var lang = !!(p && p.badges && p.badges.dogLanguage);
     var items = [];
     if (leave) items.push(ui.badge(C.badges.leave + ' ×' + leave, { icon: 'badgeStamp' }));
-    if (lang) items.push(ui.badge(C.badges.dogLanguage, { icon: 'badgeStamp' }));
     return html`
       <section class="px mt-24" aria-labelledby="otherStampTitle">
         ${ui.sectionHead('其他章', null, { id: 'otherStampTitle', cls: 'h3' })}
         ${items.length ? html`<div class="stp-badges mt-8">${items}</div>` : ''}
-        ${lang ? '' : html`<div>${ui.textBtn('滑完狗語圖卡拿「' + C.badges.dogLanguage + '」・不考試', { go: 'Dog_Language', icon: 'chevronRight', iconAfter: true })}</div>`}
         ${leave ? '' : html`<p class="note">${T.leaveStamp}</p>`}
       </section>`;
   }
