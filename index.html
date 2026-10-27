@@ -807,6 +807,8 @@ button.app-banner.reload { text-decoration: underline; text-underline-offset: 3p
 /* ---------- Forms ---------- */
 .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .label { font-size: 13px; line-height: 18px; font-weight: 700; color: var(--ink); }
+/* 「必填」 next to a field that must be filled (2026-10-28: nothing says 選填 any more) */
+.label .req { margin-left: 6px; padding: 1px 6px; border-radius: 8px; background: var(--coral-tint); color: #9A3B22; font-size: 12px; font-weight: 700; vertical-align: 1px; }
 .input, .select, .textarea { width: 100%; min-height: 44px; margin: 0; border: none; border-radius: 14px; padding: 0 14px; background: var(--cream); color: var(--ink); font-size: 16px; }
 .textarea { padding: 10px 14px; min-height: 88px; resize: vertical; line-height: 1.5; }
 .input::placeholder, .textarea::placeholder { color: var(--muted); opacity: .8; }
@@ -911,7 +913,11 @@ button.row, a.row { cursor: pointer; }
 /* real map (core/map.js, Leaflet): the map div is moved between renders, so it carries its own size */
 .dj-map { position: absolute; inset: 0; z-index: 0; background: var(--cream); }
 .dj-map .leaflet-control-attribution { font-size: 10px; }
-.dj-map .leaflet-control-zoom a { width: 36px; height: 36px; line-height: 34px; }
+.dj-map .leaflet-control-zoom a { width: 44px; height: 44px; line-height: 42px; }
+/* map labels look small but are easy to hit: the tap area reaches 44 px (2026-10-28 night check) */
+.dj-pin, .dj-walk { position: relative; }
+.dj-pin::before { content: ''; position: absolute; left: -4px; right: -4px; top: -8px; bottom: -8px; }
+.dj-walk::before { content: ''; position: absolute; left: -4px; right: -4px; top: -9px; bottom: -9px; }
 .dj-pin-wrap { background: none; border: none; }
 .dj-pin { display: inline-flex; align-items: center; gap: 4px; transform: translate(-50%, -100%); padding: 4px 10px; min-height: 28px; border: none; border-radius: 14px; background: var(--teal-ink); color: var(--white); font: inherit; font-size: 12px; line-height: 18px; white-space: nowrap; box-shadow: 0 2px 6px rgba(0, 0, 0, .2); cursor: pointer; }
 .dj-walk { display: inline-flex; align-items: center; transform: translate(-50%, -50%); padding: 3px 9px; min-height: 26px; border: none; border-radius: 13px; background: var(--white); color: var(--ink); font: inherit; font-size: 12px; line-height: 18px; white-space: nowrap; box-shadow: 0 1px 5px rgba(0, 0, 0, .18); cursor: pointer; }
@@ -1005,7 +1011,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-28.db399167","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1585,13 +1591,13 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
     var id = o.id || ('f-' + (o.model || Math.random().toString(36).slice(2, 7)));
     var input;
     if (o.type === 'textarea') {
-      input = html`<textarea class="textarea"${attrs({ id: id, 'data-model': o.model || null, placeholder: o.placeholder || null, maxlength: o.maxlength || null, rows: o.rows || 3, 'aria-describedby': o.note ? id + '-note' : null })}>${o.value == null ? '' : o.value}</textarea>`;
+      input = html`<textarea class="textarea"${attrs({ id: id, 'aria-required': o.required ? 'true' : null, 'data-model': o.model || null, placeholder: o.placeholder || null, maxlength: o.maxlength || null, rows: o.rows || 3, 'aria-describedby': o.note ? id + '-note' : null })}>${o.value == null ? '' : o.value}</textarea>`;
     } else if (o.type === 'select') {
-      input = html`<select class="select"${attrs({ id: id, 'data-model': o.model || null, 'data-live': o.live ? '1' : null })}>${(o.options || []).map(function (op) { return html`<option${attrs({ value: op.value, selected: String(op.value) === String(o.value) })}>${op.label}</option>`; })}</select>`;
+      input = html`<select class="select"${attrs({ id: id, 'aria-required': o.required ? 'true' : null, 'data-model': o.model || null, 'data-live': o.live ? '1' : null })}>${(o.options || []).map(function (op) { return html`<option${attrs({ value: op.value, selected: String(op.value) === String(o.value) })}>${op.label}</option>`; })}</select>`;
     } else {
-      input = html`<input class="input"${attrs({ id: id, type: o.type || 'text', 'data-model': o.model || null, 'data-live': o.live ? '1' : null, value: o.value == null ? '' : o.value, placeholder: o.placeholder || null, inputmode: o.inputmode || null, maxlength: o.maxlength || null, min: o.min || null, max: o.max || null, autocomplete: 'off', enterkeyhint: o.enterkeyhint || null, 'aria-describedby': o.note ? id + '-note' : null })}>`;
+      input = html`<input class="input"${attrs({ id: id, type: o.type || 'text', 'data-model': o.model || null, 'data-live': o.live ? '1' : null, value: o.value == null ? '' : o.value, placeholder: o.placeholder || null, inputmode: o.inputmode || null, maxlength: o.maxlength || null, min: o.min || null, max: o.max || null, autocomplete: 'off', enterkeyhint: o.enterkeyhint || null, 'aria-required': o.required ? 'true' : null, 'aria-describedby': o.note ? id + '-note' : null })}>`;
     }
-    return html`<div class="field ${o.cls || ''}">${o.label ? html`<label class="label" for="${id}">${o.label}</label>` : ''}${input}${o.note ? html`<span class="field-note" id="${id}-note">${o.note}</span>` : ''}</div>`;
+    return html`<div class="field ${o.cls || ''}">${o.label ? html`<label class="label" for="${id}">${o.label}${o.required ? html`<span class="req" aria-hidden="true">${(App.content && App.content.texts && App.content.texts.required) || '必填'}</span>` : ''}</label>` : ''}${input}${o.note ? html`<span class="field-note" id="${id}-note">${o.note}</span>` : ''}</div>`;
   }
 
   /** List row. go/params OR act/data makes it tappable. */
@@ -2391,7 +2397,6 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
   var STAMPS_PER_DRAW = 6;
   var PRIZES = [{ id: 'scarf', label: '實體黃領巾' }, { id: 'gift', label: '店家小禮' }]; // examples (範例)
   var STAMP_TEXTS = {
-    lineScan: '正式版也可以用 LINE 官方帳號掃（還沒開放）',
     prizesNote: '獎品都是範例，正式版會寫怎麼領。',
     scarf: '集章可換實體黃領巾（範例）',
     leaveStamp: '狗狗不舒服、這次請假，也會拿到「請假章」。'
@@ -2491,6 +2496,9 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
     stickerReveal: '雙方都送完才公開',
     reportPrivate: '只有主揪看得到',
     dmConsent: '先送邀請，對方按接受，才開始聊天。',
+    required: '必填',                    // 要填的欄位旁的小標（2026-10-28：其他欄位不寫「選填」）
+    waitlistShort: '額滿自動候補',
+    firstAidSub: '建議先截圖存在手機',
     checkinPrivacy: '位置只給狗友看',
     homeWhy: '研究發現就算設了隱私圈，很多人的住家還是被推算出來。',
     weatherOk: '天氣正常（試辦版的天氣是模擬的）',
@@ -2513,7 +2521,7 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
     territoryRule: '這週（從週一算）在這裡繞最多圈的狗，這塊就是牠的地盤；前兩名差 1 圈以內就是「搶地中」。',
     territoryKmNote: '公里是用圈數估算的（範例）',
     territoryNoGps: '試辦版沒有用 GPS，每繞完一圈就按一下「繞完一圈」。',
-    regularsRule: '比過去 28 天打卡的天數',
+    regularsRule: '近 28 天打卡天數',
     regularsHidden: '一隻只給狗友看的狗',             // 常客榜上，打卡只給狗友看的狗不顯示名字
     typhoonMaybePaused: '颱風警報中，這次可能暫停',
     albumNote: '這裡的照片是示意圖，狗聚日的相簿還不能上傳照片。',
@@ -2536,11 +2544,13 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
   var DM_REPORT_REASONS = ['找配種或約會', '讓人不舒服的訊息', '可能是詐騙', '其他'];
 
   // 徽章和章的名字（改名字時，下面 BADGE_HOW 的句子也一起改）
-  var BADGES = { vaccine: '疫苗已更新', chip: '已登記', dogLanguage: '狗語畢業章', leave: '請假章' };
+  var BADGES = { vaccine: '疫苗已更新', chip: '已登記', deworm: '驅蟲在期限內', dogLanguage: '狗語畢業章', leave: '請假章' };
   var BADGE_HOW = {
     vaccine: '填疫苗到期日，拿「疫苗已更新」',
     vaccineExpired: '疫苗過期了，補打後按「我打過了」',
     chip: '填晶片號，拿「已登記」',
+    deworm: '在提醒中心打開，拿「驅蟲在期限內」',
+    dewormExpired: '驅蟲過期了，做完在提醒中心按「做好了」',
     dogLanguage: '滑完 5 張狗語圖卡，拿「狗語畢業章」',
     chipPrivate: '晶片號不公開，名片只顯示「已登記」。',
     rabiesDone: '會把到期日改成一年後，並拿到「疫苗已更新」徽章。'
@@ -2572,7 +2582,12 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
   var REMINDER_UI = {
     emptyTitle: '目前沒有提醒',
     emptyBody: '颱風、高溫、雨後或疫苗快到期時，會在這裡提醒你。',
-    rabiesFill: '填上狂犬病疫苗到期日，到期前 {n} 天會提醒你。'
+    rabiesFill: '填上狂犬病疫苗到期日，到期前 {n} 天會提醒你。',
+    // 驅蟲徽章（2026-10-28）：主人自己打開才放上名片；名片只放到期日，過期自動不見
+    dewormBadge: '在名片顯示「驅蟲在期限內」',
+    dewormBadgeNote: '名片上會放驅蟲的到期日，過期自動不見。',
+    dewormNeedDate: '先填上次驅蟲／除蚤的日期',
+    badgeLater: '照顧提醒存好了；名片上的徽章等一下會自己更新'
   };
   // 氣象署熱指數：注意、警戒、危險、高危險 (2_狗聚App功能建議.md)
   var HEAT_LEVELS = ['normal', 'caution', 'warning', 'danger', 'extreme'];
@@ -2611,7 +2626,7 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
   ].concat(AGGRESSIVE.map(function (n) { return { name: n, size: 'L', look: 'mix', aggressive: true }; }));
   // 結紮、I 狗／E 狗（狗狗名片上，大家都看得到；都可以不填）
   var NEUTER = { yes: '已結紮', no: '未結紮', secret: '不想說' };
-  var IE = { I: { label: 'I 狗', note: '慢熱、喜歡小團或一對一' }, E: { label: 'E 狗', note: '愛交朋友、喜歡大團' } };
+  var IE = { I: { label: 'I 狗', note: '慢熱' }, E: { label: 'E 狗', note: '愛交朋友' } };
   // 個性標籤（2026-10-28 Willie：字短一點、分三組）。每個 2～3 個字；名片頁照這個順序、分組顯示。
   // showFirst：別人看名片時，這組的標籤排最前面（名片只放得下幾個，「要注意」的不會被擠掉）
   var TAG_GROUPS = [
@@ -2632,7 +2647,7 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
     title: '隱私說明',
     lead: '狗聚現在是試辦版，給朋友一起測試用。',
     sections: [
-      { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
+      { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到；打開驅蟲徽章時，名片上會有驅蟲的到期日）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
       { title: '誰看得到', body: '用狗聚的人都看得到狗狗名片、狗聚（誰報名哪一場）和聊天室。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
       { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位，位置只用來移動地圖，不會存起來。' },
       { title: '我出門遛狗', body: '按「我出門遛狗」才會用一次手機定位，不會一直追蹤。在公園裡就打卡在那座公園；在外面，別人只看到你大約在哪個 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。不存精確位置，也不送給任何人。家的位置只有你知道，存在你自己的資料裡。' },
@@ -2708,7 +2723,7 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
 
   var RECOVERY = {
     title: '找回碼（換手機用）',
-    body: '換手機、從主畫面打開、或清掉瀏覽器資料時，輸入這組碼就會變回同一隻狗。請自己保存，不要給別人。',
+    body: '換手機、從主畫面打開或清掉瀏覽器資料時，輸入這組碼就能找回同一隻狗。不要給別人。',
     claimTitle: '我有找回碼',
     claimBody: '輸入舊手機「我的」裡的找回碼，就能接著用原本的狗狗名片。',
     placeholder: '例如 ABCD-EFGH-JKLM',
@@ -2767,8 +2782,7 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
   };
   // 第一次打開（建立狗狗名片頁）最上面的說明
   var FIRST_RUN = {
-    lead: '狗聚（試辦版）：約附近的狗一起散步、玩。不用註冊。',
-    sub: '只要狗狗的名字，照片和其他之後再補。'
+    lead: '狗聚（試辦版）：約附近的狗一起散步、玩。不用註冊。'
   };
 
   // =====================================================================================================
@@ -2779,7 +2793,7 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
   var HEALTH = {
     title: '狗狗健康卡',
     entry: '狗狗健康卡',                       // 「我的」裡的那一列
-    entrySub: '急診、換醫院時給醫生看的一頁',
+    entrySub: '給醫生看的一頁',
     giveVet: '把健康卡給醫生',                 // 出事了速查卡、狗聚頁的夜間醫院
     lead: '急診醫生最需要知道的是現在吃什麼藥、會不會過敏。只填你知道的，其他之後再補。', // 報告第 1 節 [4][5]
     dogFallback: '狗狗',                       // 還沒有狗名時，訊息裡用這個
@@ -2802,7 +2816,7 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
       chronic: '慢性病和手術',
       flags: '要特別注意',
       contact: '聯絡',
-      cpr: '心跳停了怎麼辦',               // 醫生看到的標題；主人那一頁另外加「（選填）」（cpr.optional）
+      cpr: '心跳停了怎麼辦',
       rabies: '狂犬病疫苗',
       files: '照片和文件'
     },
@@ -2868,7 +2882,6 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
       // [29][30]。「醫院不一定來得及先打給你」是推的（MSD [29]：心跳停了要馬上開始急救）
       why: '心跳停了要馬上急救；選「先打給我」的話，醫院不一定來得及先打給你。國外的獸醫手冊建議住加護病房的動物都先問好這題，但各家醫院做法不一樣，台灣的情況沒查到。這裡只是讓醫院知道你的想法。',
       none: '沒有選',
-      optional: '選填',                          // 只在主人那一頁的標題後面
       callOwner: '先打給我：'                     // 醫生那一頁，後面接飼主電話
     },
     rabies: {
@@ -2983,8 +2996,8 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
       lead: '不用登入。選照片或 PDF、選種類，按「上傳」就好。',
       privacy: '上傳後你看不到這隻狗的其他資料；飼主確認後才會放進健康卡。',
       kind: '這是什麼', kinds: { summary: '病歷摘要', report: '報告', rx: '處方', receipt: '收據', other: '其他' },
-      note: '備註（選填）', notePh: '例如：10/20 血液檢查', noteMax: 200,
-      clinic: '診所名稱（選填）', clinicMax: 40,
+      note: '備註', notePh: '例如：10/20 血液檢查', noteMax: 200,
+      clinic: '診所名稱', clinicMax: 40,
       pick: '選照片或 PDF', pickDesktop: '選檔案，或把檔案拖到這裡', send: '上傳', sending: '上傳中…', removeFile: '拿掉',
       kindNote: '這一批都算同一種；不同種類請分開傳',
       tooBig: '檔案太大了（最多 5 MB）。可以改用手機拍照上傳，或掃描時選黑白、150 dpi。',
@@ -3539,7 +3552,7 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
   function statusChips(st) {
     st = st || { counts: {}, mine: [] };
     return html`<div class="park-status mt-12" role="group" aria-label="公園現在怎麼樣">
-      <div class="h3">現在怎麼樣？<span class="note">（大家最近 3 小時的回報）</span></div>
+      <div class="h3">現在怎麼樣？<span class="note">（最近 3 小時）</span></div>
       <div class="chips mt-8">${C.parkStatus.map(function (tag) {
         var n = st.counts[tag] || 0;
         return ui.chip(tag + (n ? '・' + n : ''), { pressed: st.mine.indexOf(tag) !== -1, act: 'pstat', data: { tag: tag }, check: false });
@@ -6125,6 +6138,12 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
     };
   }
   function vaccineOk(dog) { return !!(dog && dog.rabiesExpiry && fmt().daysUntil(dog.rabiesExpiry) >= 0); }
+  /** 驅蟲徽章: the owner turned it on and today (Taiwan) is not past dog.dewormUntil. Data from the store is untrusted. */
+  function dewormOk(dog) {
+    if (!dog || typeof dog.dewormUntil !== 'string' || !DATE_KEY_RE.test(dog.dewormUntil)) return false;
+    var left = fmt().daysUntil(dog.dewormUntil);
+    return left >= 0 && left <= 93;   // at most 3 months ahead: a far-future date is no badge
+  }
   function canPrivate() { return App.me.canPrivate(); }
   /** `who` may use the truly private subtree: only the real, signed-in viewer (never a persona or an anon_ id). */
   function privOk(who) { return !!who && who === App.me.selfId && !App.me.anonymous; }
@@ -7797,16 +7816,24 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
   function cleanCare(c) {
     c = isMap(c) ? c : {};
     var dw = isMap(c.deworm) && DATE_KEY_RE.test(String(c.deworm.last)) ? { last: String(c.deworm.last), months: Number(c.deworm.months) === 3 ? 3 : 1 } : null;
-    return { deworm: dw, weigh: !!c.weigh, weighedAt: DATE_KEY_RE.test(String(c.weighedAt)) ? String(c.weighedAt) : null };
+    return { deworm: dw, weigh: !!c.weigh, weighedAt: DATE_KEY_RE.test(String(c.weighedAt)) ? String(c.weighedAt) : null, showBadge: !!c.showBadge };
+  }
+  function loadCare(who) {
+    careLoading[who] = true;
+    return getPrivate(who).then(function (p) {
+      careCache[who] = cleanCare(p && p.care); emit('people');
+      // self-repair (審查 2026-10-28): the shared badge follows the private setting — after a failed card write,
+      // another phone of this dog, or an older build that changed the care settings without touching the card
+      return syncDewormBadge(who, careCache[who]).catch(function () { /* tried again next time */ });
+    }, function () { careLoading[who] = false; });
   }
   function myCare() {
     var who = actor();
-    if (!own(careCache, who) && !careLoading[who]) {
-      careLoading[who] = true;
-      getPrivate(who).then(function (p) { careCache[who] = cleanCare(p && p.care); emit('people'); }, function () { careLoading[who] = false; });
-    }
+    if (!own(careCache, who) && !careLoading[who]) loadCare(who);
     return careCache[who] || null;
   }
+  /** Read my care settings again (提醒中心 opens: another phone of this dog may have changed them). */
+  function reloadCare() { var who = actor(); delete careCache[who]; careLoading[who] = false; return loadCare(who); }
   /** Merge into my care settings: {deworm:{last, months}|null, weigh:bool, weighedAt}. */
   function setCare(patch) {
     var who = actor();
@@ -7815,8 +7842,23 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
     if (patch.deworm) need(DATE_KEY_RE.test(String(patch.deworm.last)) && fmt().daysUntil(String(patch.deworm.last), now()) <= 0, '上次驅蟲的日期不對');
     return getPrivate(who).then(function (p) {
       var next = cleanCare(Object.assign({}, cleanCare(p && p.care), patch));
-      return setPrivate({ care: next }, who).then(function () { careCache[who] = next; emit('people'); return next; });
+      return setPrivate({ care: next }, who).then(function () {
+        careCache[who] = next; emit('people');
+        // the private setting is saved either way; a card write that fails is repaired the next time care is read
+        return syncDewormBadge(who, next, 'deworm' in patch || 'showBadge' in patch).then(function () { return next; }, function (e) {
+          console.warn('[data] 驅蟲徽章 not updated yet', e && e.message);
+          return Object.assign({ cardLater: true }, next);
+        });
+      });
     });
+  }
+  /** 驅蟲徽章 on the shared card: only the expiry date (last + months), and only when the owner turned it on. */
+  function syncDewormBadge(who, care, force) {
+    var want = care && care.showBadge && care.deworm ? addMonthsKey(care.deworm.last, care.deworm.months) : null;
+    var p = person(who), cur = (p && p.dog && typeof p.dog.dewormUntil === 'string') ? p.dog.dewormUntil : null;
+    // force: the person just changed the setting — write even when the (maybe stale) cache already agrees
+    if (!p || (want === cur && !force)) return Promise.resolve();
+    return S().doc('people/' + who).update({ dog: { dewormUntil: want }, updatedAt: now() });
   }
   /** 做好了 / 量好了: today. */
   function careDone(kind) {
@@ -9464,7 +9506,7 @@ window.APP_BUILD = {"version":"2026-10-28.6e3cb96d","seedUrl":"seed-data.json"};
     sendStickers: sendStickers, withdrawStickers: withdrawStickers, watchEventStickers: watchEventStickers, watchMyStickers: watchMyStickers,
     sendReport: sendReport, watchReports: watchReports, setPlayAgain: setPlayAgain, getPlayAgain: getPlayAgain,
     // check-ins & visits
-    myCare: myCare, setCare: setCare, careDone: careDone,
+    myCare: myCare, reloadCare: reloadCare, setCare: setCare, careDone: careDone, dewormOk: dewormOk,
     watchParkStatus: watchParkStatus, reportParkStatus: reportParkStatus,
     createDiary: createDiary, watchFollowDiary: watchFollowDiary, feedItems: feedItems, watchDiary: watchDiary, watchDiaryPost: watchDiaryPost, watchDiaryComments: watchDiaryComments,
     toggleWoof: toggleWoof, addDiaryComment: addDiaryComment, deleteDiaryComment: deleteDiaryComment, deleteDiary: deleteDiary,
@@ -11609,7 +11651,7 @@ try {
           <div class="chat-pics mt-8" role="group" aria-labelledby="chat-pics-l">${PHOTOS.map(function (a, i) {
             return html`<button type="button" class="chat-pic" data-act="pick"${ui.data({ a: a })}${ui.attrs({ 'aria-pressed': String(st.art === a), 'aria-label': '插畫 ' + (i + 1) })}>${ui.art(a, { fit: 'xMidYMid slice' })}</button>`;
           })}</div>
-          <div class="mt-16">${ui.field({ label: '說明（選填）', model: 'caption', value: st.caption, placeholder: '例如：上次散步的合照', maxlength: 40, id: 'chat-cap' })}</div>
+          <div class="mt-16">${ui.field({ label: '說明', model: 'caption', value: st.caption, placeholder: '例如：上次散步的合照', maxlength: 40, id: 'chat-cap' })}</div>
           ${st.busy && st.file ? html`<p class="note mt-8" role="status">${C.photo.busy}</p>` : ''}
           <div class="sheet-actions">${ui.quietBtn('取消', { act: 'close' })}${ui.secondaryBtn('傳出去', { act: 'send', icon: 'send', disabled: !chosen || st.busy })}</div>`;
       },
@@ -12007,7 +12049,7 @@ try {
             </button>
           </div>
           <p class="ce-note">${ui.icon('noHome', { size: 16 })}${C.texts.placeOnly}</p>
-          <div class="mt-12">${ui.field({ label: '名稱（選填）', model: 'title', value: st.title, placeholder: (place ? place.name : '') + '狗聚', maxlength: 30, id: 'ce-title' })}</div>
+          <div class="mt-12">${ui.field({ label: '名稱', model: 'title', value: st.title, placeholder: (place ? place.name : '') + '狗聚', maxlength: 30, id: 'ce-title' })}</div>
         </section>
 
         <section class="px mt-20" aria-labelledby="ce-step2">
@@ -12016,7 +12058,7 @@ try {
           <div class="chips mt-8" role="group" aria-labelledby="ce-sizeLabel" style="gap:8px">
             ${SIZES.map(function (s) { return ui.chip(App.dogs.sizes[s], { pressed: st.sizes.indexOf(s) !== -1, act: 'size', data: { s: s } }); })}
           </div>
-          ${st.sizes.length ? html`<p class="note mt-4">活動卡會顯示「${D.sizesLabel(st.sizes)}」</p>` : html`<p class="note mt-4" style="color:var(--ink)">請至少選一種體型</p>`}
+          ${st.sizes.length ? '' : html`<p class="note mt-4" style="color:var(--ink)">請至少選一種體型</p>`}
           <div class="ce-cap">
             <span class="lbl" id="ce-capLabel">人數上限</span>
             <div class="ce-stepper" role="group" aria-labelledby="ce-capLabel">
@@ -12025,11 +12067,11 @@ try {
               <button type="button" class="iconbtn tint" data-act="cap" data-d="1" aria-label="多一隻"${ui.attrs({ disabled: st.capacity >= 30 })}>${ui.icon('plusRound', { size: 18 })}</button>
             </div>
           </div>
-          <p class="ce-note">${ui.icon('waitlist', { size: 16 })}${C.texts.waitlist}</p>
+          <p class="ce-note">${ui.icon('waitlist', { size: 16 })}${C.texts.waitlistShort}</p>
         </section>
 
         <section class="px mt-20" aria-labelledby="ce-step3">
-          ${step(3, '規則', '選填，最多 3 個', 'ce-step3')}
+          ${step(3, '規則', '最多 3 個', 'ce-step3')}
           <div class="chips mt-8" role="group" aria-labelledby="ce-step3" style="gap:8px">
             ${C.rules.map(function (r) { return ui.chip(r, { pressed: st.rules.indexOf(r) !== -1, act: 'rule', data: { r: r } }); })}
           </div>
@@ -12224,7 +12266,7 @@ try {
   function consentNote() {
     return html`<div class="dm-consent px" role="note">${ui.icon('lockChat', { size: 22 })}
       <div class="grow" style="min-width:0;display:flex;flex-direction:column;gap:2px">
-        <strong>對方接受才能私訊</strong><span>${C.texts.dmConsent}</span>
+        <strong>對方接受才能私訊</strong>
       </div></div>`;
   }
 
@@ -12271,7 +12313,7 @@ try {
     return html`<section class="px mt-24" aria-labelledby="dm-inbox">
       ${ui.sectionHead('收到的邀請', right, { id: 'dm-inbox' })}
       ${pending.length || acc.length ? html`<ul class="dm-list mt-4">${pending.map(function (r) { return pendingRow(ctx, r); })}${acc.map(acceptedRow)}</ul>` :
-        html`<p class="note mt-8">還沒有收到邀請。別人按「想跟你家狗玩」時，會出現在這裡。</p>`}
+        html`<p class="note mt-8">還沒有收到邀請。</p>`}
     </section>`;
   }
 
@@ -12348,6 +12390,14 @@ try {
     </div>`;
   }
 
+  /** 疫苗已更新・已登記・驅蟲在期限內 on the card others see (only the ones the dog has). */
+  function healthBadges(dog) {
+    var b = [];
+    if (D.vaccineOk(dog)) b.push(ui.badge(C.badges.vaccine, { icon: 'vaccine' }));
+    if (dog.registered) b.push(ui.badge(C.badges.chip, { icon: 'registered' }));
+    if (D.dewormOk(dog)) b.push(ui.badge(C.badges.deworm, { icon: 'tick' }));
+    return b.length ? html`<div class="dm-tags">${b}</div>` : '';
+  }
   function dogView(ctx, id) {
     var head = html`${ui.topBar({})}<h1 class="h1 px">私訊邀請與追蹤</h1>`;
     var p = D.person(id);
@@ -12364,6 +12414,7 @@ try {
             <h2 class="dm-name" id="dm-name">${dog.name || '狗狗'}</h2>
             <div class="note">${dogMeta(ctx, id) || App.dogs.describe(dog)}</div>
             ${tags.length ? html`<div class="dm-tags">${tags.map(function (t) { return ui.tag(t); })}</div>` : ''}
+            ${healthBadges(dog)}
           </div>
         </div>
         ${space ? html`<p class="note mt-12">${C.texts.yellowLegend}</p>` : ''}
@@ -12404,7 +12455,7 @@ try {
         ${following.length ? html`<ul class="dm-list mt-4">${following.map(function (id) {
           var friend = D.isFriend(me, id);
           return dogRow(ctx, id, [friend ? '狗友' : '你追蹤牠', dogMeta(ctx, id)].filter(Boolean).join('・'));
-        })}</ul>` : html`<p class="note mt-8">還沒有追蹤的狗。點下面的狗狗，就能追蹤或送邀請。</p>`}
+        })}</ul>` : html`<p class="note mt-8">還沒有追蹤的狗。點下面的狗狗就能追蹤。</p>`}
       </section>
       <section class="px mt-24" aria-labelledby="dm-others">
         ${ui.sectionHead('認識其他狗狗', null, { id: 'dm-others' })}
@@ -12530,7 +12581,7 @@ try {
             var on = s.state.reason === r;
             return html`<button type="button" class="chip ${on ? 'on' : ''}" role="radio"${ui.attrs({ 'aria-checked': String(on) })}${ui.act('reason', { r: r })}>${on ? ui.icon('checkSmall', { size: 18 }) : ''}${r}</button>`;
           })}</div>
-          <div class="mt-12">${ui.field({ label: '補充（選填）', type: 'textarea', model: 'note', value: s.state.note, maxlength: 400, rows: 3, placeholder: '發生了什麼事', id: 'dm-report-note' })}</div>
+          <div class="mt-12">${ui.field({ label: '補充', type: 'textarea', model: 'note', value: s.state.note, maxlength: 400, rows: 3, placeholder: '發生了什麼事', id: 'dm-report-note' })}</div>
           <div class="sheet-actions">${ui.primaryBtn('送出檢舉', { act: 'report' })}</div>`;
       },
       actions: {
@@ -12568,7 +12619,7 @@ try {
         return html`<div class="dm-prev">${st.preview || (st.file ? ui.loading() : '')}</div>
           <div class="mt-8">${ui.photoInput({ act: 'file', label: st.file ? C.photo.change : C.photo.pick })}</div>
           <p class="note mt-8">${C.photo.publicNote}</p>
-          <div class="mt-16">${ui.field({ label: '說明（選填）', model: 'caption', value: st.caption, maxlength: 200, placeholder: '想說什麼？', id: 'dm-cap' })}</div>
+          <div class="mt-16">${ui.field({ label: '說明', model: 'caption', value: st.caption, maxlength: 200, placeholder: '想說什麼？', id: 'dm-cap' })}</div>
           ${st.busy ? html`<p class="note mt-8" role="status">${C.photo.busy}</p>` : ''}
           <div class="sheet-actions">${ui.quietBtn('取消', { act: 'close' })}${ui.secondaryBtn('傳出去', { act: 'send', icon: 'send', disabled: !st.preview || st.busy })}</div>`;
       },
@@ -13507,6 +13558,7 @@ try {
           if (r.checkedIn.indexOf(a.id) !== -1) badges.push(ui.badge('已到', { icon: 'checkSmall' }));
           if (D.vaccineOk(dog)) badges.push(ui.badge(C.badges.vaccine, { icon: 'vaccine' }));
           if (dog.registered) badges.push(ui.badge(C.badges.chip, { icon: 'registered' }));
+          if (D.dewormOk(dog)) badges.push(ui.badge(C.badges.deworm, { icon: 'tick' }));
           var sub = [App.dogs.describe(dog), App.dogs.showTags(dog.tags).join('・')].filter(Boolean).join('｜') || '還沒填體型';
           var o = { lead: ui.dogAvatar(p, { size: 36, label: false }), title: (dog.name || '狗狗') + '・' + D.ownerName(a.id) + (a.id === ev.hostId ? '（主揪）' : '') + (extra || ''), sub: sub, right: badges.length ? html`<span class="ev-badges">${badges}</span>` : '' };
           if (a.id !== App.me.actorId) { o.go = 'DM_Invite'; o.params = { id: a.id }; }
@@ -14087,9 +14139,7 @@ try {
     })}`, editBtn('contact'));
   }
   function blockCpr(s) {
-    // 「（選填）」 only here (the vet's page, the image and the wallet card show the plain title)
-    var s2 = Object.assign({}, s, { title: s.title + '（' + H.cpr.optional + '）' });
-    return wrap(s2, html`<p class="${s.valueLabel ? '' : 'hc-none'}">${s.valueLabel || H.cpr.none}</p><p class="hc-why">${H.cpr.why}</p>`, editBtn('cpr'));
+    return wrap(s, html`<p class="${s.valueLabel ? '' : 'hc-none'}">${s.valueLabel || H.cpr.none}</p><p class="hc-why">${H.cpr.why}</p>`, editBtn('cpr'));
   }
   // the rabies dates are a year apart, so healthView's labels keep the year ('2027/3/1')
   function blockRabies(v) {
@@ -14397,7 +14447,7 @@ try {
       save = function (s) { return D.setHealthRabies(s.state.date || null); };
     } else return;
     ui.sheet({
-      title: sec === 'basics' ? H.sections.top : sec === 'cpr' ? H.sections.cpr + '（' + H.cpr.optional + '）' : H.sections[sec],
+      title: sec === 'basics' ? H.sections.top : H.sections[sec],
       state: st,
       autofocus: false,
       render: render,
@@ -15807,7 +15857,7 @@ try {
     if (D.me()) return '';
     var sizes = ['S', 'M', 'L'];
     return html`<div class="px mt-16" role="group" aria-labelledby="jl-sizeLabel">
-      <div class="label" id="jl-sizeLabel">狗狗體型<span style="font-weight:400;color:var(--muted)">（選填）</span></div>
+      <div class="label" id="jl-sizeLabel">狗狗體型</div>
       <div class="chip-grid mt-8">${sizes.map(function (k) { return ui.chip(App.dogs.sizeShort[k], { pressed: ctx.state.size === k, act: 'size', data: { size: k } }); })}</div>
     </div>`;
   }
@@ -15815,14 +15865,14 @@ try {
   function form(ctx, ev) {
     return html`
       <div class="px mt-20 grid-2">
-        ${ui.field({ label: '你的暱稱', model: 'nick', value: ctx.state.nick, placeholder: '例如：柚子姐', maxlength: 20, id: 'jl-nick' })}
-        ${ui.field({ label: '狗狗名字', model: 'dogName', value: ctx.state.dogName, placeholder: '例如：柚子', maxlength: 12, id: 'jl-dog' })}
+        ${ui.field({ label: '你的暱稱', required: true, model: 'nick', value: ctx.state.nick, placeholder: '例如：柚子姐', maxlength: 20, id: 'jl-nick' })}
+        ${ui.field({ label: '狗狗名字', required: true, model: 'dogName', value: ctx.state.dogName, placeholder: '例如：柚子', maxlength: 12, id: 'jl-dog' })}
       </div>
       ${sizeBlock(ctx)}
       ${conditionBlock(ctx, ev)}
       <div class="px mt-16">
         <div class="jl-sw"><span class="lbl" id="jl-kidsLabel">有小朋友一起來</span>${ui.switchCtl({ checked: ctx.state.kids, act: 'kids', labelledby: 'jl-kidsLabel' })}</div>
-        <div class="jl-leash"><label for="jl-leash">誰牽繩</label><input class="input"${ui.attrs({ id: 'jl-leash', type: 'text', 'data-model': 'leash', value: ctx.state.leash, maxlength: 20, autocomplete: 'off', 'aria-describedby': 'jl-leashNote', placeholder: '例如：我自己' })}></div>
+        <div class="jl-leash"><label for="jl-leash">誰牽繩<span class="req" aria-hidden="true">${C.texts.required}</span></label><input class="input"${ui.attrs({ id: 'jl-leash', type: 'text', 'data-model': 'leash', 'aria-required': 'true', value: ctx.state.leash, maxlength: 20, autocomplete: 'off', 'aria-describedby': 'jl-leashNote', placeholder: '例如：我自己' })}></div>
         <p class="jl-note" id="jl-leashNote">${ui.icon('eventInfo', { size: 16 })}${C.texts.leashAge}</p>
         ${ctx.state.kids ? html`<div class="mt-4">${ui.textBtn(C.kidsTips.title, { act: 'tips', icon: 'chevronRight', iconAfter: true, iconSize: 16 })}</div>` : ''}
       </div>`;
@@ -16465,11 +16515,11 @@ try {
 
       <form class="px mt-20" data-act="publish" novalidate style="display:flex;flex-direction:column;gap:16px">
         <div class="ld-two">
-          ${ui.field({ label: '最後看到的地點', model: 'place', value: ctx.state.place, placeholder: '例如：' + (C.parks[0] ? C.parks[0].name : '公園') + '東側', maxlength: 60, id: 'lost-place', enterkeyhint: 'next' })}
-          ${ui.field({ label: '時間', model: 'seen', value: ctx.state.seen, type: 'datetime-local', max: nowIn, id: 'lost-time' })}
+          ${ui.field({ label: '最後看到的地點', required: true, model: 'place', value: ctx.state.place, placeholder: '例如：' + (C.parks[0] ? C.parks[0].name : '公園') + '東側', maxlength: 60, id: 'lost-place', enterkeyhint: 'next' })}
+          ${ui.field({ label: '時間', required: true, model: 'seen', value: ctx.state.seen, type: 'datetime-local', max: nowIn, id: 'lost-time' })}
         </div>
         <div class="field">
-          <label class="label" for="lost-secret">只有我知道的特徵<span style="font-weight:400;color:var(--muted)">（選填，不公開）</span></label>
+          <label class="label" for="lost-secret">只有我知道的特徵<span style="font-weight:400;color:var(--muted)">（不公開）</span></label>
           <input class="input" id="lost-secret" type="text" data-model="secret" maxlength="80" autocomplete="off" placeholder="例如：右後腳有一撮白毛" aria-describedby="lost-secret-hint"${ui.attrs({ value: ctx.state.secret || '' })}>
           <span class="small" id="lost-secret-hint">${C.texts.lostSecretHint}</span>
           ${App.me.canPrivate() ? '' : html`<span class="field-note">這個暗記只存在這個分頁，重新整理就不見了。</span>`}
@@ -16571,7 +16621,7 @@ try {
         return html`<form data-act="send" style="display:flex;flex-direction:column;gap:14px">
           <p class="sub">告訴${D.ownerName(l.by)}在哪裡、什麼時候看到${(l.dog && l.dog.name) || '狗狗'}。</p>
           ${ui.field({ label: '在哪裡看到', model: 'place', value: s.state.place, placeholder: '例如：新生南路和信義路口', maxlength: 60, id: 'seen-place' })}
-          ${ui.field({ label: '看到的情況', type: 'textarea', model: 'text', value: s.state.text, placeholder: '幾點看到、狗的樣子、往哪個方向跑', maxlength: 300, rows: 4, id: 'seen-text' })}
+          ${ui.field({ label: '看到的情況', required: true, type: 'textarea', model: 'text', value: s.state.text, placeholder: '幾點看到、狗的樣子、往哪個方向跑', maxlength: 300, rows: 4, id: 'seen-text' })}
           <p class="note">狗主人可能會問你一個特徵，確認是不是同一隻。</p>
           <div class="sheet-actions" style="margin-top:4px">${ui.quietBtn('取消', { act: 'cancel' })}${ui.primaryBtn('送出回報', { type: 'submit' })}</div>
         </form>`;
@@ -16856,7 +16906,7 @@ try {
     var none = !items.length;
     return html`<section class="feed px mt-24" aria-labelledby="feed-h">
       <h2 class="h2" id="feed-h">狗友動態</h2>
-      ${none ? html`<p class="note mt-8">追蹤的狗這 7 天的日記、打卡和散步會出現在這裡。去狗聚認識狗友，或點公園常客的頭像追蹤牠們。</p>`
+      ${none ? html`<p class="note mt-8">追蹤狗狗後，牠們這 7 天的日記、打卡會出現在這裡。</p>`
         : html`<ul class="list mt-8">${rows}</ul>${items.length > 8 && !ctx.state.feedAll ? ui.textBtn('看更多動態', { act: 'feedMore', icon: 'chevronRight', iconAfter: true }) : ''}`}
     </section>`;
   }
@@ -17068,7 +17118,7 @@ try {
       });
       var chatBody = ctx.state.events === undefined ? ui.loading()
         : chats.length ? html`<ul class="list mt-8">${chatRows}</ul>`
-        : html`<p class="note mt-8">報名狗聚後，那一場的聊天室會在這裡。只有報名的狗可以在裡面聊，主揪的公告會釘在最上面。</p>`;
+        : html`<p class="note mt-8">報名狗聚後，聊天室會在這裡。</p>`;
       return html`
         ${ui.appHead('訊息', {})}
         <section class="px mt-8" aria-labelledby="ms-chats">
@@ -17727,7 +17777,8 @@ try {
     var B = C.badges, H = C.badgeHow;
     var items = [
       { on: vaccine, icon: 'vaccine', label: B.vaccine },
-      { on: registered, icon: 'registered', label: B.chip }
+      { on: registered, icon: 'registered', label: B.chip },
+      { on: D.dewormOk(dog), icon: 'tick', label: B.deworm }
     ]; // 狗語畢業章 removed from the app (2026-10-27, Willie); the Dog_Language screen stays, unlinked
     var how = [];
     if (!vaccine) {
@@ -17735,6 +17786,10 @@ try {
         : ui.textBtn(H.vaccine, { go: 'Profile_Create', params: { mode: 'edit' }, icon: 'chevronRight', iconAfter: true, iconSize: 16 }));
     }
     if (!registered) how.push(ui.textBtn(H.chip, { go: 'Profile_Create', params: { mode: 'edit' }, icon: 'chevronRight', iconAfter: true, iconSize: 16 }));
+    if (!D.dewormOk(dog)) {
+      var care = D.myCare();
+      how.push(ui.textBtn(care && care.showBadge && care.deworm ? H.dewormExpired : H.deworm, { go: 'Reminders', icon: 'chevronRight', iconAfter: true, iconSize: 16 }));
+    }
     return html`
       <section class="px mt-24" aria-labelledby="pf-badges">
         <h2 class="h2" id="pf-badges">徽章</h2>
@@ -17756,7 +17811,7 @@ try {
       body = rows.length ? html`<ul>${rows.map(function (x) {
         // a sticker without a drawing of its own keeps the spacing but shows no (misleading) borrowed icon
         return html`<li><span class="ic-wrap" aria-hidden="true">${x.s.icon ? ui.icon(x.s.icon, { size: 18 }) : ''}</span><span class="grow">${x.s.label}</span><span class="n">×${x.n}</span></li>`;
-      })}</ul>` : html`<p class="note mt-8">還沒收到。聚完互送貼紙，就會出現在這裡。</p>`;
+      })}</ul>` : html`<p class="note mt-8">聚完互送貼紙，雙方都送了才公開。</p>`;
     }
     return html`<section class="pf-stk" aria-labelledby="pf-stickers">
       <h2 class="pf-h" id="pf-stickers">收到的貼紙</h2>
@@ -17767,7 +17822,7 @@ try {
 
   function followBox() {
     var n = D.following().length;
-    var sub = n ? C.texts.followNote : '在名單或公園看板點狗狗，就能追蹤';
+    var sub = n ? C.texts.followNote : '點狗狗就能追蹤';
     return html`<button type="button" class="pf-follow"${ui.go('DM_Invite')}${ui.attrs({ 'aria-label': '追蹤的狗友 ' + n + ' 隻，看狗友' })}>
       <span class="pf-h" aria-hidden="true">追蹤的狗友</span>
       <span class="num" aria-hidden="true">${n}</span>
@@ -17874,7 +17929,7 @@ try {
       var tags = Array.isArray(dog.tags) ? dog.tags.filter(function (t) { return typeof t === 'string'; }) : [];
       var nRem = D.computeReminders(p).length;
       var spaceOn = D.spaceActive(dog);
-      var spaceSub = spaceOn ? (dog.space && dog.space.mode === 'long' ? '開著・長期' : '開著・只限今天，半夜自動關') : '打開後頭像出現黃圈，不用寫原因';
+      var spaceSub = spaceOn ? (dog.space && dog.space.mode === 'long' ? '開著・長期' : '開著・只限今天，半夜自動關') : '頭像會出現黃圈';
       var hasPhoto = !!D.photoOf(p);
       var healthInbox = ctx.state.health ? D.healthInbox(ctx.state.health).length : 0;
 
@@ -17921,9 +17976,9 @@ try {
             title: '今天需要空間', sub: spaceSub, go: 'Yellow_Space',
             right: spaceOn ? html`<span class="pf-on">開著</span>` : ''
           })}
-          ${ui.listRow({ icon: 'photo', iconSize: 20, title: '狗狗日記', sub: '照片和小故事，狗友可以汪和留言', go: 'Diary' })}
-          ${ui.listRow({ icon: 'privacy', iconSize: 20, title: '我的隱私', sub: '打卡只顯示哪個公園，不露出住家', go: 'Privacy' })}
-          ${ui.listRow({ icon: 'infoSmall', iconSize: 20, title: C.privacyNote.title, sub: '存了什麼、誰看得到、' + C.terms.title + '、' + C.deleteMine.title, go: 'Privacy', params: { section: 'note' } })}
+          ${ui.listRow({ icon: 'photo', iconSize: 20, title: '狗狗日記', sub: '照片和小故事', go: 'Diary' })}
+          ${ui.listRow({ icon: 'privacy', iconSize: 20, title: '我的隱私', sub: '打卡給誰看、家附近', go: 'Privacy' })}
+          ${ui.listRow({ icon: 'infoSmall', iconSize: 20, title: C.privacyNote.title, sub: C.terms.title + '、' + C.deleteMine.title, go: 'Privacy', params: { section: 'note' } })}
         </ul>
 
         ${recoveryCard(ctx)}
@@ -17932,7 +17987,7 @@ try {
           ${ui.sectionHead('更多', '', { id: 'pf-more' })}
           <ul class="list pf-rows mt-8">
             ${ui.listRow({ icon: 'megaphone', iconSize: 20, iconKind: 'warn', title: '走失協尋', sub: '發協尋、看附近走失的狗', go: 'Lost_Dog' })}
-            ${ui.listRow({ icon: 'alertCircle', iconSize: 20, iconKind: 'warn', title: '出事了速查卡', sub: C.texts.firstAidOffline, go: 'First_Aid' })}
+            ${ui.listRow({ icon: 'alertCircle', iconSize: 20, iconKind: 'warn', title: '出事了速查卡', sub: C.texts.firstAidSub, go: 'First_Aid' })}
           </ul>
         </section>`;
     },
@@ -18111,7 +18166,7 @@ try {
     return html`<div class="field mt-16">
       <span class="pc-group-label" id="pc-breed-label">品種</span>
       <button type="button" class="pc-pick" data-act="breed" aria-labelledby="pc-breed-label pc-breed-val">
-        <span id="pc-breed-val" class="${s.breed ? '' : 'ph'}">${s.breed || '選品種（選填）'}</span>${ui.icon('chevronDown', { size: 20, color: 'var(--muted)' })}
+        <span id="pc-breed-val" class="${s.breed ? '' : 'ph'}">${s.breed || '選品種'}</span>${ui.icon('chevronDown', { size: 20, color: 'var(--muted)' })}
       </button>
       ${info && info.brachy ? html`<span class="field-note">短鼻犬，已幫你勾「怕熱體質」</span>` : ''}
     </div>
@@ -18123,7 +18178,7 @@ try {
     var privateOk = App.me.canPrivate();
     return html`
       <section class="px mt-24" aria-labelledby="pc-more">
-        <div class="pc-more-head"><h2 class="h2" id="pc-more">想多寫一點（選填）</h2><span class="note" style="white-space:nowrap">不填也能報名</span></div>
+        <div class="pc-more-head"><h2 class="h2" id="pc-more">想多寫一點</h2></div>
         <div class="field mt-12" role="group" aria-labelledby="pc-tags-label">
           <span class="pc-group-label" id="pc-tags-label">個性標籤</span>
           ${dogs.tagGroups.map(function (g, i) {
@@ -18133,7 +18188,7 @@ try {
             </div>`;
           })}
         </div>
-        <div class="mt-16">${ui.field({ label: '出生年月（會自動算幾歲）', type: 'month', model: 'birth', value: s.birth, id: 'pc-birth', max: ui.fmt.dateKey(D.now()).slice(0, 7) })}</div>
+        <div class="mt-16">${ui.field({ label: '出生年月', type: 'month', model: 'birth', value: s.birth, id: 'pc-birth', max: ui.fmt.dateKey(D.now()).slice(0, 7) })}</div>
         <div class="field mt-12" role="group" aria-labelledby="pc-neuter-label">
           <span class="pc-group-label" id="pc-neuter-label">結紮</span>
           <div class="chips">${Object.keys(C.dogs.neuter).map(function (k) { return ui.chip(C.dogs.neuter[k], { pressed: s.neutered === k, act: 'neuter', data: { v: k } }); })}</div>
@@ -18146,12 +18201,12 @@ try {
         <ul class="list mt-12">
           ${ui.listRow({
             lead: html`<span class="row-icon warn" aria-hidden="true">${ui.icon('heat', { size: 20 })}</span>`,
-            title: '怕熱體質', sub: '短鼻犬會自動勾',
+            title: '怕熱體質',
             right: ui.switchCtl({ checked: !!s.heat, act: 'heat', label: '怕熱體質' })
           })}
           ${ui.listRow({
             lead: html`<span class="pc-switch-icon" aria-hidden="true">${ui.dogAvatar(previewDog(s), { size: 36, ring: true, label: false })}</span>`,
-            title: '今天需要空間', sub: '打開後頭像出現黃圈，不用寫原因',
+            title: '今天需要空間', sub: '頭像會出現黃圈',
             right: ui.switchCtl({ checked: !!s.space, act: 'space', label: '今天需要空間' }),
             cls: 'plain'
           })}
@@ -18264,18 +18319,17 @@ try {
         ${ui.topBar({ back: showBack, backLabel: edit ? '回狗狗檔案' : '返回' })}
         ${!edit && !D.me() ? html`<p class="note teal px pc-lead">${C.firstRun.lead}</p>` : ''}
         <h1 class="h1 px">${edit ? '編輯狗狗名片' : '30 秒建立狗狗名片'}</h1>
-        <p class="sub px mt-4">${edit ? '改完按「儲存」。' : C.firstRun.sub}</p>
         ${claimOn(s) || lineIn(s) ? html`<div class="pc-claim px"><span class="note">${C.recovery.askNewPhone}</span>${claimOn(s) ? ui.textBtn(C.recovery.claimTitle, { act: 'claim', icon: 'chevronRight', iconAfter: true, iconSize: 16 }) : ''}${lineIn(s) ? ui.textBtn(C.login.signIn, { act: 'lineIn', icon: 'chevronRight', iconAfter: true, iconSize: 16 }) : ''}</div>` : ''}
 
         <section class="px mt-20" aria-label="基本資料">
           <div class="pc-top">
             ${photoArea(s)}
-            <div class="grow" style="min-width:0">${ui.field({ label: '名字', model: 'name', value: s.name, placeholder: '狗狗的名字', maxlength: 12, id: 'pc-name', enterkeyhint: 'done' })}</div>
+            <div class="grow" style="min-width:0">${ui.field({ label: '名字', required: true, model: 'name', value: s.name, placeholder: '狗狗的名字', maxlength: 12, id: 'pc-name', enterkeyhint: 'done' })}</div>
           </div>
           ${photoActs(s)}
           ${sizeChips(s)}
           ${breedRow(s)}
-          <div class="mt-16">${ui.field({ label: '你的暱稱（選填）', model: 'nickname', value: s.nickname, placeholder: '例如：麻糬媽', maxlength: 20, id: 'pc-nick', note: '狗聚名單上會顯示這個名字' })}</div>
+          <div class="mt-16">${ui.field({ label: '你的暱稱', model: 'nickname', value: s.nickname, placeholder: '例如：麻糬媽', maxlength: 20, id: 'pc-nick', note: '狗聚名單上會顯示這個名字' })}</div>
         </section>
 
         ${moreSection(s, ctx)}
@@ -18452,10 +18506,13 @@ try {
       ctx.state.dewormLast = c.deworm ? c.deworm.last : '';
       ctx.state.dewormMonths = c.deworm ? c.deworm.months : 1;
       ctx.state.weigh = !!c.weigh;
+      ctx.state.showBadge = !!c.showBadge;
     }
-    return { dewormLast: ctx.state.dewormLast, dewormMonths: ctx.state.dewormMonths || 1, weigh: !!ctx.state.weigh };
+    return { dewormLast: ctx.state.dewormLast, dewormMonths: ctx.state.dewormMonths || 1, weigh: !!ctx.state.weigh, showBadge: !!ctx.state.showBadge };
   }
   function careSection(ctx) {
+    // until my care settings are read, no controls: a tap or a save on the empty form would undo them
+    if (!D.myCare()) return html`<section class="px mt-24" aria-labelledby="rm-care-h"><h2 class="h2" id="rm-care-h">照顧提醒</h2><p class="note mt-4" role="status">載入中…</p></section>`;
     var f = careForm(ctx);
     return html`<section class="px mt-24" aria-labelledby="rm-care-h">
       <h2 class="h2" id="rm-care-h">照顧提醒</h2>
@@ -18465,6 +18522,8 @@ try {
         ${ui.chip('每 1 個月', { pressed: f.dewormMonths === 1, act: 'careMonths', data: { v: '1' } })}
         ${ui.chip('每 3 個月', { pressed: f.dewormMonths === 3, act: 'careMonths', data: { v: '3' } })}
       </div>
+      <div class="chips mt-12">${ui.chip(C.reminderUi.dewormBadge, { pressed: f.showBadge, act: 'careBadge' })}</div>
+      <p class="note mt-4">${C.reminderUi.dewormBadgeNote}</p>
       <div class="chips mt-12">${ui.chip('每月提醒量體重', { pressed: f.weigh, act: 'careWeigh' })}</div>
       <div class="mt-12">${ui.quietBtn('儲存照顧提醒', { act: 'careSave', block: false })}</div>
     </section>`;
@@ -18503,6 +18562,12 @@ try {
     title: '提醒中心',
     tab: null,
 
+    mount: function (ctx) {
+      // another phone of this dog may have changed the care settings: read them again, then fill the form once
+      ctx.state.careInit = false;
+      D.reloadCare();
+    },
+
     render: function (ctx) {
       var p = D.me();
       return html`
@@ -18519,12 +18584,14 @@ try {
     actions: {
       careMonths: function (ctx, d) { ctx.set({ dewormMonths: d.v === '3' ? 3 : 1 }); },
       careWeigh: function (ctx) { ctx.set({ weigh: !careForm(ctx).weigh }); },
+      careBadge: function (ctx) { ctx.set({ showBadge: !careForm(ctx).showBadge }); },
       careSave: function (ctx) {
         var f = careForm(ctx), inp = document.getElementById('rm-deworm');
         var last = String(inp ? inp.value : f.dewormLast || '').trim();
-        return D.setCare({ deworm: last ? { last: last, months: f.dewormMonths } : null, weigh: f.weigh }).then(function () {
+        if (f.showBadge && !last) { ui.toast(C.reminderUi.dewormNeedDate); return; }
+        return D.setCare({ deworm: last ? { last: last, months: f.dewormMonths } : null, weigh: f.weigh, showBadge: f.showBadge }).then(function (c) {
           ctx.set({ dewormLast: last });
-          ui.toast('照顧提醒存好了');
+          ui.toast(c && c.cardLater ? C.reminderUi.badgeLater : '照顧提醒存好了');
         });
       },
       careDone: function (ctx, d) { return D.careDone(d.kind).then(function () { ui.toast('記下了，下次到期前再提醒你'); }); },
@@ -18649,7 +18716,7 @@ try {
         </div>
         <div class="mt-16">${ui.progress(Math.min(v.count, big), big, '集章進度')}</div>
         <ul class="stp-slots" aria-label="集章格">${slots}</ul>
-        <p class="stp-names"><span>${names}</span><span>${rest}</span></p>
+        <p class="stp-names"><span>${names}</span>${v.count ? html`<span>${rest}</span>` : ''}</p>
         ${draw}
         ${prizes.length ? html`<p class="note mt-12">抽到過：${prizes.map(function (x) { return x.label + '（範例）'; }).join('、')}</p>` : ''}
       </section>`;
@@ -18721,8 +18788,7 @@ try {
               <span class="grow"><span class="row-title">${shopTitle(shop)}</span><span class="row-sub">${got ? '已蓋過' : shopSub(shop)}</span></span>
               ${got ? ui.art(shop.stamp, { width: 32, height: 32 }) : ''}
             </button>`;
-          })}</div>
-          <p class="note mt-12" style="text-align:center">${T.lineScan}</p>`;
+          })}</div>`;
       },
       actions: {
         scan: function (s, d) { return scan(ctx, s, d.id); },
@@ -18771,7 +18837,6 @@ try {
         ${ui.appHead('遛狗集章', { right: html`<span class="note" style="white-space:nowrap">${C.mapArea}試辦（範例）</span>` })}
         ${stampCard(ctx, p)}
         <div class="px mt-20">${ui.primaryBtn('掃 QR 蓋章', { act: 'scan', icon: 'qr' })}</div>
-        <p class="note px mt-8" style="text-align:center">${T.lineScan}</p>
         ${shopList(ctx)}
         ${otherStamps(ctx, p)}
         ${C.prizes.length ? html`<p class="note px mt-20 row-flex">${ui.icon('scarf', { size: 18, color: 'var(--teal-ink)' })}<span class="grow">獎品（範例）：${C.prizes.map(function (x) { return x.label; }).join('、')}</span></p>` : ''}`;
