@@ -1005,7 +1005,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-27.f25622b0","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-27.d2736213","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2516,9 +2516,9 @@ window.APP_BUILD = {"version":"2026-10-27.f25622b0","seedUrl":"seed-data.json"};
     regularsHidden: '一隻只給狗友看的狗',             // 常客榜上，打卡只給狗友看的狗不顯示名字
     typhoonMaybePaused: '颱風警報中，這次可能暫停',
     albumNote: '這裡的照片是示意圖，狗聚日的相簿還不能上傳照片。',
-    // 追蹤的說明（試辦版沒有推播：追蹤的狗打卡、開團會出現在提醒中心）
-    followNote: '牠們打卡、開團時，會出現在提醒中心',
-    followNoteOne: '牠打卡、開團時，會出現在提醒中心',
+    // 追蹤的說明（試辦版沒有推播：追蹤的狗寫日記、打卡、散步、開團會出現在首頁的狗友動態）
+    followNote: '牠們寫日記、打卡、開團時，會出現在首頁的狗友動態',
+    followNoteOne: '牠寫日記、打卡、開團時，會出現在首頁的狗友動態',
     lostPublishNote: '發布後，大家打開狗聚就會在首頁看到協尋',
     lostAsk: '送私訊邀請問問看',
     myJoin: '我的報名（改狀態或這次不來了）',
@@ -9671,7 +9671,7 @@ window.APP_BUILD = {"version":"2026-10-27.f25622b0","seedUrl":"seed-data.json"};
   /**
    * App.register(name, {
    *   title: '頁面名稱',              // used for document.title
-   *   tab: 'map'|'events'|'stamps'|'me'|null,  // shows the bottom nav with this tab active
+   *   tab: 'map'|'events'|'msgs'|'stamps'|'me'|null,  // shows the bottom nav with this tab active
    *   needsProfile: true,             // default true: without a profile, go to Profile_Create first
    *   admin: false,                   // true: only when the admin tools are unlocked (App.me.isAdmin), else Main
    *   public: false,                  // true: a token-only page for someone who does not use the app (a vet: Health_View,
@@ -11693,8 +11693,8 @@ try {
 /* ---- screens/DM_Invite.js ---- */
 try {
 /* DM_Invite — 私訊邀請與追蹤: a dog's card ({id}) with 想跟你家狗玩 / 追蹤, received invites (接受 / 婉拒),
-   the 1:1 chat ({chat: otherId}, only after both agree; text + real photos, opening it marks it read), my DM
-   conversations with unread dots + dog lists ({}), and 封鎖或檢舉. */
+   the 1:1 chat ({chat: otherId}, only after both agree; text + real photos, opening it marks it read), invites and
+   dog lists ({}), and 封鎖或檢舉. My DM conversations are listed on the 訊息 tab only (2026-10-27, no duplicates). */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, C = App.content, fmt = ui.fmt;
@@ -11840,25 +11840,6 @@ try {
     </li>`;
   }
 
-  /** 私訊: my conversations, newest first, with the unread dot (cache-backed, no subscription). */
-  function threadsSection() {
-    var me = meId();
-    var list = D.dmThreads().filter(function (t) { return t.otherId !== me && D.person(t.otherId) && !blockedEither(t.otherId); });
-    if (!list.length) return '';
-    return html`<section class="px mt-20" aria-labelledby="dm-threads">
-      ${ui.sectionHead('私訊', null, { id: 'dm-threads' })}
-      <ul class="dm-list mt-4">${list.map(function (t) {
-        var when = t.lastMessageAt ? fmt.relative(t.lastMessageAt) : '';
-        var sub = t.unread ? '有新訊息' + (when ? '・' + when : '') : (t.lastBy === me ? '你傳的' + (when ? '・' + when : '') : when);
-        return html`<li><button type="button" class="dm-who"${ui.go('DM_Invite', { chat: t.otherId })}>
-          ${avatar(t.otherId, 44)}
-          <span class="row-main"><span class="h3">${D.dogName(t.otherId)}・${D.ownerName(t.otherId)}</span><span class="note">${sub}</span></span>
-          <span class="dm-end">${t.unread ? ui.dot() : ''}<span class="chev">${ui.icon('chevronRight', { size: 22 })}</span></span>
-        </button></li>`;
-      })}</ul>
-    </section>`;
-  }
-
   function inbox(ctx, excludeId) {
     var reqs = ctx.state.reqs;
     if (!reqs) return excludeId ? '' : html`<div class="px mt-24">${ui.loading()}</div>`;
@@ -11993,7 +11974,6 @@ try {
     }).sort(function (a, b) { return String(a.dog.name).localeCompare(String(b.dog.name), 'zh-Hant'); });
     return html`${ui.topBar({})}
       <h1 class="h1 px">私訊邀請與追蹤</h1>
-      ${threadsSection()}
       ${consentNote()}
       ${inbox(ctx, null)}
       ${outbox(ctx)}
@@ -16622,7 +16602,8 @@ try {
 try {
 /* Messages（訊息, a bottom tab since 2026-10-27）— the 狗聚 chat rooms I am in (signed up / waiting / host; only
    signed-up dogs can talk there — the Chat screen enforces it) with unread dots, then DM invites waiting for me and
-   my DM conversations, and the way to my 狗友 list. */
+   my DM conversations, and the way to my 狗友 list. A room stays listed after its meetup ends, while its chat is
+   still open (D.chatState), because its new lines still light the dot. */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, fmt = ui.fmt;
@@ -16636,16 +16617,23 @@ try {
     }).sort(function (a, b) { return (b.lastMessageAt || 0) - (a.lastMessageAt || 0) || a.startAt - b.startAt; });
   }
 
+  /** My DM conversations: not with a dog that is gone (deleted / hidden) or blocked either way (same rule as the chat). */
+  function myThreads() {
+    var me = App.me.actorId;
+    return D.dmThreads().filter(function (th) {
+      return th.otherId !== me && D.person(th.otherId) && !D.isBlocked(th.otherId) && !D.isBlocked(me, th.otherId);
+    });
+  }
+
   App.register('Messages', {
     title: '訊息',
     tab: 'msgs',
     mount: function (ctx) {
-      ctx.live('events', D.watchEvents);
-      ctx.live('reqs', D.watchDmRequests);
+      ctx.live('events', D.watchEvents, { when: 'all' }); // ended meetups too: their chats stay open for a while
+      ctx.live('reqs', D.watchDmRequests);                 // re-render when an invite comes in or is answered
     },
     render: function (ctx) {
-      var u = D.unread(), chats = myChats(ctx);
-      var threads = D.dmThreads().filter(function (th) { return !D.isBlocked(th.otherId); });
+      var u = D.unread(), chats = myChats(ctx), threads = myThreads();
       var chatRows = chats.map(function (ev) {
         var dot = !!u.events[ev.id];
         return ui.listRow({ icon: 'chat', iconSize: 20, title: ev.title, sub: fmt.dayLabel(ev.startAt) + (ev.lastMessageAt ? '・最新 ' + fmt.relative(ev.lastMessageAt) : '・還沒有人說話'),
@@ -16656,11 +16644,14 @@ try {
           title: D.dogName(th.otherId), sub: th.lastMessageAt ? fmt.relative(th.lastMessageAt) : '', go: 'DM_Invite', params: { chat: th.otherId },
           right: th.unread ? ui.dot({ label: '有新私訊' }) : '' });
       });
+      var chatBody = ctx.state.events === undefined ? ui.loading()
+        : chats.length ? html`<ul class="list mt-8">${chatRows}</ul>`
+        : html`<p class="note mt-8">報名狗聚後，那一場的聊天室會在這裡。只有報名的狗可以在裡面聊，主揪的公告會釘在最上面。</p>`;
       return html`
         ${ui.appHead('訊息', {})}
         <section class="px mt-8" aria-labelledby="ms-chats">
           <h2 class="h2" id="ms-chats">狗聚聊天室</h2>
-          ${chats.length ? html`<ul class="list mt-8">${chatRows}</ul>` : html`<p class="note mt-8">報名狗聚後，那一場的聊天室會在這裡。只有報名的狗可以在裡面聊，主揪的公告會釘在最上面。</p>`}
+          ${chatBody}
         </section>
         <section class="px mt-24" aria-labelledby="ms-dms">
           <h2 class="h2" id="ms-dms">私訊</h2>
@@ -17894,8 +17885,8 @@ try {
 ;
 /* ---- screens/Reminders.js ---- */
 try {
-/* Reminders（提醒中心）— weather / rain / rabies / tick reminders from App.data.computeReminders(),
-   「我打過了」, and ⊕ 狗友動態 (check-ins and new events of dogs I follow). */
+/* Reminders（提醒中心）— weather / rain / rabies / tick reminders from App.data.computeReminders(), 「我打過了」, and the
+   照顧提醒 form. (Its 狗友動態 list went away on 2026-10-27 — the home page shows the same 狗友動態, Willie: no duplicates.) */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, C = App.content;
@@ -18016,57 +18007,9 @@ try {
     })}</div>`;
   }
 
-  function activityRow(a, evById) {
-    var who = D.person(a.id);
-    var dogName = D.dogName(a.id);
-    var lead = html`<span aria-hidden="true">${ui.dogAvatar(who, { size: 40, bg: 'tint', label: false })}</span>`;
-    if (a.kind === 'checkin') {
-      var park = C.park(a.parkId);
-      if (!park) return '';
-      return ui.listRow({ lead: lead, title: dogName + ' 在' + park.name + '打卡', sub: ui.fmt.relative(a.at), go: 'Park_Board', params: { park: park.id } });
-    }
-    var ev = ui.own(evById, a.eventId);
-    if (!ev) return '';
-    var owner = who && typeof who.nickname === 'string' && who.nickname ? who.nickname : dogName + '家';
-    return ui.listRow({ lead: lead, title: owner + '開了狗聚：' + ev.title, sub: ui.fmt.dateTime(ev.startAt) + '・' + C.placeName(ev.place), go: 'Event', params: { id: ev.id } });
-  }
-
-  function friendActivity(ctx) {
-    var checkins = ctx.state.checkins, events = ctx.state.events;
-    var body;
-    if (checkins === undefined || events === undefined) body = ui.loading();
-    else {
-      var nFollow = D.following().length;
-      var evById = {};
-      (events || []).forEach(function (ev) { evById[ev.id] = ev; });
-      var acts = D.followActivity(checkins, events).slice(0, 10);
-      var rows = acts.map(function (a) { return activityRow(a, evById); }).filter(function (x) { return x !== ''; });
-      if (!nFollow) {
-        body = html`<div class="mt-8">${ui.emptyState({
-          title: '還沒追蹤狗友',
-          body: '在狗聚名單或公園看板點狗狗，按「追蹤」，牠打卡或開團時會出現在這裡。',
-          action: ui.secondaryBtn('找狗友', { go: 'DM_Invite', block: false })
-        })}</div>`;
-      } else if (!rows.length) {
-        body = html`<p class="note mt-8">追蹤的 ${nFollow} 隻狗友最近沒有打卡或開團。</p>`;
-      } else {
-        body = html`<ul class="list mt-8">${rows}</ul>`;
-      }
-    }
-    return html`<section class="px mt-24" aria-labelledby="rm-friends">
-      ${ui.sectionHead('狗友動態', ui.textBtn('追蹤的狗友', { go: 'DM_Invite', icon: 'chevronRight', iconAfter: true, iconSize: 16 }), { id: 'rm-friends' })}
-      ${body}
-    </section>`;
-  }
-
   App.register('Reminders', {
     title: '提醒中心',
     tab: null,
-
-    mount: function (ctx) {
-      ctx.live('checkins', D.watchCheckins);
-      ctx.live('events', D.watchEvents, { when: 'upcoming' });
-    },
 
     render: function (ctx) {
       var p = D.me();
@@ -18078,8 +18021,7 @@ try {
         </div>
         ${reminderList(p)}
         ${rabiesHint(p)}
-        ${careSection(ctx)}
-        ${friendActivity(ctx)}`;
+        ${careSection(ctx)}`;
     },
 
     actions: {
