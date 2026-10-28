@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="狗聚">
+<meta name="apple-mobile-web-app-title" content="豆米特">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="format-detection" content="telephone=no">
 <meta name="referrer" content="no-referrer">
@@ -15,8 +15,8 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<title>狗聚</title>
-<meta name="description" content="狗聚 試辦版：約附近的狗一起散步、玩。">
+<title>豆米特 DogMeet</title>
+<meta name="description" content="豆米特 DogMeet 試辦版：約附近的狗一起散步、玩。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" media="print" onload="this.media='all'">
@@ -1023,9 +1023,9 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <script src="app-config.js" defer></script>
 </head>
 <body>
-<div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
+<div id="app"><div class="boot" role="status"><div class="h1-tab">豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-28.130a6a88","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2543,7 +2543,7 @@ window.APP_BUILD = {"version":"2026-10-28.130a6a88","seedUrl":"seed-data.json"};
     homeWhy: '研究發現就算設了隱私圈，很多人的住家還是被推算出來。',
     weatherOk: '天氣正常（試辦版的天氣是模擬的）',
     weatherAuto: '颱風警報時會自動暫停',
-    meetupAuto: '颱風警報時會自動暫停，打開狗聚就會看到',
+    meetupAuto: '颱風警報時會自動暫停，打開豆米特就會看到',
     vetCall: '先打電話確認有醫師',
     firstAidOffline: '試辦版要有網路才打得開，建議先截圖存在手機',
     firstAidReview: '內容請合作獸醫審過',
@@ -2570,7 +2570,7 @@ window.APP_BUILD = {"version":"2026-10-28.130a6a88","seedUrl":"seed-data.json"};
     // 追蹤的說明（試辦版沒有推播：追蹤的狗寫日記、打卡、散步、開團會出現在首頁的狗友動態）
     followNote: '牠們寫日記、打卡、開團時，會出現在首頁的狗友動態',
     followNoteOne: '牠寫日記、打卡、開團時，會出現在首頁的狗友動態',
-    lostPublishNote: '發布後，大家打開狗聚就會在首頁看到協尋',
+    lostPublishNote: '發布後，大家打開豆米特就會在首頁看到協尋',
     lostAsk: '送私訊邀請問問看',
     myJoin: '我的報名（改狀態或這次不來了）',
     demoTag: '範例'                                    // 範例狗狗開的狗聚，標籤上多一個「範例」
@@ -2609,9 +2609,9 @@ window.APP_BUILD = {"version":"2026-10-28.130a6a88","seedUrl":"seed-data.json"};
   // 提醒中心的文字（颱風、熱指數、雨後、狂犬病疫苗、壁蝨季）
   // =====================================================================================================
   var REMINDER_TEXT = {
-    typhoon: { tag: '颱風警報', title: '這週的固定狗聚日已自動暫停', body: '主揪不用設定，大家打開狗聚就會看到。開車的話，車別停河濱堤外，會被拖吊。', link: { screen: 'Theme_Day', label: '看固定狗聚日' }, icon: 'typhoon' },
+    typhoon: { tag: '颱風警報', title: '這週的固定狗聚日已自動暫停', body: '主揪不用設定，大家打開豆米特就會看到。開車的話，車別停河濱堤外，會被拖吊。', link: { screen: 'Theme_Day', label: '看固定狗聚日' }, icon: 'typhoon' },
     // 固定狗聚日收起來的時候（WEEKLY.on: false），颱風提醒用這一則
-    typhoonNoWeekly: { tag: '颱風警報', title: '狗聚自動暫停', body: '主揪不用設定，大家打開狗聚就會看到。開車的話，車別停河濱堤外，會被拖吊。', link: { screen: 'Event', label: '看狗聚' }, icon: 'typhoon' },
+    typhoonNoWeekly: { tag: '颱風警報', title: '狗聚自動暫停', body: '主揪不用設定，大家打開豆米特就會看到。開車的話，車別停河濱堤外，會被拖吊。', link: { screen: 'Event', label: '看狗聚' }, icon: 'typhoon' },
     heat: { tag: '今天下午', body: '怕熱體質建議改到清晨、傍晚或延期。一直喘、站不穩，先移到陰涼處，用涼的流動水沖身體。', link: { screen: 'First_Aid', params: { card: 'heat' }, label: '中暑先這樣做' }, icon: 'heat' },
     rain: { tag: '雨後 3 到 5 天', title: '別讓狗喝水坑的水', body: '回家洗腳擦乾。鉤端螺旋體會經積水傳染，人也會被傳染。打疫苗時，確認有含鉤端螺旋體。', icon: 'rain' },
     rabies: { body: '每年要補打，沒打可罰 3 萬到 15 萬元。', action: { act: 'rabiesDone', label: '我打過了' }, icon: 'alertCircle' },
@@ -2687,14 +2687,14 @@ window.APP_BUILD = {"version":"2026-10-28.130a6a88","seedUrl":"seed-data.json"};
   // =====================================================================================================
   var PRIVACY_NOTE = {
     title: '隱私說明',
-    lead: '狗聚現在是試辦版，給朋友一起測試用。',
+    lead: '豆米特現在是試辦版，給朋友一起測試用。',
     sections: [
       { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到；打開驅蟲徽章時，名片上會有驅蟲的到期日）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
-      { title: '誰看得到', body: '用狗聚的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
+      { title: '誰看得到', body: '用豆米特的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
       { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位，位置只用來移動地圖，不會存起來。' },
       { title: '我出門遛狗', body: '按「我出門遛狗」才會用一次手機定位，不會一直追蹤。在公園裡就打卡在那座公園；在外面，別人只看到你大約在哪個 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。不存精確位置，也不送給任何人。家的位置只有你知道，存在你自己的資料裡。' },
       { title: '還是測試', body: '試辦版的保護還不完整：狗聚、聊天和協尋這些共用的資料，懂技術的人可能改得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
-      { title: '通知（選用）', body: '在「我的」打開通知，手機會給狗聚一個推播地址，由 Google、Apple、Mozilla 或 Microsoft 的推播服務轉送。有人在你的狗聚聊天室說話、私訊你或邀請你時，手機會跳出狗聚名稱或狗狗名字，不會有訊息內容。關掉通知或刪除我的資料，這個地址就刪掉。' },
+      { title: '通知（選用）', body: '在「我的」打開通知，手機會給豆米特一個推播地址，由 Google、Apple、Mozilla 或 Microsoft 的推播服務轉送。有人在你的狗聚聊天室說話、私訊你或邀請你時，手機會跳出狗聚名稱或狗狗名字，不會有訊息內容。關掉通知或刪除我的資料，這個地址就刪掉。' },
       { title: '沒有帳號', body: '不用註冊。你的身分記在這支手機的瀏覽器裡，清除瀏覽器資料、換手機、或從主畫面打開（iPhone），都會變成新的人。要變回同一隻狗，用「我的」→「家人」裡的找回碼。' },
       { title: '綁定 LINE（選用）', body: '有開放時，「我的」→「家人」可以綁定 LINE，換手機或換瀏覽器時用 LINE 登入就能找回同一隻狗。綁定時，登入系統會存 LINE 給的帳號編號、名字和大頭貼，只用來登入，不給別人看；不拿 email，也不會傳 LINE 訊息給你。刪除我的資料時會一起刪掉。' },
       { title: '回報問題', body: '按「回報問題」送出時，會一起附上你是哪隻狗、畫面名稱、App 版本、手機和瀏覽器的種類、時間，方便找出問題。私訊頁的「檢舉」也會用回報問題送給開這個 App 的人。只有你和開這個 App 的人看得到。' },
@@ -2730,15 +2730,15 @@ window.APP_BUILD = {"version":"2026-10-28.130a6a88","seedUrl":"seed-data.json"};
   // =====================================================================================================
   var TERMS = {
     title: '使用條款',
-    lead: '狗聚是 Willie 做的試辦服務，免費讓飼主約狗狗一起散步、玩。用狗聚就表示同意下面這些事。（2026-10-27 版）',
+    lead: '豆米特 DogMeet 是 Willie 做的試辦服務，免費讓飼主約狗狗一起散步、玩。用豆米特就表示同意下面這些事。（2026-10-29 版）',
     agree: '建立名片就表示同意',
     sections: [
       { title: '這是試辦版', body: '功能和規則可能會改，也可能暫停或結束，重要的改變會在 App 裡說。資料可能因為技術問題遺失，重要的東西請自己另外留一份。' },
       { title: '你的狗你負責', body: '帶狗出門請遵守各縣市的規定（公共場所牽繩、清理便便、攻擊性犬種的規定），按時打疫苗，看好自己的狗。狗狗對別的狗或人造成的傷害和損失，依法由飼主負責（民法第 190 條）。' },
-      { title: '狗聚是大家自己約的', body: '狗聚由飼主自己發起、自己參加。狗聚這個 App 不辦活動、不在現場，也不保證每個人、每隻狗的狀況。去之前看清楚規則，覺得不對就不要去，或提早離開。' },
+      { title: '狗聚是大家自己約的', body: '狗聚由飼主自己發起、自己參加。豆米特這個 App 不辦活動、不在現場，也不保證每個人、每隻狗的狀況。去之前看清楚規則，覺得不對就不要去，或提早離開。' },
       { title: '不可以做的事', body: '不可以買賣狗、徵求配種、打廣告、騷擾或威脅別人、冒用別人的身分、貼出別人的住址或電話，也不可以發違法或讓人不舒服的內容。' },
       { title: '檢舉和處理', body: '看到不對的內容或人，可以檢舉或封鎖。Willie 可能會把內容藏起來，或限制、停用帳號，不一定會先通知。' },
-      { title: '你寫的和你拍的', body: '你寫的字、上傳的照片還是你的；你同意它們在狗聚裡照你選的範圍給別人看。你可以隨時刪掉，或用「刪除我的資料」全部刪掉。' },
+      { title: '你寫的和你拍的', body: '你寫的字、上傳的照片還是你的；你同意它們在豆米特裡照你選的範圍給別人看。你可以隨時刪掉，或用「刪除我的資料」全部刪掉。' },
       { title: '健康卡和速查卡', body: '狗狗健康卡是你自己填的資料，不是醫院的病歷；出事了速查卡只是先應急，不能取代獸醫。狗狗不舒服，請直接找獸醫。' },
       { title: '有問題怎麼辦', body: '有問題或要申訴，用每一頁最下面的「回報問題」。' }
     ]
@@ -2752,14 +2752,14 @@ window.APP_BUILD = {"version":"2026-10-28.130a6a88","seedUrl":"seed-data.json"};
     onSub: '開著・有人在你的狗聚聊天室說話、私訊你、邀請你時通知你',
     offSub: '關著・打開後，有人回你時手機會跳通知',
     on: '開著', off: '關著',
-    needInstall: 'iPhone 要先在 Safari 按「分享」→「加入主畫面」，從主畫面打開狗聚，才能打開通知',
-    denied: '通知被手機擋住了，要到手機的設定裡打開狗聚的通知',
+    needInstall: 'iPhone 要先在 Safari 按「分享」→「加入主畫面」，從主畫面打開豆米特，才能打開通知',
+    denied: '通知被手機擋住了，要到手機的設定裡打開豆米特的通知',
     unsupported: '這支手機或瀏覽器不能收通知',
     notReady: '通知還沒在後台設定好，請告訴開這個 App 的人',
     failed: '通知沒有打開，請再試一次',
     enabled: '通知打開了',
     offTitle: '關掉通知？',
-    offBody: '關掉後，有人回你時手機不會跳通知，打開狗聚還是看得到紅點。',
+    offBody: '關掉後，有人回你時手機不會跳通知，打開豆米特還是看得到紅點。',
     offOk: '關掉',
     disabled: '通知關掉了'
   };
@@ -2793,7 +2793,7 @@ window.APP_BUILD = {"version":"2026-10-28.130a6a88","seedUrl":"seed-data.json"};
     invite: '邀請家人',
     inviteNote: '家人在建立名片頁按「家人已經在用？」，輸入這組找回碼，就能看到全部的狗。',
     mergeEntry: '加入家人的家',
-    mergeNote: '家人已經在用狗聚、你們各有一個家時：這支手機和你家的狗一起搬進家人那個家。',
+    mergeNote: '家人已經在用豆米特、你們各有一個家時：這支手機和你家的狗一起搬進家人那個家。',
     mergeLead: '輸入家人那個家的找回碼。',
     mergeNext: '下一步',
     mergeConfirm: '{dogs}會搬進「{home}」，名片和所有紀錄都跟著過去。這支手機改成那個家的家人。你們家原本的「家的位置」和已讀紀錄不會帶過去。',
@@ -2899,7 +2899,7 @@ window.APP_BUILD = {"version":"2026-10-28.130a6a88","seedUrl":"seed-data.json"};
   };
   // 第一次打開（建立狗狗名片頁）最上面的說明
   var FIRST_RUN = {
-    lead: '狗聚（試辦版）：約附近的狗一起散步、玩。不用註冊。'
+    lead: '豆米特 DogMeet（試辦版）：約附近的狗一起散步、玩。不用註冊。'
   };
 
   // =====================================================================================================
@@ -11089,7 +11089,7 @@ window.APP_BUILD = {"version":"2026-10-28.130a6a88","seedUrl":"seed-data.json"};
     runCleanups();
     cur = { name: name, params: params || {}, def: def };
     cur.ctx = makeCtx(name, cur.params, def);
-    document.title = (def.title && def.title !== '狗聚' ? def.title + '・' : '') + '狗聚';
+    document.title = (def.title ? def.title + '・' : '') + '豆米特';
     // mount runs BEFORE the first render: set initial ctx.state and subscriptions there.
     if (def.mount) {
       try { var c = def.mount(cur.ctx, screenEl); if (typeof c === 'function') cur.ctx.onCleanup(c); }
@@ -11302,7 +11302,7 @@ window.APP_BUILD = {"version":"2026-10-28.130a6a88","seedUrl":"seed-data.json"};
   /** The boot screen. retry: a 「再試一次」 button (an iPhone home-screen app has no reload button). */
   function shell(msg, retry) {
     var ui = App.ui;
-    root().innerHTML = String(ui.html`<div class="boot" role="status"><div class="h1-tab">${ui.icon('paw', { size: 30, color: 'var(--teal-2)' })}狗聚</div><p class="sub">${msg || '載入中…'}</p>${retry ? ui.html`<button type="button" class="btn btn-secondary" id="boot-retry">再試一次</button>` : ''}</div>`);
+    root().innerHTML = String(ui.html`<div class="boot" role="status"><div class="h1-tab">${ui.icon('paw', { size: 30, color: 'var(--teal-2)' })}豆米特</div><p class="sub">${msg || '載入中…'}</p>${retry ? ui.html`<button type="button" class="btn btn-secondary" id="boot-retry">再試一次</button>` : ''}</div>`);
     var b = document.getElementById('boot-retry');
     if (b) b.addEventListener('click', function () { b.disabled = true; try { window.location.reload(); } catch (e) { /* ignore */ } });
     if (ui._reattachBanner) ui._reattachBanner(root()); // a sync-lost banner raised during boot stays visible
@@ -17027,7 +17027,7 @@ try {
     return ev.title + '\n' + fmt.dateTime(ev.startAt) + '・' + C.placeName(ev.place) + '\n' +
       D.eventTags(ev).join('・') + (D.eventTags(ev).length ? '\n' : '') +
       '名額 ' + r.count + '/' + r.capacity + (r.full ? '（額滿可候補）' : '') + '\n' +
-      (App.shareUrl('Join_Link', { id: ev.id }) ? '報名：' + App.shareUrl('Join_Link', { id: ev.id }) : '在「狗聚」找這一團就能報名');
+      (App.shareUrl('Join_Link', { id: ev.id }) ? '報名：' + App.shareUrl('Join_Link', { id: ev.id }) : '打開豆米特，在「狗聚」分頁找這一團就能報名');
   }
 
   /** What is blocking the form, if anything: {panel, button} */
@@ -17971,7 +17971,7 @@ try {
         }
         var file = ctx.state.photoFile;
         // a public alert: ask first (pressing 前往 on the keyboard in the place field also submits the form)
-        return ui.confirm({ title: '發布協尋？', body: '發布後大家打開狗聚都看得到。找到後再按「找到了」。', ok: '發布', cancel: '再看一下' }).then(function (yes) {
+        return ui.confirm({ title: '發布協尋？', body: '發布後大家打開豆米特都看得到。找到後再按「找到了」。', ok: '發布', cancel: '再看一下' }).then(function (yes) {
           if (!yes || ctx.dead) return;
           ctx.set({ publishing: true });
           if (file && !D.photosInline()) ui.toast(C.photo.busy);
@@ -18017,7 +18017,7 @@ try {
         var text = '走失協尋：' + (dog.name || '狗狗') + (dogLine(dog) ? '（' + dogLine(dog) + '）' : '') + '\n' +
           '最後看到：' + l.place + '\n' +
           (isFinite(l.seenAt) ? '時間：' + fmt.dateTime(l.seenAt) + '\n' : '') +
-          '看到請用狗聚 App 回報。\n' + C.texts.lostScam;
+          '看到請用豆米特 App 回報。\n' + C.texts.lostScam;
         return ui.share(text, '已複製協尋內容，可以貼到群組');
       }
     }
@@ -18373,7 +18373,7 @@ try {
       var p = D.me();
       var dog = (p && p.dog) || {};
       return html`
-        ${ui.appHead('狗聚', {
+        ${ui.appHead('豆米特', {
           logo: true,
           right: html`<button type="button" class="iconbtn" data-tab="Profile" aria-label="${'我的狗狗：' + (dog.name || '')}">${ui.dogAvatar(p, { size: 44, bg: 'tint', label: false })}</button>`
         })}
@@ -19267,7 +19267,7 @@ try {
     var tags = Array.isArray(dog.tags) ? dog.tags.filter(function (t) { return typeof t === 'string'; }) : [];
     if (tags.length) lines.push('個性：' + tags.join('、'));
     if (p.nickname) lines.push('主人：' + p.nickname);
-    lines.push('狗聚的狗狗名片');
+    lines.push('豆米特的狗狗名片');
     return lines.join('\n');
   }
 
@@ -20855,7 +20855,7 @@ try {
         var th = ctx.state.theme;
         if (!th) return;
         var park = C.park(th.parkId) || C.parks[0];
-        var text = th.title + (th.example ? '（範例）' : '') + '\n' + fmt.date(th.at) + '・' + park.name + (th.note ? '\n' + th.note : '') + '\n狗聚 App';
+        var text = th.title + (th.example ? '（範例）' : '') + '\n' + fmt.date(th.at) + '・' + park.name + (th.note ? '\n' + th.note : '') + '\n豆米特 DogMeet';
         return ui.copyText(text, '已複製，貼到行事曆就好');
       },
       album: function (ctx, d) {

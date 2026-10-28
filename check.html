@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#FFFAF3">
-<title>狗聚・連線檢查</title>
+<title>豆米特・連線檢查</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 :root { --page: #FFFAF3; --ink: #342824; --body: #3B3430; --muted: #6E5E52; --teal-ink: #1F6670; --teal-tint: #E7F3F4; --cream: #F5EEE4; --coral: #E8775A; --coral-tint: #FBE6DF; }
@@ -35,11 +35,11 @@ a { color: var(--teal-ink); display: inline-flex; align-items: center; min-heigh
 <body>
 <main>
 <h1>連線檢查</h1>
-<p>Supabase 和 GitHub 都設定好之後，打開這一頁。五項都打勾，就可以把狗聚的連結傳給朋友了。</p>
+<p>Supabase 和 GitHub 都設定好之後，打開這一頁。五項都打勾，就可以把豆米特的連結傳給朋友了。</p>
 <ol id="list"></ol>
 <button type="button" id="again" disabled>檢查中…</button>
 <p id="sum" role="status" aria-live="polite"></p>
-<p class="note">這一頁會用這支手機的身分寫一筆測試資料、傳一張很小的測試照片，檢查完就刪掉。<a href="./">回到狗聚</a></p>
+<p class="note">這一頁會用這支手機的身分寫一筆測試資料、傳一張很小的測試照片，檢查完就刪掉。<a href="./">回到豆米特</a></p>
 </main>
 <script>
 (function () {
@@ -201,7 +201,7 @@ a { color: var(--teal-ink); display: inline-flex; align-items: center; min-heigh
       .then(function () { return stage('photo', photo); })
       .then(function () {
         if (sb && path && !stop) sb.from('docs').delete().eq('path', path).then(function () {}, function () {});
-        sum.textContent = ok === CHECKS.length ? '全部打勾了，可以分享狗聚的連結了。' : '有 ' + bad + ' 項沒過' + (skipped ? '（後面 ' + skipped + ' 項還沒檢查）' : '') + '，照著上面的提示改，改完按「再檢查一次」。';
+        sum.textContent = ok === CHECKS.length ? '全部打勾了，可以分享豆米特的連結了。' : '有 ' + bad + ' 項沒過' + (skipped ? '（後面 ' + skipped + ' 項還沒檢查）' : '') + '，照著上面的提示改，改完按「再檢查一次」。';
         btn.disabled = false; btn.textContent = '再檢查一次';
       });
   }

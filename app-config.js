@@ -1,4 +1,4 @@
-/* 狗聚：共用資料庫設定（Supabase）
+/* 豆米特：共用資料庫設定（Supabase）
    這個檔案由 tools/build_web.py 從專案的 .env 產生（SUPABASE_URL、SUPABASE_ANON_KEY），要改請改 .env 再 build。
    兩個值的來源（Project Settings → API Keys / Data API）：
      supabaseUrl      例如 'https://abcdefghijklmnop.supabase.co'
