@@ -1011,7 +1011,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">狗聚</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-28.974de5f8","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2508,6 +2508,8 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
     firstAidOffline: '試辦版要有網路才打得開，建議先截圖存在手機',
     firstAidReview: '內容請合作獸醫審過',
     chatCloses: '聚完 {n} 天後聊天室自動收起',          // {n} = 上面的 CHAT_CLOSE_DAYS
+    blockQuiet: '牠的邀請、私訊和日記留言不會出現在你這裡，牠不會收到通知。', // 封鎖的說明（安靜封鎖：被封鎖的狗不會知道）
+    chatLocked: '報名的狗才看得到聊天室',               // 沒報名的人打開狗聚聊天室時看到的（2026-10-28 起只有報名的狗看得到）
     loopRule: '繞一圈才算，直線來回不算',
     homeRoute: '家附近的路線不會畫出來',
     // Join_Link footer. There is no login: the visitor is remembered by this phone's browser.
@@ -2648,7 +2650,7 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
     lead: '狗聚現在是試辦版，給朋友一起測試用。',
     sections: [
       { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到；打開驅蟲徽章時，名片上會有驅蟲的到期日）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
-      { title: '誰看得到', body: '用狗聚的人都看得到狗狗名片、狗聚（誰報名哪一場）和聊天室。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
+      { title: '誰看得到', body: '用狗聚的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
       { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位，位置只用來移動地圖，不會存起來。' },
       { title: '我出門遛狗', body: '按「我出門遛狗」才會用一次手機定位，不會一直追蹤。在公園裡就打卡在那座公園；在外面，別人只看到你大約在哪個 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。不存精確位置，也不送給任何人。家的位置只有你知道，存在你自己的資料裡。' },
       { title: '還是測試', body: '試辦版的保護還不完整：狗聚、聊天和協尋這些共用的資料，懂技術的人可能改得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
@@ -6039,6 +6041,12 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
   }
   var parksReg = new Map();    // parks/<id>: the shared park registry (any park tapped on the map), see ensurePark
   var followsMap = new Map();
+  // 2026-10-28 (Willie：「追蹤和封鎖名單只有自己看得到」): on the server follows/<id> is the dog's own. What the app still
+  // needs about other dogs' lists — which dogs I follow follow me back (狗友) — comes from my_links(); linkmarks/<me> (the
+  // database writes it when a follow naming me changes) says when to ask again. On an older database every list is
+  // readable and my_links() is missing: the follows docs alone answer, like before. 安靜封鎖: a dog is never told who
+  // blocked it — its screens stay the same, its DM lines to that dog are kept but muted (the server marks them).
+  var links = { friends: {} };
   var eventsAll = [];          // every event (normalised) — unread dots, delete-my-data, admin
   var threads = [];            // dms/<a>__<b> thread docs {a, b, lastMessageAt, lastBy}
   var readsSelf = { events: {}, dms: {} }, memReads = {}, readsExists = false;
@@ -6073,20 +6081,17 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
       if (JSON.stringify(sim.hidden || null) !== before) emit('people'); // admin hid / showed a profile
     }, function (e) { console.warn('[data] sim listener', e); });
     S().collection('follows').onSnapshot(function (qs) {
-      var m = new Map();
+      var m = new Map(), mineBefore = JSON.stringify(followsMap.get(actor()) || null);
       qs.docs.forEach(function (d) { m.set(d.id, d.data()); });
-      followsMap = m; emit('follows'); recomputeUnread();
-      // beta 隱私鎖: the server shows friends-only check-ins / diary posts / visits to 狗友 only. A new (or lost) 狗友
-      // changes what we may read, though those rows did not change: read them again.
-      var sig = friendSig();
-      if (sig !== lastFriendSig) {
-        var first = lastFriendSig === null;
-        lastFriendSig = sig;
-        if (!first) S().refetch(function (k) { return /^(checkins|visits|territory|diary)(\/|$)/.test(k); });
-      }
+      followsMap = m;
+      // my own list changed (I followed / blocked someone): my 狗友 may have changed too
+      if (JSON.stringify(m.get(actor()) || null) !== mineBefore) refreshLinks();
+      followsChanged();
     }, function (e) { console.warn('[data] follows listener', e); });
+    watchLinkmarks();
+    App.me.onChange(function () { watchLinkmarks(); });
     // unread dots: events carry lastMessageAt/lastMessageBy, DM threads lastMessageAt/lastBy, my read marks are private
-    S().collection('events').onSnapshot(function (qs) { eventsAll = listOf(qs).map(normEvent).filter(Boolean); recomputeUnread(); },
+    S().collection('events').onSnapshot(function (qs) { eventsAll = listOf(qs).map(normEvent).filter(Boolean); rereadJoinedChats(); recomputeUnread(); },
       function (e) { console.warn('[data] events listener', e); });
     S().collection('dms').onSnapshot(function (qs) { threads = listOf(qs).filter(function (t) { return typeof t.id === 'string' && t.id.indexOf('__') > 0; }); recomputeUnread(); },
       function (e) { console.warn('[data] dm threads listener', e); });
@@ -6099,12 +6104,28 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
     }
     try {
       // read marks are written at most every 15 s while a chat stays open: write the last one when the page is hidden
-      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flushReads(); });
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') flushReads();
+        else refreshLinks(); // back in the app: a mark may have been missed while the page slept
+      });
       window.addEventListener('pagehide', function () { flushReads(); });
     } catch (e) { /* ignore */ }
     App.me.onChange(function () { recomputeUnread(); });
-    setInterval(function () { emit('tick'); recomputeUnread(); }, 60000);
+    var ticks = 0;
+    setInterval(function () { emit('tick'); recomputeUnread(); if (++ticks % 5 === 0) refreshLinks(); }, 60000);
     return Promise.race([readyP, new Promise(function (r) { setTimeout(r, 6000); })]);
+  }
+  // 2026-10-28: a 狗聚 chat is read only by the dogs in it. A chat this phone read before signing up came back empty,
+  // and joining changes no line in it (realtime brings nothing): read it again when I am in it.
+  var chatIn = {};
+  function rereadJoinedChats() {
+    var me = actor();
+    if (!me || S().backend !== 'supabase') return;
+    eventsAll.forEach(function (ev) {
+      var inNow = isHost(ev, me) || ['going', 'waitlist', 'pending', 'rest'].indexOf(myStatus(ev, me)) !== -1;
+      if (chatIn[ev.id] === false && inNow) S().refetch(function (k) { return k === 'events/' + ev.id + '/messages'; });
+      chatIn[ev.id] = inNow;
+    });
   }
   /** cb(kind) on 'people' | 'sim' | 'follows' | 'tick'. The router re-renders the screen on each. */
   function onChange(cb) { listeners.add(cb); return function () { listeners.delete(cb); }; }
@@ -6768,6 +6789,8 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
       sender's screen says its live list is already full (`full`) — read the newest MAX_MSGS + PRUNE_BATCH and delete
       what lies beyond MAX_MSGS. Never rejects. */
   function prune(col, full) {
+    // Supabase (2026-10-28): the database keeps the newest 100 itself (docs_chat_trim) — nobody may delete others' lines
+    if (S().backend === 'supabase') return Promise.resolve();
     var k = col.path;
     pruneCount[k] = (pruneCount[k] || 0) + 1;
     if (!full && pruneCount[k] % PRUNE_EVERY !== 0) return Promise.resolve();
@@ -6798,7 +6821,7 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
       need(ev, '找不到這場狗聚');
       need(!chatState(ev).closed, ev.status === 'cancelled' ? '這場狗聚取消了，聊天室只能看' : '聊天室已收起，只能看之前的訊息');
       var st = myStatus(ev, who);
-      need(isHost(ev, who) || ['going', 'waitlist', 'pending', 'rest'].indexOf(st) !== -1, st === 'declined' ? '主揪這次婉拒了，只能看訊息' : '報名後就能聊天');
+      need(isHost(ev, who) || ['going', 'waitlist', 'pending', 'rest'].indexOf(st) !== -1, st === 'declined' ? '主揪這次婉拒了' : '報名後就能聊天');
       return file ? uploadPhotoFile(file, 'chat') : null; // checked first: nothing is uploaded for a refused message
     }).then(function (photo) {
       msg = { by: who, text: text, at: msgTime(), kind: art || photo ? 'photo' : 'text' };
@@ -6836,7 +6859,7 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
       case 'cancelled': return '這場狗聚取消了';
       case 'ended': return '狗聚結束了，記得互送貼紙';
       case 'break': return '中場休息，先把狗叫回來';
-      default: return typeof m.text === 'string' ? m.text : '';
+      default: return '';   // (審查 2026-10-28) a notice the app does not know says nothing (no free text as a notice)
     }
   }
 
@@ -7417,15 +7440,81 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
   /** Follow lists skip dogs whose card is gone (deleted data, cleared demo dogs) once the people feed has arrived. */
   function exists(id) { return !peopleOk || people.has(id); }
   function following(id) { return truthyKeys(followDoc(id).following).filter(exists); }
-  function followers(id) { id = id || actor(); var out = []; followsMap.forEach(function (d, k) { if (d && own(d.following, id) && exists(k)) out.push(k); }); return out; }
-  function isFollowing(other, id) { return !!own(followDoc(id).following, other); }
-  function isBlocked(other, id) { return !!own(followDoc(id).blocked, other); }
+  /** id's list (key 'following' | 'blocked') has `other`: read from the list when this phone may read it (its own, an
+      example dog's, any on an older database); otherwise only my_links() knows, and only who follows me back. */
+  function listHas(id, key, other) {
+    id = id || actor();
+    var d = followsMap.get(id);
+    if (d) return !!own(d[key], other);
+    return key === 'following' && other === actor() && !!own(links.friends, id);
+  }
+  /** The dogs I know follow `id` (for me: the readable lists, plus my 狗友 from my_links — a one-way follower stays private) */
+  function followers(id) {
+    id = id || actor();
+    var out = [];
+    followsMap.forEach(function (d, k) { if (d && own(d.following, id) && exists(k)) out.push(k); });
+    if (id === actor()) Object.keys(links.friends).forEach(function (k) { if (!followsMap.has(k) && exists(k)) out.push(k); });
+    return out;
+  }
+  function isFollowing(other, id) { return listHas(id, 'following', other); }
+  function isBlocked(other, id) { return listHas(id, 'blocked', other); }
   var lastFriendSig = null;
   /** The 狗友 of the acting dog, as one string (changes when one is added or lost). */
   function friendSig() {
     var me = actor(), out = [];
     followsMap.forEach(function (v, id) { if (id !== me && isFriend(me, id)) out.push(id); });
+    Object.keys(links.friends).forEach(function (id) { if (!followsMap.has(id) && id !== me && isFriend(me, id)) out.push(id); });
     return out.sort().join(',');
+  }
+  /** Something in the follows / links changed: screens re-render; a new (or lost) 狗友 changes what the server lets me
+      read (friends-only check-ins / diary posts / visits) though those rows did not change: read them again. */
+  function followsChanged() {
+    emit('follows'); recomputeUnread();
+    var sig = friendSig();
+    if (sig !== lastFriendSig) {
+      var first = lastFriendSig === null;
+      lastFriendSig = sig;
+      if (!first) S().refetch(function (k) { return /^(checkins|visits|territory|diary)(\/|$)/.test(k); });
+    }
+  }
+  function idSet(list) {
+    var o = {};
+    (Array.isArray(list) ? list : []).forEach(function (x) { if (typeof x === 'string' && ok(x)) o[x] = true; });
+    return o;
+  }
+  var linksBusy = null, linksAgain = false, linksSeen = false, linkUnsub = null, linkFor = null, linksRetry = null;
+  /** Ask my_links() again — one request at a time (a call meanwhile asks once more after it). Never rejects. my_links
+      answers for this sign-in's own dog: not while the admin acts as an example dog (its lists are open anyway). */
+  function refreshLinks() {
+    if (S().backend !== 'supabase' || !actor() || App.me.isPersona) return Promise.resolve();
+    if (linksBusy) { linksAgain = true; return linksBusy; }
+    var who = actor();
+    linksBusy = S().rpc('my_links', {}, { optional: true }).then(function (r) {
+      if (who !== actor()) return;
+      var next = { friends: idSet(r && r.friends) };
+      // the first answer: this database keeps other dogs' lists to themselves — drop any read before that
+      if (!linksSeen) { linksSeen = true; S().refetch(function (k) { return k === 'follows'; }); }
+      if (JSON.stringify(next) === JSON.stringify(links)) return;
+      links = next;
+      followsChanged();
+    }, function (e) {
+      // an older database (no my_links): the follows docs answer. Offline or a hiccup: 狗友 would look gone — soon again
+      if (!(e && e.code === 'not_configured') && !linksRetry) linksRetry = setTimeout(function () { linksRetry = null; refreshLinks(); }, 5000);
+    }).then(function () {
+      linksBusy = null;
+      if (linksAgain) { linksAgain = false; return refreshLinks(); }
+    });
+    return linksBusy;
+  }
+  /** linkmarks/<me>: the database bumps it when someone's list naming me changes → ask my_links() again. */
+  function watchLinkmarks() {
+    var who = actor() || null;
+    if (who === linkFor) return;
+    if (linkUnsub) { linkUnsub(); linkUnsub = null; }
+    linkFor = who;
+    links = { friends: {} };
+    if (!who || S().backend !== 'supabase' || App.me.isPersona) return;
+    linkUnsub = S().doc('linkmarks/' + who).onSnapshot(function () { refreshLinks(); }, function () { refreshLinks(); });
   }
   /** 狗友 = mutual follow. Used for check-in visibility ('friends'). */
   function isFriend(a, b) { return isFollowing(b, a) && isFollowing(a, b); }
@@ -7441,12 +7530,13 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
     need(otherId !== who, '不能封鎖自己');
     var patch = { blocked: obj(otherId, on === false ? null : now()) };
     if (on !== false) patch.following = obj(otherId, null);
+    // 安靜封鎖 (2026-10-28): its waiting invite is not declined (it would see 婉拒) — it just never shows here. Unblocking
+    // marks the DM read up to now: the lines it sent meanwhile stay hidden (muted), so they must not leave a dot (up to
+    // now, not only up to the newest line this phone has heard of — that news may still be on its way).
     return upsert(S().doc('follows/' + who), patch, { following: {}, blocked: {} }).then(function () {
-      if (on === false) return null;
-      var req = S().doc('dmRequests/' + otherId + '__' + who);
-      return req.get().then(function (s) {
-        if (s.exists && s.data().status === 'pending') return req.update({ status: 'declined', decidedAt: now() });
-      });
+      if (on !== false) return null;
+      var key = dmKey(who, otherId), th = threads.filter(function (x) { return x.id === key; })[0];
+      return saveRead(who, 'dms', key, Math.max(now(), th ? num(th.lastMessageAt) || 0 : 0)).catch(function () { return false; });
     });
   }
   /** 檢舉 a person: kept in userReports (writer only) AND sent as a 回報問題 (kind 'report') so the admin page shows it. */
@@ -7468,7 +7558,6 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
     var who = actor();
     needId(toId, '找不到這隻狗');
     need(toId !== who, '不能邀請自己');
-    need(!isBlocked(who, toId), '對方目前不接受邀請');
     var mine = reqRef(who, toId), reverse = reqRef(toId, who);
     return Promise.all([mine.get(), reverse.get()]).then(function (r) {
       var m = r[0].exists ? r[0].data() : null, rv = r[1].exists ? r[1].data() : null;
@@ -7524,7 +7613,11 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
   function dmCol(otherId, who) { return S().collection('dms/' + dmKey(who || actor(), needId(otherId, '找不到這隻狗')) + '/messages'); }
   function watchDm(otherId, cb) {
     if (!ok(otherId)) return badWatch(cb, []);
-    return dmCol(otherId).orderBy('at', 'desc').limit(MAX_MSGS).onSnapshot(function (qs) { cb(listOf(qs).sort(byAtThenId)); }, function () { cb([]); });
+    // 安靜封鎖: a line the other dog sent while I had blocked it is muted (by the server) — never shown, not even later
+    return dmCol(otherId).orderBy('at', 'desc').limit(MAX_MSGS).onSnapshot(function (qs) {
+      var me = actor();
+      cb(listOf(qs).filter(function (m) { return !(m.muted === true && m.by !== me); }).sort(byAtThenId));
+    }, function () { cb([]); });
   }
   /** sendDm(otherId, text, [opts]) — opts.photoFile = a picture (File/Blob) sent as a photo message; opts.full = prune now. */
   function sendDm(otherId, text, opts) {
@@ -7534,7 +7627,7 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
     var file = opts.photoFile || null;
     need(text || file, '先打點字');
     var col = dmCol(otherId, who);
-    need(!isBlocked(who, otherId) && !isBlocked(otherId, who), '目前不能傳訊息');
+    need(!isBlocked(otherId, who), '你已封鎖' + dogName(otherId));
     var key = dmKey(who, otherId), msg = null;
     return Promise.all([reqRef(who, otherId).get(), reqRef(otherId, who).get()]).then(function (r) {
       var accepted = r.some(function (s) { return s.exists && s.data().status === 'accepted'; });
@@ -7543,6 +7636,9 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
     }).then(function (photo) {
       msg = { by: who, text: text, at: msgTime() };
       if (photo) { msg.kind = 'photo'; msg.photo = photo; }
+      // 安靜封鎖: the server mutes a line to a dog that blocked me itself (never as a field — its writer would see it);
+      // the in-browser mock has no server, every list is readable there: it gets the mark from here
+      if (S().backend !== 'supabase' && isBlocked(who, otherId)) msg.muted = true;
       return col.add(msg);
     }).then(function () {
       // unread dots: the thread doc dms/<a>__<b> carries the newest line
@@ -7577,7 +7673,7 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
   function normDiary(d, viewer) {
     if (!d || d.deleted || typeof d.by !== 'string' || !ok(d.by) || isHiddenId(d.by)) return null;
     viewer = viewer || actor();
-    if (blockedEither(d.by, viewer)) return null;
+    if (d.by !== viewer && isBlocked(d.by, viewer)) return null;
     var audience = d.audience === 'public' ? 'public' : 'friends';
     if (!(d.by === viewer || audience === 'public' || isFriend(d.by, viewer))) return null;
     var likes = isMap(d.likes) ? truthyKeys(d.likes) : [];
@@ -7588,8 +7684,6 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
       at: num(d.at) || 0, woofs: likes.length, woofedByMe: likes.indexOf(viewer) !== -1, comments: Math.max(0, num(d.commentCount) || 0) };
   }
   function canSeeDiary(d, viewer) { return !!normDiary(d, viewer); }
-  /** a blocked b, or b blocked a */
-  function blockedEither(a, b) { return a !== b && (isBlocked(a, b) || isBlocked(b, a)); }
   /** Write a post. input {text, files:[File…≤3], audience:'friends'|'public'} → id */
   function createDiary(input) {
     input = input || {};
@@ -7630,7 +7724,8 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
     var last = [];
     function deliver() {
       var me = actor();
-      cb(last.filter(function (c) { return typeof c.by === 'string' && typeof c.text === 'string' && !isHiddenId(c.by) && !blockedEither(c.by, me); })
+      // 安靜封鎖: a muted comment (its writer is blocked by the post's author) is shown to its writer only
+      cb(last.filter(function (c) { return typeof c.by === 'string' && typeof c.text === 'string' && !isHiddenId(c.by) && (c.by === me || (!isBlocked(c.by, me) && c.muted !== true)); })
         .map(function (c) { return { id: c.id, by: c.by, text: c.text.slice(0, DIARY_MAX_COMMENT), at: num(c.at) || 0 }; }).sort(function (a, b) { return a.at - b.at; }));
     }
     var unsub = diaryComments(id).onSnapshot(function (qs) { last = listOf(qs); deliver(); }, function () { cb([]); });
@@ -7658,14 +7753,18 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
     var raw = typeof text === 'string' ? text.trim() : '';
     need(raw, '先打點字');
     need(raw.length <= DIARY_MAX_COMMENT, '留言最多 ' + DIARY_MAX_COMMENT + ' 字');
-    return seenPost(id).then(function () {
-      var t = msgTime();
+    return seenPost(id).then(function (post) {
+      var t = msgTime(), c = { by: who, text: str(raw, DIARY_MAX_COMMENT), at: t };
+      // 安靜封鎖: the server mutes a comment on the post of a dog that blocked me; the in-browser mock gets the mark here
+      if (S().backend !== 'supabase' && isBlocked(who, post.by)) c.muted = true;
       // commenters: lets 刪除我的資料 find my comments without reading every post's comments
-      return diaryComments(id).add({ by: who, text: str(raw, DIARY_MAX_COMMENT), at: t }).then(function () {
+      return diaryComments(id).add(c).then(function () {
         return diaryRef(id).update({ commenters: obj(who, true) });
       }).then(function () { return recountComments(id, t); });
     });
   }
+  /** The count on the post. On Supabase (2026-10-28) the database keeps it itself (docs_comment_count: every comment,
+      muted ones too) and ignores this; the mock and an older database still take it from here. */
   function recountComments(id, t) {
     return diaryComments(id).get().then(function (qs) { return diaryRef(id).update({ commentCount: qs.docs.length, lastCommentAt: t || now() }); });
   }
@@ -9521,7 +9620,7 @@ window.APP_BUILD = {"version":"2026-10-28.59adfac5","seedUrl":"seed-data.json"};
     // meetups
     weeklyMeetup: weeklyMeetup, themeMeetups: themeMeetups, watchMeetup: watchMeetup, rsvpMeetup: rsvpMeetup, watchMeetups: watchMeetups,
     // follows & DMs
-    following: following, followers: followers, isFollowing: isFollowing, isBlocked: isBlocked, isFriend: isFriend,
+    following: following, followers: followers, isFollowing: isFollowing, isBlocked: isBlocked, isFriend: isFriend, refreshLinks: refreshLinks,
     follow: follow, block: block, reportUser: reportUser, watchFollows: watchFollows,
     dmKey: dmKey, sendDmRequest: sendDmRequest, respondDmRequest: respondDmRequest, watchDmRequests: watchDmRequests, dmStatus: dmStatus,
     watchDm: watchDm, sendDm: sendDm,
@@ -11451,7 +11550,8 @@ try {
 /* ---- screens/Chat.js ---- */
 try {
 /* Chat（活動聊天室）— live event chat: 主揪公告, day separators, system lines, real photos (tap = full size) and the
-   drawn pictures, send box. Only people in the event can send; the chat closes 7 days after the event (read-only).
+   drawn pictures, send box. Only people in the event can read and send (2026-10-28: the database lets nobody else read
+   it — the others see 「報名的狗才看得到聊天室」 and the 主揪公告); the chat closes 7 days after the event (read-only).
    Being on this screen marks the chat read (unread dots; D.markEventRead writes only when something new arrived).
    No 「回報問題」 footer (the fixed send bar leaves no room): the link sits in the header instead.
    The send bar lives OUTSIDE the re-rendered screen (appended to #app on mount, removed on leave), so typing —
@@ -11526,7 +11626,9 @@ try {
     document.head.appendChild(s);
   })();
 
-  function canSend(ev) {
+  /** In this meetup's chat: the host and the dogs signed up / waiting / pending / resting — the ones that may talk and
+      the only ones the database lets read it. */
+  function inChat(ev) {
     if (!ev) return false;
     if (D.isHost(ev)) return true;
     return ['going', 'waitlist', 'pending', 'rest'].indexOf(D.myStatus(ev)) !== -1;
@@ -11548,11 +11650,15 @@ try {
       if (!m || typeof m.at !== 'number' || !isFinite(m.at)) return;
       var day = fmt.dateKey(m.at);
       if (day !== lastDay) { out.push(html`<div class="chat-day">${dayLabel(m.at)}</div>`); lastDay = day; prev = null; }
-      if (m.kind === 'system') { out.push(html`<div class="chat-sys">${D.systemText(m)}<span class="sr-only">・${fmt.time(m.at)}</span></div>`); prev = null; return; }
+      if (m.kind === 'system') {
+        var note = D.systemText(m);
+        if (note) out.push(html`<div class="chat-sys">${note}<span class="sr-only">・${fmt.time(m.at)}</span></div>`);
+        prev = null; return;
+      }
       var by = typeof m.by === 'string' ? m.by : '';
       var text = typeof m.text === 'string' ? m.text : '';
       var mine = by === me;
-      if (!mine && by && D.isBlocked(by)) { out.push(html`<div class="chat-sys">（你封鎖的狗友傳了一則訊息）</div>`); prev = null; return; }
+      if (!mine && by && D.isBlocked(by)) { out.push(html`<div class="chat-sys">（你封鎖的狗傳了一則訊息）</div>`); prev = null; return; }
       var cont = prev && prev.by === by && m.at - prev.at < GROUP_MS;
       prev = { by: by, at: m.at };
       var content;
@@ -11578,7 +11684,7 @@ try {
       </div>`);
     });
     if (!out.length) {
-      return html`<div class="chat-empty"><div class="h3">還沒有人說話</div><p class="note mt-4">${canSend(ev) ? '打聲招呼，說說你家狗今天的狀況。' : '報名後就能在這裡跟大家聊。'}</p></div>`;
+      return html`<div class="chat-empty"><div class="h3">還沒有人說話</div><p class="note mt-4">打聲招呼，說說你家狗今天的狀況。</p></div>`;
     }
     return out;
   }
@@ -11603,8 +11709,9 @@ try {
     var ev = ctx.state.event;
     if (!ev) return 'none';
     var cs = D.chatState(ev);
+    if (!inChat(ev)) return cs.closed || D.eventStatus(ev) === 'done' ? 'none' : 'join';   // an ended meetup takes no 報名
     if (cs.closed) return ev.status === 'cancelled' ? 'cancelled' : 'closed';
-    return canSend(ev) ? 'send' : 'join';
+    return 'send';
   }
   function barHtml(ctx, mode) {
     var ev = ctx.state.event;
@@ -11618,7 +11725,7 @@ try {
     }
     if (mode === 'join') {
       var mine = D.myStatus(ev);
-      return html`<div class="chat-join"><span>${mine === 'declined' ? '主揪這次婉拒了，只能看訊息' : '報名後就能聊天'}</span>${mine === 'declined' ? '' : ui.primaryBtn('報名', { go: 'Join_Link', params: { id: ev.id }, block: false })}</div>`;
+      return html`<div class="chat-join"><span>${mine === 'declined' ? '主揪這次婉拒了' : '報名後就能看、也能聊天'}</span>${mine === 'declined' ? '' : ui.primaryBtn('報名', { go: 'Join_Link', params: { id: ev.id }, block: false })}</div>`;
     }
     if (mode === 'closed') return html`<p class="chat-closed">${ui.icon('lockChat', { size: 18 })}聊天室已收起，只能看之前的訊息</p>`;
     if (mode === 'cancelled') return html`<p class="chat-closed">${ui.icon('lockChat', { size: 18 })}這場狗聚取消了，聊天室只能看</p>`;
@@ -11630,6 +11737,7 @@ try {
     var mode = barMode(ctx);
     if (mode === ctx.state.barMode) return;
     ctx.state.barMode = mode;
+    bar.hidden = mode === 'none';
     bar.innerHTML = String(barHtml(ctx, mode));
   }
 
@@ -11676,7 +11784,7 @@ try {
           if (st.busy) return; // a second tap while the photo is still resizing / uploading
           var ev = ctx.state.event;
           if (!ev) return;
-          if (!canSend(ev) || D.chatState(ev).closed) { ui.toast('報名後就能聊天'); return; }
+          if (!inChat(ev) || D.chatState(ev).closed) { ui.toast('報名後就能聊天'); return; }
           if (!st.file && !st.art) { ui.toast('先選一張照片'); return; }
           var opts = { full: (ctx.state.msgs || []).length >= D.maxMessages };
           if (st.file) opts.photoFile = st.file; else opts.art = st.art;
@@ -11733,7 +11841,7 @@ try {
       pocket does not swallow new lines) and only for people whose dot this chat can light (host / signed up). */
   function markRead(ctx) {
     var ev = ctx.state.event;
-    if (ctx.dead || !ev || !canSend(ev) || D.chatState(ev).closed) return;
+    if (ctx.dead || !ev || !inChat(ev) || D.chatState(ev).closed) return;
     if (document.visibilityState === 'hidden') return;
     D.markEventRead(ev.id).catch(function () { /* the dot stays; tried again on the next change */ });
   }
@@ -11793,10 +11901,10 @@ try {
           <div class="chat-title"><h1 class="h1">活動聊天室</h1>${ui.feedbackBtn()}</div>
           <p class="sub">${ev.title}・${fmt.dateTime(ev.startAt)}</p>
         </header>
-        <p class="px chat-closes">${closesLine}</p>
+        ${inChat(ev) ? html`<p class="px chat-closes">${closesLine}</p>` : ''}
         ${announcement(ev)}
         <div class="chat-log" role="log" aria-label="聊天訊息" aria-live="polite" data-keep-scroll="chatlog">
-          ${msgList(ctx, ev)}
+          ${inChat(ev) ? msgList(ctx, ev) : html`<div class="chat-empty"><div class="h3">${C.texts.chatLocked}</div></div>`}
           <button type="button" class="chat-new" data-act="toBottom" hidden>${ui.icon('chevronDown', { size: 16 })}有新訊息</button>
         </div>`;
     },
@@ -11830,7 +11938,7 @@ try {
         var ev = ctx.state.event;
         if (!ev) return;
         if (D.chatState(ev).closed) throw D.userError('聊天室已收起');
-        if (!canSend(ev)) throw D.userError('報名後就能聊天');
+        if (!inChat(ev)) throw D.userError('報名後就能聊天');
         var inp = ctx.state.bar && ctx.state.bar.querySelector('#chat-msg');
         var text = String(inp ? inp.value : (ctx.state.draft || '')).trim();
         if (!text) { if (inp) inp.focus(); return; }
@@ -11844,7 +11952,7 @@ try {
       },
       photo: function (ctx) {
         var ev = ctx.state.event;
-        if (!ev || !canSend(ev) || D.chatState(ev).closed) { ui.toast('報名後就能聊天'); return; }
+        if (!ev || !inChat(ev) || D.chatState(ev).closed) { ui.toast('報名後就能聊天'); return; }
         openPhotos(ctx);
       },
       announce: function (ctx) { openAnnounce(ctx); },
@@ -12245,7 +12353,6 @@ try {
   }
   function avatar(id, size) { return ui.dogAvatar(D.person(id), { size: size || 44, bg: 'cream', label: false }); }
   function dayName(t) { var n = fmt.daysUntil(t); return n === 0 ? '今天' : n === -1 ? '昨天' : fmt.date(t); }
-  function blockedEither(id) { return D.isBlocked(id) || D.isBlocked(meId(), id); }
 
   /** Accepted pairs (either direction) → [{id, at}] newest first, no blocked / missing people. */
   /** Accepted invites. dir 'in' = they invited me (收到的邀請); 'out' = I invited them (送出的邀請) — a pair that
@@ -12341,10 +12448,7 @@ try {
     var name = D.dogName(id), fam = famName(id);
     var reqs = ctx.state.reqs;
     if (D.isBlocked(id)) {
-      return html`<div class="mt-16">${ui.warnPanel({ icon: 'flag', title: '你已封鎖' + name, body: '牠的邀請不會出現，也不能私訊你。', action: ui.textBtn('解除封鎖', { act: 'unblock', data: { id: id } }) })}</div>`;
-    }
-    if (D.isBlocked(meId(), id)) {
-      return html`<div class="mt-16">${ui.primaryBtn('想跟你家狗玩', { icon: 'invite', disabled: true })}</div><p class="note mt-8">對方目前不接受邀請。</p>`;
+      return html`<div class="mt-16">${ui.warnPanel({ icon: 'flag', title: '你已封鎖' + name, body: C.texts.blockQuiet, action: ui.textBtn('解除封鎖', { act: 'unblock', data: { id: id } }) })}</div>`;
     }
     if (!reqs) return html`<div class="mt-16">${ui.primaryBtn('想跟你家狗玩', { icon: 'invite', disabled: true })}</div>`;
     var st = D.dmStatus(id, reqs);
@@ -12476,8 +12580,8 @@ try {
     if (!p || other === meId()) return html`${top}<div class="px mt-16">${ui.emptyState({ title: '找不到這個聊天', body: p ? '' : '對方可能刪掉了狗狗名片。', action: ui.secondaryBtn('回私訊邀請', { go: 'DM_Invite', block: false }) })}</div>`;
     var reqs = ctx.state.reqs;
     if (!reqs) return html`${top}${ui.loading()}`;
-    if (blockedEither(other)) {
-      return html`${top}<div class="px mt-16">${ui.warnPanel({ icon: 'flag', title: '目前不能傳訊息', body: D.isBlocked(other) ? '你已封鎖' + name + '。' : '對方目前不接受訊息。', action: D.isBlocked(other) ? ui.textBtn('解除封鎖', { act: 'unblock', data: { id: other } }) : null })}</div>`;
+    if (D.isBlocked(other)) {
+      return html`${top}<div class="px mt-16">${ui.warnPanel({ icon: 'flag', title: '你已封鎖' + name, body: C.texts.blockQuiet, action: ui.textBtn('解除封鎖', { act: 'unblock', data: { id: other } }) })}</div>`;
     }
     if (D.dmStatus(other, reqs) !== 'accepted') {
       return html`${top}<div class="px mt-16">${ui.emptyState({ icon: 'lockChat', title: '對方接受邀請後才能私訊', body: C.texts.dmConsent, action: ui.secondaryBtn('回邀請頁', { go: 'DM_Invite', params: { id: other }, block: false }) })}</div>`;
@@ -12560,13 +12664,13 @@ try {
         var name = D.dogName(who);
         var isB = D.isBlocked(who);
         var blockPart;
-        if (isB) blockPart = html`${ui.infoPanel({ icon: 'flag', title: '已封鎖' + name, body: '牠的邀請不會出現，也不能私訊你。', action: ui.textBtn('解除封鎖', { act: 'unblock', data: { id: who } }) })}`;
+        if (isB) blockPart = html`${ui.infoPanel({ icon: 'flag', title: '已封鎖' + name, body: C.texts.blockQuiet, action: ui.textBtn('解除封鎖', { act: 'unblock', data: { id: who } }) })}`;
         else if (s.state.sure) blockPart = html`<div class="card cream" style="padding:16px">
             <div class="h3">確定封鎖${name}？</div>
-            <p class="note mt-4">牠的邀請不會出現，也不能私訊你，也會取消追蹤。之後可以解除。</p>
+            <p class="note mt-4">${C.texts.blockQuiet}也會取消追蹤，之後可以解除。</p>
             <div class="sheet-actions" style="margin-top:12px">${ui.quietBtn('先不要', { act: 'notSure' })}<button type="button" class="btn btn-warn block" data-act="block">確定封鎖</button></div>
           </div>`;
-        else blockPart = html`<p class="note">封鎖後，牠的邀請不會出現，也不能私訊你。</p>
+        else blockPart = html`<p class="note">封鎖後，${C.texts.blockQuiet}</p>
             <button type="button" class="btn btn-warn block mt-8" data-act="sure">${ui.icon('flag', { size: 20 })}封鎖${name}</button>`;
         return html`
           <div class="dm-sheet-who">${ui.dogAvatar(D.person(who), { size: 44, bg: 'cream', label: false })}
@@ -12668,7 +12772,7 @@ try {
     // the other dog deleted its data (its invites are gone too): opening the chat still clears the dot
     if (!D.person(other)) { D.markDmRead(other).catch(function () { /* ignore */ }); return; }
     if (!ctx.state.reqs) return;
-    if (blockedEither(other) || D.dmStatus(other, ctx.state.reqs) !== 'accepted') return;
+    if (D.isBlocked(other) || D.dmStatus(other, ctx.state.reqs) !== 'accepted') return;
     D.markDmRead(other).catch(function () { /* the dot stays; tried again on the next change */ });
   }
 
@@ -12746,7 +12850,7 @@ try {
       dmPhoto: function (ctx, d) {
         var other = String(ctx.params.chat || '');
         if (!other || !d.file) return;
-        if (blockedEither(other) || !ctx.state.reqs || D.dmStatus(other, ctx.state.reqs) !== 'accepted') { ui.toast('對方接受邀請後才能私訊'); return; }
+        if (D.isBlocked(other) || !ctx.state.reqs || D.dmStatus(other, ctx.state.reqs) !== 'accepted') { ui.toast('對方接受邀請後才能私訊'); return; }
         openDmPhoto(ctx, other, d.file);
       },
       viewPhoto: function (ctx, d) {
@@ -17087,11 +17191,12 @@ try {
     }).sort(function (a, b) { return (b.lastMessageAt || 0) - (a.lastMessageAt || 0) || a.startAt - b.startAt; });
   }
 
-  /** My DM conversations: not with a dog that is gone (deleted / hidden) or blocked either way (same rule as the chat). */
+  /** My DM conversations: not with a dog that is gone (deleted / hidden) or that I blocked (安靜封鎖: a dog that blocked me
+      is not told, so its conversation stays). */
   function myThreads() {
     var me = App.me.actorId;
     return D.dmThreads().filter(function (th) {
-      return th.otherId !== me && D.person(th.otherId) && !D.isBlocked(th.otherId) && !D.isBlocked(me, th.otherId);
+      return th.otherId !== me && D.person(th.otherId) && !D.isBlocked(th.otherId);
     });
   }
 
