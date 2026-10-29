@@ -1033,7 +1033,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1942,10 +1942,13 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
       }
       if (!t.hasAttribute || !t.hasAttribute('data-model')) return;
       s.state[t.getAttribute('data-model')] = t.type === 'checkbox' ? t.checked : t.value;
-      if (t.hasAttribute('data-live')) s.update();
+      // a character still being composed (注音、拼音): no redraw — it would end the composing (審查 2026-10-29);
+      // compositionend draws once the character is chosen
+      if (t.hasAttribute('data-live') && !e.isComposing) s.update();
     }
     overlay.addEventListener('input', onInput);
     overlay.addEventListener('change', onInput);
+    overlay.addEventListener('compositionend', function (e) { onInput({ type: 'input', target: e.target, isComposing: false }); });
     overlay.addEventListener('submit', function (e) {
       e.preventDefault();
       var name = e.target.getAttribute('data-act');
@@ -2409,6 +2412,30 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
   // 公園即時狀況：大家順手回報的選項（最近 3 小時的才顯示，只顯示人數）
   var PARK_STATUS = ['狗很多', '狗很少', '有大狗', '草地濕', '有水可以喝', '施工／關閉'];
   var PARKS_NOTE = '在地圖上點公園，或從下面選。'; // 選公園的清單上面那一句（我在公園、開團地點、家的範圍、劃地盤）
+  // 其他地點：主揪自己填的店家、餐廳（Willie 2026-10-29：「住家或餐廳也可以」）。卡片上一定標「主揪填的地點」；住家要等
+  // 「只給狗友看、主揪核准後才看得到地址」的狗聚。
+  var SPOT = {
+    entry: '其他地點（餐廳、咖啡廳…）',
+    title: '其他地點',
+    nameLabel: '地點名稱',
+    namePlaceholder: '例如：好日咖啡',
+    mapNote: '拖地圖、放大，點一下地點的位置。',
+    picked: '已選好位置',
+    noHome: '請不要填住家地址。這個地點會標「主揪填的地點」。',
+    use: '用這個地點',
+    label: '（主揪填的地點）',
+    needName: '請輸入地點名稱',
+    needPoint: '請在地圖上點一下位置',
+    notTaiwan: '地點要在台灣',
+    onMap: '在地圖上看',
+    // 點的位置離自己設定的家很近（隱私 → 家的位置；只有這支手機知道）：先確認不是住家（審查 2026-10-29）
+    nearHome: '這個位置離你設定的家很近。狗聚的位置大家都看得到，請確定這裡不是住家。',
+    nearHomeOk: '這裡是店家',
+    nearHomeNo: '換一個位置'
+  };
+  // 選公園的搜尋（core/parkpick.js；Willie 2026-10-29：「這些地點太少了」）：全台灣有名字的公園都找得到
+  var PARK_SEARCH = { label: '搜尋公園', placeholder: '搜尋公園（例如：河濱、青年、大安）', none: '找不到「{q}」，換個字試試，或在地圖上點公園。',
+    selected: '已選的公園', loading: '公園清單載入中…', failed: '公園清單載入不了，可以在地圖上點公園。' };
   var MAP_AREA = '台北市'; // 集章頁標題旁的「台北市試辦（範例）」（地圖本身是全台灣）
   PARKS.forEach(function (p) { p.legacy = true; });
 
@@ -2487,7 +2514,9 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
   //   第 3 個＝需主揪核准（會打開核准）、第 4 個要跟下面 TYPES.indoor 一模一樣。新規則加在最後面。
   //   第 5 個以後只是標示（App 不會檢查，例如不會去查疫苗打了沒）；字要短（最多 4 個字），開團頁排成三欄才整齊。
   var RULES = ['牽繩散步團', '限小型犬', '需主揪核准', '室內',
-    '已打疫苗', '已結紮', '發情勿來', '零食先問', '雨天取消', '新手友善', '老狗友善', '親子友善']; // Willie 2026-10-29：加更多、簡短點
+    '已打疫苗', '已結紮', '發情勿來', '不亂餵食', '雨天取消', '慢熟友善', '老狗友善', '親子友善']; // Willie 2026-10-29：加更多、簡短點
+  // 改過名字的規則：已經開好的狗聚照新名字顯示（Willie 2026-10-29：「新手友善」「零食先問」怪怪的）
+  var RULE_RENAMES = { '新手友善': '慢熟友善', '零食先問': '不亂餵食' };
   var RULES_MAX = 5; // 一場狗聚最多選幾個規則（Willie 2026-10-29）
   var TYPES = { leash: '牽繩散步團', offleash: '放繩玩', indoor: '室內' }; // leash / indoor 的字要跟上面 RULES 第 1、4 個一樣
   var QUICK_TIMES = ['08:30', '09:00', '16:30', '19:00']; // 開團「選時間」的快速選項（24 小時制 'HH:MM'）
@@ -2545,8 +2574,7 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
   // =====================================================================================================
   var TEXTS = {
     leashDefault: '預設已選：公共場所依各縣市規定要牽繩',
-    placeOnly: '只能選公園或店家，不能填住家',
-    placeOnlyParks: '只能選公園，不能填住家', // 集章收起來時（STAMPS.on = false）沒有店家可選
+    placeOnly: '公園、店家或餐廳都可以，不要填住家', // 開團選地點上面那一句（其他地點：主揪填的店家、餐廳）
     waitlist: '額滿自動候補，有人退出就自動遞補',
     leashAge: '牽繩的人要 7 歲以上（動保法第 20 條）',
     conditionNote: '選其他狀態會建議這次先休息、名額幫你留',
@@ -2610,7 +2638,8 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
 
   // 隱私頁「一直開著的保護」（固定，不能關）。go = 點了打開哪一頁（不用就拿掉）
   var PRIVACY_FIXED = [
-    { title: '開團地點只能選公園或店家', note: '輸入不了住家地址' },
+    // 2026-10-29 起主揪可以自己填店家、餐廳（其他地點），所以不再說「輸入不了住家地址」，改成照實說
+    { title: '主揪自己填的地點會標出來', note: '地點的位置大家都看得到，所以請不要填住家' },
     { title: '私訊需要雙方同意', note: '對方接受邀請才能聊', go: 'DM_Invite' }
   ];
 
@@ -2941,9 +2970,9 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
     share: '分享',
     copy: '複製連結',
     copied: '連結已複製，可以貼到 LINE',
-    copiedText: '名片已複製，可以貼到 LINE',
+    copiedText: '已複製，可以貼到 LINE',
     saveHint: '這裡不能直接分享圖片：長按圖片可以存起來，再傳到 LINE。',
-    failed: '名片圖做不出來，可以先分享名片文字和連結。',
+    failed: '名片圖做不出來，可以先分享文字和連結。',
     scan: '掃描看名片',
     tagline: '約附近的狗一起散步',
     invite: '我是{dog}，想認識你家的狗！在豆米特看我的名片、一起約散步', // 分享時跟著圖的文字（狗的口吻，Willie 2026-10-29），後面接「：」和連結
@@ -3318,7 +3347,7 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
       .concat(SHOPS.map(function (s) { return { id: s.id, kind: 'shop', parkId: null, name: s.name, example: true, sub: s.kindLabel }; }));
   }
   App.content = {
-    parks: PARKS, parksNote: PARKS_NOTE, mapArea: MAP_AREA, shops: SHOPS, stickers: STICKERS, conditions: CONDITIONS, rules: RULES, rulesMax: RULES_MAX, types: TYPES,
+    parks: PARKS, parksNote: PARKS_NOTE, parkSearch: PARK_SEARCH, spot: SPOT, mapArea: MAP_AREA, shops: SHOPS, stickers: STICKERS, conditions: CONDITIONS, rules: RULES, rulesMax: RULES_MAX, ruleRenames: RULE_RENAMES, types: TYPES,
     stamps: STAMPS, locationHelp: LOCATION_HELP,
     packing: PACKING, breakEveryMin: BREAK_EVERY_MIN, chatCloseDays: CHAT_CLOSE_DAYS, kidsTips: KIDS_TIPS, yellowActions: YELLOW_ACTIONS, yellowSuggestTags: YELLOW_SUGGEST_TAGS, quickTimes: QUICK_TIMES,
     privacyFixed: PRIVACY_FIXED, dmReportReasons: DM_REPORT_REASONS, badges: BADGES, badgeHow: BADGE_HOW, reminderUi: REMINDER_UI,
@@ -3344,9 +3373,14 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
     /** Where a new meetup can be: the parks, plus the (sample) shops only while 集章 is on (STAMPS.on). keepId: a
         meetup's own place stays pickable when it is edited. */
     meetPlaces: function (keepId) { return placeList().filter(function (p) { return p.kind !== 'shop' || STAMPS.on !== false || p.id === keepId; }); },
-    placeNote: function () { return STAMPS.on === false ? TEXTS.placeOnlyParks : TEXTS.placeOnly; },
+    placeNote: function () { return TEXTS.placeOnly; },
     /** '寵物友善咖啡廳（範例）' / '大安森林公園' — accepts a place/shop object or an event.place */
-    placeName: function (p) { return p ? p.name + (p.example ? '（範例）' : '') : ''; },
+    // a 主揪填的地點 has the label in its stored name (so the old app shows it too); older test meetups may not
+    placeName: function (p) {
+      if (!p) return '';
+      if (p.kind === 'spot') return String(p.name || '').slice(-SPOT.label.length) === SPOT.label ? p.name : p.name + SPOT.label;
+      return p.name + (p.example ? '（範例）' : '');
+    },
     sticker: function (id) { return STICKERS.filter(function (s) { return s.id === id; })[0] || null; }
   };
 })(window.App = window.App || {});
@@ -3448,13 +3482,60 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
       var size = r[6] * r[7];
       if (!best || (r[3] && !best.r[3]) || (r[3] === best.r[3] && size < best.size)) best = { r: r, size: size };
     });
-    if (!best) return null;
-    var r = best.r, type = r[0].charAt(0) === 'r' ? 'r' : 'w', num = r[0].slice(1);
+    return best ? parkOf(best.r) : null;
+  }
+  /** A listed row → a park {id: 'osm-w-123', osm, name, area, lat, lng} (the original park when it is one of those). */
+  function parkOf(r) {
+    var L = api._local, type = r[0].charAt(0) === 'r' ? 'r' : 'w', num = r[0].slice(1);
     var osm = type + '/' + num;
     var legacy = C.parks.filter(function (p) { return (p.osm || []).indexOf(osm) !== -1; })[0];
     if (legacy) return legacy;
     return { id: 'osm-' + type + '-' + num, osm: osm, name: clean(r[1]), area: clean(L.areas[r[2]] || ''),
       lat: (r[4] + r[6] / 2) / 1e5, lng: (r[5] + r[7] / 2) / 1e5 };
+  }
+  // ---- search and nearby (Willie 2026-10-29: 「這些地點太少了」): every listed park in Taiwan, not only the known ones
+  function words(s) { return String(s || '').replace(/臺/g, '台').replace(/\s+/g, '').toLowerCase(); }
+  /** Squared distance (degrees, longitude shrunk for the latitude) from a row's centre to a point. */
+  function dist2(r, lat, lng) {
+    var y = (r[4] + r[6] / 2) / 1e5 - lat, x = ((r[5] + r[7] / 2) / 1e5 - lng) * Math.cos(lat * Math.PI / 180);
+    return y * y + x * x;
+  }
+  /** Where a listed park can be used: the same box the app accepts a park in (App.data parkCandidate) — 金門 is not. */
+  function usable(r) { var y = (r[4] + r[6] / 2) / 1e5, x = (r[5] + r[7] / 2) / 1e5; return y > 21 && y < 26.5 && x > 119 && x < 123; }
+  /** One place twice: the same name in the same district within 1 km (OSM often has a park as two pieces; two
+      中山公園 16 km apart in 花蓮縣 stay two). */
+  function samePark(a, b) {
+    if (a.id === b.id) return true;
+    if (words(a.name) !== words(b.name) || words(a.area) !== words(b.area)) return false;
+    var y = (a.lat - b.lat) * 111000, x = (a.lng - b.lng) * 111000 * Math.cos(a.lat * Math.PI / 180);
+    return y * y + x * x < 1000 * 1000;
+  }
+  /** Rows (nearest first) → parks, at most n, each place once. */
+  function firstParks(list, n) {
+    var out = [];
+    for (var i = 0; i < list.length && out.length < n; i++) {
+      var p = parkOf(list[i].r);
+      if (!out.some(function (q) { return samePark(p, q); })) out.push(p);
+    }
+    return out;
+  }
+  /** The n listed parks nearest to a point. Needs the list (loadLocal); [] without it. */
+  function nearest(lat, lng, n) {
+    var L = api._local;
+    if (!L || !isFinite(lat) || !isFinite(lng)) return [];
+    return firstParks(L.rows.filter(usable).map(function (r) { return { r: r, d: dist2(r, lat, lng) }; }).sort(function (a, b) { return a.d - b.d; }), n || 10);
+  }
+  /** Listed parks whose name (first) or district has the words — 台 and 臺 alike — nearest first, at most n. */
+  function search(q, lat, lng, n) {
+    var L = api._local, k = words(q);
+    if (!L || !k) return [];
+    var hits = [];
+    L.rows.forEach(function (r) {
+      if (!usable(r)) return;
+      var rank = words(r[1]).indexOf(k) !== -1 ? 0 : words(L.areas[r[2]]).indexOf(k) !== -1 ? 1 : -1;
+      if (rank !== -1) hits.push({ r: r, rank: rank, d: isFinite(lat) && isFinite(lng) ? dist2(r, lat, lng) : 0 });
+    });
+    return firstParks(hits.sort(function (a, b) { return a.rank - b.rank || a.d - b.d; }), n || 20);
   }
   /** The district (…區/鄉/鎮/市) of the nearest listed park within ~2 km, or ''. Needs the list (loadLocal). */
   function districtNear(lat, lng) {
@@ -3535,7 +3616,7 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
   }
 
   var api = App.osm = {
-    parkAt: parkAt, pick: pick, nameOf: nameOf, loadLocal: loadLocal, districtNear: districtNear,
+    parkAt: parkAt, pick: pick, nameOf: nameOf, loadLocal: loadLocal, districtNear: districtNear, nearest: nearest, search: search, samePark: samePark,
     lastError: null,
     _fetch: function (u, i) { return window.fetch(u, i); },
     _fetchLocal: function (u) { return window.fetch(u); },
@@ -3695,10 +3776,15 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
 /* ---- core/parkpick.js ---- */
 /* App.parkPick — the ONE way screens let people choose a park (我在公園, 開團地點, 劃地盤, 家的範圍, 常客榜).
    Lists C.knownParks() (the three original parks, the shared registry, parks tapped on the map in this tab) with the
-   ones inside the current map view first. Picking on the map itself happens on the home screen (screens/Main.js). */
+   ones inside the current map view first, then the 10 parks nearest to the map's centre from the list of every park in
+   Taiwan (App.osm), then the other known parks; typing in 搜尋公園 searches that whole list (Willie 2026-10-29: 「這些地點
+   太少了」). A park found that way is remembered for this tab (App.data.notePark) when it is picked: resolve(id).
+   Picking on the map itself happens on the home screen (screens/Main.js). */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, C = App.content;
+  var shown = {}; // id → park, the parks the last list offered (search results are not known parks yet)
+  var listState = null; // the list of every park: null (not asked yet) | 'loading' | 'ok' | 'failed'
 
   /** Known parks, those inside the map view first: [{park, inView}] */
   function ordered() {
@@ -3707,20 +3793,74 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
     all.forEach(function (p) { var v = !!(App.map && App.map.inView(p)); (v ? inV : rest).push({ park: p, inView: v }); });
     return inV.concat(rest);
   }
-  /** Park rows (buttons data-act="<act>" data-park="<id>") with group headings. o: {selected, act, sub(park) → text} */
+  /** Where 「附近」 is measured from: the map's centre (where the person is looking, or where they are). */
+  function center() {
+    var L = App.map && App.map._leaflet;
+    if (L) { var c = L.getCenter(); return { lat: c.lat, lng: c.lng }; }
+    return { lat: C.map.center[0], lng: C.map.center[1] };
+  }
+  /** The parks to offer, in groups [{title, parks}]: with words, the search over every park in Taiwan; without, the
+      selected park when it would not be first anyway (what 打卡 / 開始 uses must be seen — 審查 2026-10-29), the known
+      parks in the map view, the 10 nearest parks and the other known parks. Each place once (a known park wins over the
+      same place found in the list). */
+  function groups(q, selectedId) {
+    var c = center(), known = ordered(), kept = [], out = [];
+    function add(title, list) {
+      list = list.filter(function (p) {
+        if (!p || kept.some(function (k) { return App.osm.samePark(k, p); })) return false;
+        kept.push(p); return true;
+      });
+      if (list.length) out.push({ title: title, parks: list });
+    }
+    if (String(q || '').trim()) add('搜尋結果', App.osm.search(q, c.lat, c.lng, 20));
+    else {
+      var inView = known.filter(function (x) { return x.inView; }).map(function (x) { return x.park; });
+      var sel = selectedId ? C.park(selectedId) : null;
+      if (sel && !(inView[0] && inView[0].id === sel.id)) add(C.parkSearch.selected, [sel]);
+      add('在地圖畫面裡', inView);
+      add('附近的公園', App.osm.nearest(c.lat, c.lng, 10));
+      add('其他公園', known.filter(function (x) { return !x.inView; }).map(function (x) { return x.park; }));
+    }
+    shown = {};
+    out.forEach(function (g) { g.parks.forEach(function (p) { shown[p.id] = p; }); });
+    return out;
+  }
+  /** The park for a picked id: a known park, or one the last list offered (remembered for this tab from now on); null
+      when the app cannot use it. */
+  function resolve(id) { return C.park(id) || (shown[id] ? App.data.notePark(shown[id]) : null); }
+  /** The list of every park loads on first use; the open sheet s is drawn again once it is there (or once it failed). */
+  function ensureList(s) {
+    if (App.osm._local) { listState = 'ok'; return; }
+    if (s) { if (s._parkList) return; s._parkList = true; } // once per sheet: a failed list is not fetched again on every redraw
+    listState = 'loading';
+    App.osm.loadLocal().then(function (ok) { listState = ok ? 'ok' : 'failed'; if (s && !s.closed) s.update(); });
+  }
+  /** A line under 搜尋公園 when the words found nothing: the list is still coming, did not come, or has no such park. */
+  function noneNote(q) {
+    q = String(q || '').trim();
+    if (!q) return listState === 'failed' ? html`<p class="note mt-12">${C.parkSearch.failed}</p>` : '';
+    var t = listState === 'loading' ? C.parkSearch.loading : listState === 'failed' ? C.parkSearch.failed : ui.tpl(C.parkSearch.none, { q: q });
+    return html`<p class="note mt-12" role="status">${t}</p>`;
+  }
+  /** 搜尋公園 (bound to the sheet's state.ppq, drawn again as it is typed in). */
+  function searchBox(q) {
+    return html`<input class="input mt-12" id="pp-q" type="search" data-model="ppq" data-live="1"${ui.attrs({ value: q || '', placeholder: C.parkSearch.placeholder, 'aria-label': C.parkSearch.label, autocomplete: 'off', enterkeyhint: 'search' })}>`;
+  }
+  /** 搜尋公園 + park rows (buttons data-act="<act>" data-park="<id>") with group headings.
+      o: {q (the sheet's state.ppq), sheet (to draw again when the park list arrives), selected, act, sub(park) → text} */
   function rows(o) {
     o = o || {};
-    var list = ordered(), shownOther = false, shownIn = false;
-    return html`<div class="mt-12" role="group" aria-label="選公園">${list.map(function (x) {
-      var pk = x.park, on = o.selected === pk.id;
-      var head = '';
-      if (x.inView && !shownIn) { shownIn = true; head = html`<p class="note mt-8">在地圖畫面裡</p>`; }
-      else if (!x.inView && shownIn && !shownOther) { shownOther = true; head = html`<p class="note mt-12">其他公園</p>`; }
-      var sub = o.sub ? o.sub(pk) : (pk.area || '');
-      return html`${head}<button type="button" class="park-choice" data-act="${o.act || 'pick'}"${ui.data({ park: pk.id })}${ui.attrs({ 'aria-pressed': String(on) })}>
+    ensureList(o.sheet);
+    var list = groups(o.q, o.selected);
+    var none = !list.length || listState === 'failed' ? noneNote(o.q) : '';
+    return html`${searchBox(o.q)}${none}<div class="mt-4" role="group" aria-label="選公園">${list.map(function (g) {
+      return html`<p class="note mt-12">${g.title}</p>${g.parks.map(function (pk) {
+        var on = o.selected === pk.id, sub = o.sub ? o.sub(pk) : (pk.area || '');
+        return html`<button type="button" class="park-choice" data-act="${o.act || 'pick'}"${ui.data({ park: pk.id })}${ui.attrs({ 'aria-pressed': String(on) })}>
         <span class="row-icon">${ui.icon('parkPin', { size: 22 })}</span>
         <span class="row-main"><span class="row-title">${pk.name}</span>${sub ? html`<span class="row-sub">${sub}</span>` : ''}</span>
         ${on ? ui.icon('checkSmall', { size: 22, color: 'var(--teal-ink)' }) : ''}</button>`;
+      })}`;
     })}</div>`;
   }
   /** A sheet to choose a park (and optionally a shop). o: {title, current, includeShops, sub(park), onPick(park | shopPlace)} —
@@ -3729,12 +3869,13 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
     o = o || {};
     return ui.sheet({
       title: o.title || '選公園',
+      autofocus: false, // no keyboard over the list on open (審查 2026-10-29)
       state: { sel: o.current || null },
       render: function (s) {
         var shops = o.includeShops ? C.places().filter(function (pl) { return pl.kind === 'shop'; }) : [];
         return html`
           <p class="sub">${C.parksNote}</p>
-          ${rows({ selected: s.state.sel, act: 'pick', sub: o.sub })}
+          ${rows({ q: s.state.ppq, sheet: s, selected: s.state.sel, act: 'pick', sub: o.sub })}
           ${shops.length ? html`<p class="note mt-12">店家</p><div role="group" aria-label="選店家">${shops.map(function (pl) {
             return html`<button type="button" class="park-choice" data-act="shop"${ui.data({ id: pl.id })}${ui.attrs({ 'aria-pressed': String(s.state.sel === pl.id) })}>
               <span class="row-icon">${ui.icon('shopCafe', { size: 22 })}</span>
@@ -3743,7 +3884,7 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
       },
       actions: {
         pick: function (s, d) {
-          var pk = C.park(d.park);
+          var pk = resolve(d.park);
           if (!pk) return;
           return Promise.resolve(o.onPick ? o.onPick(pk) : null).then(function () { s.close(); });
         },
@@ -3768,7 +3909,7 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
     </div>`;
   }
 
-  App.parkPick = { rows: rows, open: open, ordered: ordered, statusChips: statusChips };
+  App.parkPick = { rows: rows, open: open, ordered: ordered, groups: groups, resolve: resolve, ensureList: ensureList, searchBox: searchBox, noneNote: noneNote, statusChips: statusChips };
 })(window.App = window.App || {});
 
 ;
@@ -4165,12 +4306,22 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
   /** The personality tags in the order the card shows them: 要注意 first, so a warning is never the one left out. */
   function tagsOf(dog) { return App.dogs.showTags(dog.tags); }
   function link(id) { return id ? App.shareUrl('Dog_Card', { id: id }, { frameOk: api._frameOk }) : null; }
+  /** The 名片 lines: 「豆花｜小型犬・米克斯」, 個性, 主人 — only where there is no link (the claude.ai viewer), so the copied
+      text still says who the dog is. */
+  function lines(p) {
+    var dog = (p && p.dog) || {}, d = App.dogs.describe(dog), out = [String(dog.name || '') + (d ? '｜' + d : '')];
+    var tags = tagsOf(dog);
+    if (tags.length) out.push('個性：' + tags.join('、'));
+    if (p && p.nickname) out.push('主人：' + p.nickname);
+    return out.join('\n');
+  }
   /** The words that go with the picture: the dog says hello and invites (Willie 2026-10-29: the name, breed, personality
-      and owner are on the picture already — 「有點多餘」), then the link. */
+      and owner are on the picture already — 「有點多餘」), then the link. No link: the 名片 lines instead (審查). */
   function text(p, id) {
     var u = link(id), name = String(((p && p.dog) || {}).name || '狗狗');
-    var say = C.shareCard.invite.replace('{dog}', /^[A-Za-z0-9]/.test(name) ? ' ' + name : name); // 「我是 Dog」、「我是豆豆」
-    return say + (u ? '：\n' + u : '。');
+    if (!u) return lines(p);
+    // ui.tpl: a 「$」 in a name stays as written; 「我是 Dog」、「我是豆豆」
+    return ui.tpl(C.shareCard.invite, { dog: /^[A-Za-z0-9]/.test(name) ? ' ' + name : name }) + '：\n' + u;
   }
 
   /** What goes on the picture: the tags that fit on one row (the QR code takes the right side when there is a link). */
@@ -4214,7 +4365,7 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
     t.width = tw; t.height = th;
     var s = Math.max(tw / img.naturalWidth, th / img.naturalHeight);
     tg.drawImage(img, (tw - img.naturalWidth * s) / 2, (th - img.naturalHeight * s) / 2, img.naturalWidth * s, img.naturalHeight * s);
-    g.imageSmoothingEnabled = true;
+    tg.imageSmoothingQuality = 'high'; g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
     g.drawImage(t, x, y, w, h);
     g.fillStyle = 'rgba(255, 250, 243, 0.35)'; g.fillRect(x, y, w, h);
     var r = photoRect(img.naturalWidth, img.naturalHeight);
@@ -4293,7 +4444,7 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
     var s = ui.sheet({
       title: S.title,
       render: function () {
-        var pic = st.url ? html`<img class="sc-pic" src="${st.url}" alt="${S.alt.replace('{dog}', (p.dog && p.dog.name) || '')}" width="1080" height="1350">`
+        var pic = st.url ? html`<img class="sc-pic" src="${st.url}" alt="${ui.tpl(S.alt, { dog: (p.dog && p.dog.name) || '' })}" width="1080" height="1350">`
           : html`<div class="sc-wait" role="status">${st.failed ? S.failed : S.making}</div>`;
         return html`${pic}
           ${st.url && !st.files ? html`<p class="note mt-8">${S.saveHint}</p>` : ''}
@@ -7216,7 +7367,7 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
     if (!isMap(out.live)) out.live = {};
     if (!isMap(out.place)) out.place = { name: '' };
     if (!Array.isArray(out.sizes)) out.sizes = ['S', 'M', 'L'];
-    if (!Array.isArray(out.rules)) out.rules = [];
+    out.rules = Array.isArray(out.rules) ? out.rules.map(function (r) { return own(C.ruleRenames, r) ? C.ruleRenames[r] : r; }) : [];
     if (typeof out.title !== 'string') out.title = String(out.title || '狗聚');
     if (typeof out.endAt !== 'number' || !isFinite(out.endAt)) out.endAt = null;
     if (typeof out.capacity !== 'number' || !(out.capacity > 0)) out.capacity = 8;
@@ -7272,6 +7423,17 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
   }
   var SIZE_KEYS = ['S', 'M', 'L'];
   function cleanSizes(v) { var s = (Array.isArray(v) ? v : []).filter(function (x, i, a) { return SIZE_KEYS.indexOf(x) !== -1 && a.indexOf(x) === i; }); return s.length ? s : SIZE_KEYS.slice(); }
+  /** 其他地點 (Willie 2026-10-29): a place the host names and taps on the map — a name (≤ 20) and a point (4 decimals,
+      about 10 m) inside the box the app accepts parks in, without the coast of 福建 (審查). The stored name carries
+      「（主揪填的地點）」, so the old live app shows the label too; `plain` keeps the name as typed. */
+  function cleanSpot(v) {
+    var S = C.spot, name = str(v && v.name, 20), lat = Number(v && v.lat), lng = Number(v && v.lng);
+    need(name, S.needName);
+    need(isFinite(lat) && isFinite(lng), S.needPoint);
+    need(lat > 21 && lat < 26.5 && lng > 119 && lng < 123 && !(lat > 25.4 && lng < 119.8), S.notTaiwan);
+    return { id: newId('spot'), kind: 'spot', parkId: null, name: name + S.label, plain: name,
+      lat: Math.round(lat * 1e4) / 1e4, lng: Math.round(lng * 1e4) / 1e4, example: false };
+  }
   function cleanRules(v) { return (Array.isArray(v) ? v : []).filter(function (r, i, a) { return RULES.indexOf(r) !== -1 && a.indexOf(r) === i; }).slice(0, C.rulesMax); }
   function cleanCapacity(v) { return Math.max(2, Math.min(30, Math.round(Number(v)) || 8)); }
   function cleanTime(v) { var n = typeof v === 'number' ? v : fmt().parseInput(v); return isFinite(n) ? n : NaN; }
@@ -7300,7 +7462,7 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
     var p = person(who);
     need(p, '先建立狗狗名片');
     var newPark = input.park ? parkCandidate(input.park) : null;
-    var place = newPark ? { id: newPark.id, kind: 'park', parkId: newPark.id, name: newPark.name, example: false } : App.content.place(input.placeId);
+    var place = input.spot ? cleanSpot(input.spot) : newPark ? { id: newPark.id, kind: 'park', parkId: newPark.id, name: newPark.name, example: false } : App.content.place(input.placeId);
     need(place, '請選公園或店家');
     var startAt = cleanTime(input.startAt);
     need(isFinite(startAt) && startAt > now() - HOUR, '請選之後的時間');
@@ -7314,9 +7476,9 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
     var id = newId('e');
     var t = now();
     var data = {
-      title: str(input.title, 30) || (place.name + '狗聚'),
+      title: str(input.title, 30) || ((place.plain || place.name) + '狗聚'),
       hostId: who,
-      place: { id: place.id, kind: place.kind, parkId: place.parkId, name: place.name, example: !!place.example },
+      place: place.kind === 'spot' ? place : { id: place.id, kind: place.kind, parkId: place.parkId, name: place.name, example: !!place.example },
       startAt: startAt, endAt: endAt,
       type: type, sizes: sizes, capacity: cleanCapacity(input.capacity),
       rules: rules, approval: approval, theme: str(input.theme, 20) || null, status: 'open',
@@ -7347,8 +7509,10 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
       if (input.approval !== undefined) patch.approval = !!input.approval;
       if (input.theme !== undefined) patch.theme = str(input.theme, 20) || null;
       var np = input.park ? parkCandidate(input.park) : null;
-      if (input.park) { need(np, '請選公園或店家'); patch.place = { id: np.id, kind: 'park', parkId: np.id, name: np.name, example: false }; }
-      else if (input.placeId) { var pl = App.content.place(input.placeId); need(pl, '請選公園或店家'); patch.place = { id: pl.id, kind: pl.kind, parkId: pl.parkId, name: pl.name, example: !!pl.example }; }
+      // a 主揪填的地點 had a point and a plain name: a park place clears them (an update merges into the old place)
+      if (input.park) { need(np, '請選公園或店家'); patch.place = { id: np.id, kind: 'park', parkId: np.id, name: np.name, example: false, plain: null, lat: null, lng: null }; }
+      // the meetup's own place again (a 主揪填的地點 is not in any list): nothing to change
+      else if (input.placeId && !(ev.place && input.placeId === ev.place.id)) { var pl = App.content.place(input.placeId); need(pl, '請選公園或店家'); patch.place = { id: pl.id, kind: pl.kind, parkId: pl.parkId, name: pl.name, example: !!pl.example, plain: null, lat: null, lng: null }; }
       var changed = (patch.startAt && patch.startAt !== ev.startAt) || (patch.place && patch.place.id !== (ev.place && ev.place.id));
       var capUp = patch.capacity !== undefined && patch.capacity > ev.capacity;
       return eventRef(id).update(patch).then(function () {
@@ -10982,7 +11146,7 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
   function openTaken() {
     var L = App.content.login, ui = App.ui, p = App.data.me();
     var name = (p && p.dog && p.dog.name) || '現在的狗狗';
-    ui.confirm({ title: L.taken.title, body: L.taken.body.replace('{dog}', name), ok: L.taken.ok, cancel: L.taken.cancel }).then(function (yes) {
+    ui.confirm({ title: L.taken.title, body: L.taken.body.split('{dog}').join(name), ok: L.taken.ok, cancel: L.taken.cancel }).then(function (yes) {
       if (yes) return me.lineGo('signin').catch(function (e) { ui.toast((e && e.userMessage) || L.failed); });
     });
   }
@@ -11519,7 +11683,8 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
     var model = t.getAttribute('data-model');
     if (!model) return;
     cur.ctx.state[model] = t.type === 'checkbox' ? t.checked : t.value;
-    if (t.hasAttribute('data-live')) cur.ctx.update();
+    // a character still being composed (注音、拼音): no redraw until it is chosen (compositionend below)
+    if (t.hasAttribute('data-live') && !e.isComposing) cur.ctx.update();
   }
   function onSubmit(e) {
     var f = e.target;
@@ -11543,6 +11708,7 @@ window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
       rootEl.addEventListener('click', onClick);
       rootEl.addEventListener('input', onInput);
       rootEl.addEventListener('change', onInput);
+      rootEl.addEventListener('compositionend', function (e) { onInput({ type: 'input', target: e.target, isComposing: false }); });
       rootEl.addEventListener('submit', onSubmit);
       App.data.onChange(function () { if (cur && !nextDog()) queueRender(); });
       App.me.onChange(function () { stack = stack.slice(-1); remount(); });
@@ -13091,6 +13257,8 @@ try {
   function startOf(st) { return fmt.parseInput(st.date, st.time); }
   /** The chosen place: a shop / original park (C.place), or any other park (C.park) as a park place. */
   function placeOf(st) {
+    // 其他地點: the host's own place (a name and a point), labelled 主揪填的地點
+    if (st.placeId === 'spot') return st.spot ? { id: 'spot', kind: 'spot', parkId: null, name: st.spot.name, lat: st.spot.lat, lng: st.spot.lng } : null;
     var pl = C.place(st.placeId);
     if (pl) return pl;
     var pk = C.park(st.placeId);
@@ -13106,30 +13274,98 @@ try {
   function openPlaceSheet(ctx) {
     ui.sheet({
       title: '選地點',
-      render: function () {
+      autofocus: false, // no keyboard over the list on open (審查 2026-10-29)
+      render: function (s) {
         var shops = C.meetPlaces().filter(function (p) { return p.kind === 'shop'; }); // none while 集章 is off
-        var parks = App.parkPick.ordered().map(function (x) { return placeOf({ placeId: x.park.id }); });
-        function row(pl) {
+        App.parkPick.ensureList(s);
+        // parks: 搜尋公園 over every park in Taiwan, or the ones in view, the 10 nearest and the known ones (App.parkPick)
+        var groups = App.parkPick.groups(s.state.ppq, ctx.state.placeId);
+        function row(pl, sub, icon) {
           var on = ctx.state.placeId === pl.id;
-          var park = pl.kind === 'park' ? C.park(pl.parkId) : null;
-          var shop = pl.kind === 'shop' ? C.shop(pl.id) : null;
-          var sub = park ? (park.rule || park.area || '') : (shop ? shop.kindLabel + (shop.dist ? '・' + shop.dist : '') : '');
           return html`<button type="button" class="ce-place" data-act="pick"${ui.data({ id: pl.id })}${ui.attrs({ 'aria-pressed': String(on) })}>
-            <span class="row-icon">${ui.icon(park ? 'parkPin' : ((shop && shop.icon) || 'shopCafe'), { size: 22 })}</span>
+            <span class="row-icon">${ui.icon(icon, { size: 22 })}</span>
             <span class="row-main"><span class="row-title">${pl.name}${pl.example ? html`<span class="ex">（範例）</span>` : ''}</span>${sub ? html`<span class="row-sub">${sub}</span>` : ''}</span>
             ${on ? ui.icon('checkSmall', { size: 22, color: 'var(--teal-ink)' }) : ''}</button>`;
         }
+        var q = String(s.state.ppq || '').trim();
         return html`<p class="ce-note" style="margin-top:0">${ui.icon('noHome', { size: 16 })}${C.placeNote()}</p>
           <div class="label mt-16">公園</div>
           <p class="note mt-4">${C.parksNote}</p>
-          <div class="mt-8" role="group" aria-label="公園">${parks.map(row)}</div>
+          ${App.parkPick.searchBox(s.state.ppq)}
+          ${!groups.length || !q ? App.parkPick.noneNote(q) : ''}
+          ${groups.map(function (g) {
+            return html`<p class="note mt-12">${g.title}</p><div class="mt-8" role="group"${ui.attrs({ 'aria-label': g.title })}>${g.parks.map(function (pk) {
+              return row({ id: pk.id, name: pk.name }, pk.rule || pk.area || '', 'parkPin');
+            })}</div>`;
+          })}
           ${shops.length ? html`<div class="label mt-20">店家</div>
-          <div class="mt-8" role="group" aria-label="店家">${shops.map(row)}</div>` : ''}`;
+          <div class="mt-8" role="group" aria-label="店家">${shops.map(function (pl) {
+            var shop = C.shop(pl.id);
+            return row(pl, shop ? shop.kindLabel + (shop.dist ? '・' + shop.dist : '') : '', (shop && shop.icon) || 'shopCafe');
+          })}</div>` : ''}
+          <div class="label mt-20">${C.spot.title}</div>
+          ${ctx.state.spot ? html`<div class="mt-8">${row({ id: 'spot', name: ctx.state.spot.name }, C.spot.label, 'shopCafe')}</div>` : ''}
+          <div class="mt-8">${ui.secondaryBtn(C.spot.entry, { act: 'spot' })}</div>`;
       },
       actions: {
-        pick: function (s, d) { if (placeOf({ placeId: d.id })) ctx.set({ placeId: d.id }); s.close(); }
+        spot: function (s) { s.close(); openSpotSheet(ctx); },
+        pick: function (s, d) {
+          if (d.id === 'spot') { if (ctx.state.spot) ctx.set({ placeId: 'spot' }); s.close(); return; }
+          // a park from the search or the nearby list is remembered first, so the form can name it
+          var ok = C.place(d.id) || App.parkPick.resolve(d.id);
+          if (ok && placeOf({ placeId: d.id })) ctx.set({ placeId: d.id });
+          s.close();
+        }
       }
     });
+  }
+
+  /** 其他地點 (Willie 2026-10-29: 「住家或餐廳也可以」): the place's name and a tap on the map. The map is the one app map,
+      lent to this sheet (like 隱私 → 家的位置); the sheet is not drawn again while it is open, so the map stays put. */
+  function openSpotSheet(ctx) {
+    var S = C.spot, cur = ctx.state.spot, pt = cur ? { lat: cur.lat, lng: cur.lng } : null, dot = null;
+    D.myHomeAt(); // starts reading this phone's private home point, for the check in 用這個地點
+    var sh = ui.sheet({
+      title: S.title,
+      state: { name: cur ? cur.name : '' },
+      render: function (s) {
+        return html`<div class="ce-warn" style="margin-top:0">${S.noHome}</div>
+          <div class="mt-12">${ui.field({ label: S.nameLabel, model: 'name', value: s.state.name, placeholder: S.namePlaceholder, maxlength: 20, id: 'sp-name', required: true })}</div>
+          <p class="note mt-12">${S.mapNote}</p>
+          <div class="sp-mapslot mt-8" style="position:relative;height:min(40vh,300px);border-radius:16px;overflow:hidden;isolation:isolate"></div>
+          <p class="note mt-8" id="sp-at" role="status">${pt ? S.picked : S.needPoint}</p>
+          <div class="sheet-actions">${ui.primaryBtn(S.use, { act: 'use' })}</div>`;
+      },
+      actions: {
+        use: function (s) {
+          var name = String(s.state.name || '').trim();
+          if (!name) { ui.toast(S.needName); return; }
+          if (!pt) { ui.toast(S.needPoint); return; }
+          function done() { ctx.set({ placeId: 'spot', spot: { name: name.slice(0, 20), lat: pt.lat, lng: pt.lng } }); s.close(); }
+          // the point is near the home this phone set (隱私 → 家的位置): make sure it is not a home (審查 2026-10-29)
+          var home = D.myHomeAt();
+          if (home && D.distM(home, pt) < 200) return ui.confirm({ title: S.title, body: S.nearHome, ok: S.nearHomeOk, cancel: S.nearHomeNo }).then(function (yes) { if (yes) done(); });
+          done();
+        }
+      },
+      onClose: function () { if (dot) dot.remove(); }
+    });
+    function mark() {
+      var L = App.map._leaflet;
+      if (!L || !pt || !window.L) return;
+      if (dot) dot.setLatLng([pt.lat, pt.lng]);
+      else dot = window.L.circleMarker([pt.lat, pt.lng], { radius: 10, color: '#1F6670', weight: 3, fillColor: '#E8775A', fillOpacity: 0.9 }).addTo(L);
+    }
+    App.map.attach(sh.el.querySelector('.sp-mapslot'), {
+      onTap: function (ll) {
+        if (sh.closed) return; // a tap counts 300 ms later: the sheet may be gone (no dot left on the home map)
+        pt = { lat: ll.lat, lng: ll.lng };
+        mark();
+        var at = sh.el.querySelector('#sp-at');
+        if (at) at.textContent = S.picked;
+      }
+    });
+    if (pt && App.map._leaflet) { App.map._leaflet.setView([pt.lat, pt.lng], 17, { animate: false }); mark(); }
   }
 
   function openTimeSheet(ctx) {
@@ -13302,7 +13538,8 @@ try {
           title: st.title,
           // original parks and shops by id; any other park as the park itself (data writes it to the registry)
           placeId: C.place(st.placeId) ? st.placeId : undefined,
-          park: C.place(st.placeId) ? undefined : C.park(st.placeId),
+          park: C.place(st.placeId) || st.placeId === 'spot' ? undefined : C.park(st.placeId),
+          spot: st.placeId === 'spot' ? st.spot : undefined,
           startAt: t,
           type: aggr ? 'leash' : typeOf(rules),
           sizes: st.sizes,
@@ -14207,10 +14444,10 @@ try {
     if (document.getElementById('css-Dog_Card')) return;
     var s = document.createElement('style'); s.id = 'css-Dog_Card';
     s.textContent = [
-      '.dc-pic{margin:16px 16px 0;border-radius:24px;overflow:hidden;background:var(--teal-tint);display:flex;align-items:center;justify-content:center}',
-      '.dc-pic.face{aspect-ratio:4/3}',
-      // the whole photo, never cut (Willie 2026-10-29: 「照片的頭被切掉了」)
-      '.dc-pic img{display:block;width:100%;height:auto;max-height:60vh;object-fit:contain}',
+      '.dc-pic{margin:16px 16px 0;display:flex;align-items:center;justify-content:center}',
+      '.dc-pic.face{aspect-ratio:4/3;border-radius:24px;background:var(--teal-tint)}',
+      // the whole photo, never cut (Willie 2026-10-29: 「照片的頭被切掉了」), its own round corners, no bars beside it
+      '.dc-pic img{display:block;width:auto;max-width:100%;height:auto;max-height:60vh;object-fit:contain;border-radius:24px}',
       '.dc-name{margin-top:16px;font-family:var(--font-head);font-size:32px;line-height:40px;color:var(--ink);overflow-wrap:anywhere}',
       '.dc-meta{margin-top:2px;font-size:16px;line-height:22px;color:var(--muted)}',
       '.dc-owner{margin-top:10px;font-size:15px;line-height:20px;color:var(--body)}',
@@ -14803,7 +15040,7 @@ try {
         <div class="grow">
           <div class="ev-when">${fmt.dateTime(ev.startAt)}${ev.endAt ? '–' + fmt.time(ev.endAt) : ''}</div>
           <h1 class="h1">${ev.title}</h1>
-          <div class="ev-place">${C.placeName(ev.place)}</div>
+          <div class="ev-place">${C.placeName(ev.place)}${spotLink(ev.place)}</div>
           <div class="ev-host">${ui.dogAvatar(host || { dog: {} }, { size: 22, label: false })}主揪 ${D.ownerName(ev.hostId)}${D.isHost(ev) ? '（你）' : ''}</div>
         </div>
         <span class="ev-hero">${ui.art('eventHero', { width: 124 })}</span>
@@ -14937,7 +15174,7 @@ try {
         leaveDog: function (s, d) {
           var ev = ctx.state.event;
           if (!ev || !D.isMyDog(d.id)) return null;
-          return ui.confirm({ title: C.home.leaveDog.replace('{dog}', D.dogName(d.id)) + '？', body: '名額會自動讓給候補的狗，聊天室會通知大家。', ok: '不來了', cancel: '先不要', danger: true }).then(function (ok) {
+          return ui.confirm({ title: C.home.leaveDog.split('{dog}').join(D.dogName(d.id)) + '？', body: '名額會自動讓給候補的狗，聊天室會通知大家。', ok: '不來了', cancel: '先不要', danger: true }).then(function (ok) {
             if (!ok) return null;
             return D.leaveEvent(ev.id, d.id).then(function (r) {
               ui.toast(r && r.promoted && r.promoted.length ? D.dogName(d.id) + '取消報名了，' + D.dogName(r.promoted[0]) + ' 從候補遞補上了' : D.dogName(d.id) + '取消報名了');
@@ -15042,6 +15279,13 @@ try {
   }
 
   // ------------------------------------------------------------------ screen
+  /** 其他地點: the point the host tapped, opened in the phone's map app (which branch of a chain, how to get there). */
+  function spotLink(pl) {
+    if (!pl || pl.kind !== 'spot' || !isFinite(pl.lat) || !isFinite(pl.lng)) return '';
+    var url = 'https://www.google.com/maps/search/?api=1&query=' + Number(pl.lat).toFixed(4) + ',' + Number(pl.lng).toFixed(4);
+    return html` <a class="link" href="${url}" target="_blank" rel="noopener noreferrer">${C.spot.onMap}</a>`;
+  }
+
   App.register('Event', {
     title: '狗聚',
     tab: 'events',
@@ -15149,8 +15393,8 @@ try {
   function lineBlock() {
     if (!App.me.lineOn()) return '';
     var L = C.login, p = D.me(), name = (p && p.dog && p.dog.name) || '狗狗';
-    if (App.me.lineLinked()) return html`<p class="fm-line-on">${ui.icon('checkSmall', { size: 18 })}<span><strong>${L.linked}</strong>・${L.linkedBody.replace('{dog}', name)}</span></p>`;
-    return html`<div class="fm-line">${ui.secondaryBtn(L.linkTitle, { act: 'linkLine', block: false })}<p class="note">${L.linkBody.replace('{dog}', name)}</p></div>`;
+    if (App.me.lineLinked()) return html`<p class="fm-line-on">${ui.icon('checkSmall', { size: 18 })}<span><strong>${L.linked}</strong>・${L.linkedBody.split('{dog}').join(name)}</span></p>`;
+    return html`<div class="fm-line">${ui.secondaryBtn(L.linkTitle, { act: 'linkLine', block: false })}<p class="note">${L.linkBody.split('{dog}').join(name)}</p></div>`;
   }
   function inviteCard(ctx) {
     if (!recoveryOn()) return '';
@@ -17360,9 +17604,9 @@ try {
     var H = C.home, a = avail(ev), sel = picked(ctx, ev), r = D.roster(ev);
     var left = ev.approval ? sel.length : r.spotsLeft, wait = sel.slice(Math.max(0, left));
     return html`<div class="px mt-20">
-        ${a.length > 1 ? ui.dogPicker({ dogs: a, selected: sel }) : html`<p class="h3">${H.joinOne.replace('{dog}', D.dogName(a[0]))}</p>`}
+        ${a.length > 1 ? ui.dogPicker({ dogs: a, selected: sel }) : html`<p class="h3">${H.joinOne.split('{dog}').join(D.dogName(a[0]))}</p>`}
         <p class="note mt-8">${H.seatNote}</p>
-        ${wait.length ? html`<p class="note mt-4" role="status">${H.seatWait.replace('{dog}', wait.map(D.dogName).join('、'))}</p>` : ''}
+        ${wait.length ? html`<p class="note mt-4" role="status">${H.seatWait.split('{dog}').join(wait.map(D.dogName).join('、'))}</p>` : ''}
       </div>`;
   }
   function validCond(c) { return C.conditions.some(function (x) { return x.id === c; }); }
@@ -18554,14 +18798,14 @@ try {
           var park = c.kind !== 'walk' && c.parkId ? C.park(c.parkId) : null;
           var where = c.kind === 'walk' ? '散步中' : park ? '在' + park.name : '在附近';
           return ui.listRow({ lead: ui.dogAvatar(D.person(c.id) || { dog: {} }, { size: 36, label: false }), title: D.dogName(c.id), sub: where + '・' + ui.fmt.time(c.until) + ' 自動消失',
-            right: ui.textBtn(H.goHome.replace('{dog}', D.dogName(c.id)), { act: 'goHome', data: { id: c.id } }) });
+            right: ui.textBtn(H.goHome.split('{dog}').join(D.dogName(c.id)), { act: 'goHome', data: { id: c.id } }) });
         })}</ul>
           <div class="sheet-actions">${ui.quietBtn('改在公園打卡', { act: 'park' })}${ui.primaryBtn(H.allLeft, { act: 'allOut' })}</div>`;
       },
       actions: {
         goHome: function (s, d) {
           return D.checkOut(d.id).then(function () {
-            ui.toast(H.wentHome.replace('{dog}', D.dogName(d.id)));
+            ui.toast(H.wentHome.split('{dog}').join(D.dogName(d.id)));
             s.state.gone.push(d.id);
             if (s.state.gone.length >= list.length) s.close(); else s.update();
           });
@@ -18677,6 +18921,7 @@ try {
     var first = App.parkPick.ordered()[0];
     ui.sheet({
       title: '我在公園',
+      autofocus: false, // no keyboard over the parks on open (審查 2026-10-29)
       state: { park: (parkId && C.park(parkId) && parkId) || (pres0.mine && pres0.mine.parkId && C.park(pres0.mine.parkId) && pres0.mine.parkId) || (first && first.park.id) || 'daan', dogs: D.myDogs().slice() },
       render: function (s) {
         var pres = D.presence(ctx.state.checkins || []);
@@ -18686,7 +18931,7 @@ try {
         return html`
           <p class="sub">打卡只顯示哪個公園，${hours} 小時後自動消失。${C.parksNote}</p>
           ${multi ? html`${ui.dogPicker({ dogs: D.myDogs(), selected: s.state.dogs })}<p class="note mt-4">${C.home.bringNote}</p>` : ''}
-          ${App.parkPick.rows({ selected: s.state.park, act: 'pick', sub: function (pk) {
+          ${App.parkPick.rows({ q: s.state.ppq, sheet: s, selected: s.state.park, act: 'pick', sub: function (pk) {
             var n = (pres.byPark[pk.id] || []).length;
             return (n ? '現在 ' + n + ' 隻' : '現在沒有狗') + (home === pk.id ? '・家附近，只顯示「在附近」' : '');
           } })}
@@ -18694,7 +18939,7 @@ try {
           <div class="sheet-actions">${pres.mine && !multi ? ui.quietBtn('離開公園', { act: 'out' }) : ''}${ui.primaryBtn(multi ? C.home.checkinCta.replace('{n}', s.state.dogs.length) : pres.mine ? '改到這裡' : '打卡', { act: 'go' })}</div>`;
       },
       actions: {
-        pick: function (s, d) { if (C.park(d.park)) { s.state.park = d.park; s.update(); } },
+        pick: function (s, d) { var pk = App.parkPick.resolve(d.park); if (pk) { s.state.park = pk.id; s.update(); } },
         pickDog: function (s, d) { toggle(s.state.dogs, d.id); s.update(); },
         go: function (s) {
           var park = C.park(s.state.park);
@@ -19236,7 +19481,7 @@ try {
   function familyDelete() {
     var H = C.home, dogs = D.myDogs(), dog = App.me.actorId;
     var one = dogs.length > 1
-      ? html`<p class="note">${H.deleteDogBody.replace('{dog}', D.dogName(dog))}</p>
+      ? html`<p class="note">${H.deleteDogBody.split('{dog}').join(D.dogName(dog))}</p>
         <button type="button" class="btn btn-warn block"${ui.act('deleteDog')}>${ui.icon('warning', { size: 20 })}${H.deleteDog}</button>`
       : html`<p class="note">${H.lastDog}</p>`;
     return html`${ui.dogSwitch({ dogs: dogs, current: dog, act: 'dog' })}
@@ -19425,12 +19670,12 @@ try {
         if (App.me.isPersona) { ui.toast(C.deleteMine.persona); return; }
         var H = C.home, dog = App.me.actorId, name = D.dogName(dog);
         if (D.myDogs().length < 2) { ui.toast(H.lastDog); return; }
-        return ui.confirm({ title: H.deleteDog + '？', body: H.deleteDogBody.replace('{dog}', name), ok: C.deleteMine.ok, danger: true }).then(function (yes) {
+        return ui.confirm({ title: H.deleteDog + '？', body: H.deleteDogBody.split('{dog}').join(name), ok: C.deleteMine.ok, danger: true }).then(function (yes) {
           if (!yes || ctx.dead) return;
           deletingDog = true;
           ctx.set({ deleting: true });
           // the screen opens again as the next dog when the card goes; deletingDog keeps 刪除中 on it until the end
-          return D.deleteDog(dog).then(function () { ui.toast(H.dogDeleted.replace('{dog}', name)); }).then(function () {
+          return D.deleteDog(dog).then(function () { ui.toast(H.dogDeleted.split('{dog}').join(name)); }).then(function () {
             deletingDog = false;
             if (!ctx.dead) ctx.set({ deleting: false }); else App.router.refresh();
           }, function (e) {
@@ -20129,7 +20374,7 @@ try {
           return D.addDog({ dog: { name: name, breed: s.breed || '', size: SIZES.indexOf(s.size) !== -1 ? s.size : null } }).then(function (id) {
             if (ctx.dead) return;
             ctx.state.saving = false;
-            ui.toast(C.home.added.replace('{dog}', name));
+            ui.toast(C.home.added.split('{dog}').join(name));
             App.go('Profile', {}, { root: true });
             // switch once this button is no longer busy (setDog waits for running saves)
             setTimeout(function () { App.me.setDog(id); }, 0);
@@ -20897,15 +21142,16 @@ try {
     var last = mine && Array.isArray(mine.walks) && mine.walks.length ? mine.walks[mine.walks.length - 1].parkId : null;
     ui.sheet({
       title: '在哪裡散步？',
+      autofocus: false, // no keyboard over the parks on open (審查 2026-10-29)
       state: { park: C.park(preset) ? preset : (C.park(last) ? last : (C.parks[0] && C.parks[0].id)) },
       render: function (s) {
         return html`
-          ${App.parkPick.rows({ selected: s.state.park, act: 'pick', sub: function (pk) { return pk.rule || pk.area || ''; } })}
+          ${App.parkPick.rows({ q: s.state.ppq, sheet: s, selected: s.state.park, act: 'pick', sub: function (pk) { return pk.rule || pk.area || ''; } })}
           <div class="mt-12">${ui.infoPanel({ icon: 'loop', title: C.texts.loopRule, body: C.texts.territoryNoGps })}</div>
           <div class="sheet-actions">${ui.quietBtn('取消', { act: 'close' })}${ui.primaryBtn('開始', { act: 'go' })}</div>`;
       },
       actions: {
-        pick: function (s, d) { if (C.park(d.park)) { s.state.park = d.park; s.update(); } },
+        pick: function (s, d) { var pk = App.parkPick.resolve(d.park); if (pk) { s.state.park = pk.id; s.update(); } },
         close: function (s) { s.close(); },
         go: function (s) {
           var pk = C.park(s.state.park);
