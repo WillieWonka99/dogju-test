@@ -933,6 +933,8 @@ button.row, a.row { cursor: pointer; }
 .map.map-real .map-slot { position: absolute; inset: 0; }
 .map.map-real .map-cta { z-index: 1000; }
 .map-locate { position: absolute; right: 12px; top: 12px; z-index: 1000; min-height: 44px; padding: 0 14px; border: none; border-radius: 22px; background: var(--white); color: var(--ink); font: inherit; font-size: 14px; box-shadow: 0 2px 6px rgba(0, 0, 0, .18); }
+/* 首頁地圖上面的「搜尋公園」: looks like a search field, opens the park search sheet (2026-10-29) */
+.map-search { width: 100%; min-height: 46px; padding: 0 16px; border: none; border-radius: 23px; background: var(--cream); color: var(--muted); font: inherit; font-size: 15px; text-align: left; display: flex; align-items: center; gap: 8px; }
 .map-you { position: absolute; display: flex; align-items: center; gap: 4px; pointer-events: none; }
 .map-you .me-dot { width: 12px; height: 12px; border-radius: 9px; border: 3px solid var(--white); background: var(--teal-2); box-sizing: content-box; }
 .map-you .me-lbl { padding: 0 8px; border-radius: 10px; background: var(--white); font-size: 12px; line-height: 18px; font-weight: 700; color: var(--teal-ink); }
@@ -1033,7 +1035,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-29.e8236ab2","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1666,7 +1668,7 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
     var faceSize = o.bg ? Math.round(size * 0.875) : size;
     var ring = o.ring === true || (o.ring !== false && App.data && App.data.spaceActive && App.data.spaceActive(dog));
     var rs = Math.round(size * 1.3), off = Math.round((rs - size) / 2);
-    var label = o.label === false ? null : (o.label || (dog.name ? dog.name + (ring ? '，今天需要空間' : '') : null));
+    var label = o.label === false ? null : (o.label || (dog.name ? dog.name + (ring ? '，請保持距離' : '') : null));
     var ph = o.photo !== false && App.data && App.data.photoOf ? App.data.photoOf(dog) : null;
     return html`<span class="avatar ${o.bg ? 'bg-' + o.bg : ''} ${o.cls || ''}" style="width:${size}px;height:${size}px"${attrs({ role: label ? 'img' : null, 'aria-label': label, 'aria-hidden': label ? null : 'true' })}>${App.dogs.face(dog, { size: faceSize })}${ph ? html`<img class="avatar-img ph" src="${size > 96 ? ph.url : ph.thumb}" alt="" width="${size}" height="${size}" loading="lazy" decoding="async">` : ''}${ring ? html`<svg class="ring" width="${rs}" height="${rs}" viewBox="0 0 68 68" style="left:-${off}px;top:-${off}px" aria-hidden="true">${raw(App.art.yellowRing[1])}</svg>` : ''}</span>`;
   }
@@ -2435,7 +2437,8 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
   };
   // 選公園的搜尋（core/parkpick.js；Willie 2026-10-29：「這些地點太少了」）：全台灣有名字的公園都找得到
   var PARK_SEARCH = { label: '搜尋公園', placeholder: '搜尋公園（例如：河濱、青年、大安）', none: '找不到「{q}」，換個字試試，或在地圖上點公園。',
-    selected: '已選的公園', loading: '公園清單載入中…', failed: '公園清單載入不了，可以在地圖上點公園。' };
+    selected: '已選的公園', loading: '公園清單載入中…', failed: '公園清單載入不了，可以在地圖上點公園。',
+    fromMe: '離你 ', hereMe: '就在你附近' };
   var MAP_AREA = '台北市'; // 集章頁標題旁的「台北市試辦（範例）」（地圖本身是全台灣）
   PARKS.forEach(function (p) { p.legacy = true; });
 
@@ -2586,7 +2589,7 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
     newFriend: '先把狗叫回身邊',
     breakVibrate: '中場休息時手機會輕震一下（iPhone 不會震，看畫面）',
     breakNow: '該中場休息了：喊一聲，把狗叫回來幾秒',
-    yellowLegend: '黃圈＝今天需要空間，先問再靠近',
+    yellowLegend: '黃圈＝請保持距離，先問再靠近',
     yellowMeaning: '黃色＝請先問、給空間 不代表兇',
     yellowFine: '不用寫原因・別人不能幫你開・不代替牽繩和訓練',
     yellowPro: '有行為問題，還是建議找獸醫和專業訓練師。',
@@ -2614,10 +2617,11 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
     homeRoute: '家附近的路線不會畫出來',
     // Join_Link footer. There is no login: the visitor is remembered by this phone's browser.
     joinNoApp: '在 LINE 裡打開・不用下載 App、不用註冊',
-    aggressiveShort: '法定攻擊性犬種只會看到牽繩團，並提醒戴口罩、短牽繩、成年人陪同。',
+    // 不寫「攻擊性」（Willie 的朋友 2026-10-29：這樣的飼主會不開心）：一律說「出門有特別規定的犬種」，只寫法律規定
+    aggressiveShort: '出門有特別規定的犬種只會看到牽繩團，並提醒戴口罩、短牽繩、成年人陪同。',
     aggressiveRemind: '記得戴口罩、短牽繩、成年人陪同',
-    aggressiveNotLeash: '這團不是牽繩團，法定攻擊性犬種不能報名',
-    aggressiveHostOnlyLeash: '法定攻擊性犬種只能開牽繩團',
+    aggressiveNotLeash: '這團不是牽繩團，出門有特別規定的犬種不能報名',
+    aggressiveHostOnlyLeash: '出門有特別規定的犬種只能開牽繩團',
     typhoonPaused: '颱風警報，這場自動暫停',
     typhoonWeekPaused: '颱風警報，這週暫停',
     territoryRule: '這週（從週一算）在這裡繞最多圈的狗，這塊就是牠的地盤；前兩名差 1 圈以內就是「搶地中」。',
@@ -2705,7 +2709,9 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
   // Legally listed aggressive breeds (2_狗聚App功能建議.md, 動保法 [41][44]) — only what the docs say.
   var AGGRESSIVE = ['比特犬', '日本土佐犬', '紐波利頓犬', '阿根廷杜告犬', '巴西菲勒犬', '獒犬類'];
   var AGGRESSIVE_NOTE = '以及曾被政府列管的狗';
-  var AGGRESSIVE_RULE = '具攻擊性的狗要有成年人陪同，並且使用 1.5 公尺以下的牽繩加透氣口罩，或改用金屬籠子，違者罰 3 萬到 15 萬元。';
+  var AGGRESSIVE_RULE = '依動物保護法，出門有特別規定的犬種在公共場所要由成年人陪同，使用 1.5 公尺以下的牽繩加透氣口罩（或改用金屬籠子），違者罰 3 萬到 15 萬元。';
+  // 選品種時這一組的標題和說明（Willie 2026-10-29 選的說法）
+  var RULE_BREEDS = { title: '出門有特別規定的犬種', note: '依動物保護法，這些犬種在公共場所要戴口罩、短牽繩，並由成年人陪同。' };
   var BREEDS = [
     { name: '米克斯', size: 'M', look: 'mix' },
     { name: '臘腸', size: 'S', look: 'dachshund' },
@@ -2735,13 +2741,14 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
   var TAG_GROUPS = [
     { title: '怎麼玩', tags: ['愛追球', '護玩具', '愛拔河', '愛追逐', '愛摔角', '愛玩水', '愛聞聞', '體力好'] },
     { title: '交朋友', tags: ['慢熟', '親小孩', '自來熟', '愛大狗', '愛小狗', '黏人'] },
-    { title: '要注意', tags: ['怕大狗', '怕小孩', '要空間', '護食', '怕吵', '會暴衝', '怕被摸', '學社交'], showFirst: true }
+    // 怕狗狗：大小都怕（Willie 的朋友 2026-10-29：「有些狗狗就是怕狗，小狗也怕」）
+    { title: '要注意', tags: ['怕大狗', '怕狗狗', '怕小孩', '要空間', '護食', '怕吵', '會暴衝', '怕被摸', '學社交'], showFirst: true }
   ];
   var TAGS = [].concat.apply([], TAG_GROUPS.map(function (g) { return g.tags; }));
   // 改短的舊名字：已經選過的狗，看到和存的都換成新名字（左邊是舊的、右邊是新的）
   var TAG_RENAMES = { '會護玩具': '護玩具', 'OK 小孩': '親小孩', '需要空間': '要空間' };
-  // 有這些標籤的狗，「今天需要空間」頁會建議打開黃圈（要跟上面的字一樣）
-  var YELLOW_SUGGEST_TAGS = ['慢熟', '怕大狗', '怕吵', '怕被摸', '學社交'];
+  // 有這些標籤的狗，「請保持距離」頁會建議打開黃圈（要跟上面的字一樣）
+  var YELLOW_SUGGEST_TAGS = ['慢熟', '怕大狗', '怕狗狗', '怕吵', '怕被摸', '學社交'];
 
   // =====================================================================================================
   // 第一批新功能的文字：隱私說明、找回碼、回報問題、刪除我的資料、新版本
@@ -2752,7 +2759,7 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
     sections: [
       { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到；打開驅蟲徽章時，名片上會有驅蟲的到期日）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
       { title: '誰看得到', body: '用豆米特的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
-      { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位，位置只用來移動地圖，不會存起來。' },
+      { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位。位置只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。' },
       { title: '我出門遛狗', body: '按「我出門遛狗」才會用一次手機定位，不會一直追蹤。在公園裡就打卡在那座公園；在外面，別人只看到你大約在哪個 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。不存精確位置，也不送給任何人。家的位置只有你知道，存在你自己的資料裡。' },
       { title: '還是測試', body: '試辦版的保護還不完整：狗聚、聊天和協尋這些共用的資料，懂技術的人可能改得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
       { title: '通知（選用）', body: '在「我的」打開通知，手機會給豆米特一個推播地址，由 Google、Apple、Mozilla 或 Microsoft 的推播服務轉送。有人在你的狗聚聊天室說話、私訊你或邀請你時，手機會跳出狗聚名稱或狗狗名字，不會有訊息內容。關掉通知或刪除我的資料，這個地址就刪掉。' },
@@ -2795,7 +2802,7 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
     agree: '建立名片就表示同意',
     sections: [
       { title: '這是試辦版', body: '功能和規則可能會改，也可能暫停或結束，重要的改變會在 App 裡說。資料可能因為技術問題遺失，重要的東西請自己另外留一份。' },
-      { title: '你的狗你負責', body: '帶狗出門請遵守各縣市的規定（公共場所牽繩、清理便便、攻擊性犬種的規定），按時打疫苗，看好自己的狗。狗狗對別的狗或人造成的傷害和損失，依法由飼主負責（民法第 190 條）。' },
+      { title: '你的狗你負責', body: '帶狗出門請遵守各縣市的規定（公共場所牽繩、清理便便、特定犬種出門的規定），按時打疫苗，看好自己的狗。狗狗對別的狗或人造成的傷害和損失，依法由飼主負責（民法第 190 條）。' },
       { title: '狗聚是大家自己約的', body: '狗聚由飼主自己發起、自己參加。豆米特這個 App 不辦活動、不在現場，也不保證每個人、每隻狗的狀況。去之前看清楚規則，覺得不對就不要去，或提早離開。' },
       { title: '不可以做的事', body: '不可以買賣狗、徵求配種、打廣告、騷擾或威脅別人、冒用別人的身分、貼出別人的住址或電話，也不可以發違法或讓人不舒服的內容。' },
       { title: '檢舉和處理', body: '看到不對的內容或人，可以檢舉或封鎖。Willie 可能會把內容藏起來，或限制、停用帳號，不一定會先通知。' },
@@ -3355,7 +3362,7 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
     firstAid: FIRST_AID, texts: TEXTS, vet: VET, hotlines: HOTLINES,
     weekly: WEEKLY, themeDays: THEME_DAYS, prizes: PRIZES, stampsPerDraw: STAMPS_PER_DRAW, stampTexts: STAMP_TEXTS,
     reminderText: REMINDER_TEXT, reminderRules: REMINDER_RULES, heatLevels: HEAT_LEVELS, heatLabel: HEAT_LABEL,
-    dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, tagGroups: TAG_GROUPS, tagRenames: TAG_RENAMES, neuter: NEUTER, ie: IE, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, aggressiveShort: TEXTS.aggressiveShort },
+    dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, tagGroups: TAG_GROUPS, tagRenames: TAG_RENAMES, neuter: NEUTER, ie: IE, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, ruleBreeds: RULE_BREEDS, aggressiveShort: TEXTS.aggressiveShort },
     privacyNote: PRIVACY_NOTE, terms: TERMS, home: HOME, recovery: RECOVERY, shareCard: SHARE_CARD, login: LOGIN, push: PUSH, feedback: FEEDBACK, deleteMine: DELETE_MINE, updateBanner: UPDATE_BANNER, photo: PHOTO, firstRun: FIRST_RUN,
     freePlan: FREE_PLAN, health: HEALTH,
     map: MAP, parkStatus: PARK_STATUS,
@@ -3447,14 +3454,15 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
   function cellKey(y, x) { return Math.floor(y / CELL) + ':' + Math.floor(x / CELL); }
   /** Index a list document {areas, parks: [[id, name, areaIdx, dog, minlat, minlon, dlat, dlon, ring]]} (ints in 1e-5°). */
   function setLocal(doc) {
-    var rows = (doc && doc.parks) || [], areas = (doc && doc.areas) || [], grid = {};
+    var rows = (doc && doc.parks) || [], areas = (doc && doc.areas) || [], grid = {}, ids = {};
     rows.forEach(function (r, i) {
+      ids[r[0]] = i;
       var y0 = r[4] / 1e5, x0 = r[5] / 1e5, y1 = (r[4] + r[6]) / 1e5, x1 = (r[5] + r[7]) / 1e5;
       for (var cy = Math.floor(y0 / CELL); cy <= Math.floor(y1 / CELL); cy++) {
         for (var cx = Math.floor(x0 / CELL); cx <= Math.floor(x1 / CELL); cx++) (grid[cy + ':' + cx] = grid[cy + ':' + cx] || []).push(i);
       }
     });
-    api._local = { rows: rows, areas: areas, grid: grid, count: rows.length };
+    api._local = { rows: rows, areas: areas, grid: grid, ids: ids, count: rows.length };
     return api._local;
   }
   function ringOf(r) {
@@ -3469,6 +3477,30 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
       if ((yi > lat) !== (yj > lat) && lng < (xj - xi) * (lat - yi) / ((yj - yi) || 1e-12) + xi) inside = !inside;
     }
     return inside;
+  }
+  /** Metres from a point to the nearest side of a ring (flat earth: fine at a park's size). */
+  function ringM(lat, lng, ring) {
+    var ky = Math.PI / 180 * 6371000, kx = ky * Math.cos(lat * Math.PI / 180), best = Infinity;
+    for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      var ax = (ring[j][1] - lng) * kx, ay = (ring[j][0] - lat) * ky, dx = (ring[i][1] - ring[j][1]) * kx, dy = (ring[i][0] - ring[j][0]) * ky;
+      var l2 = dx * dx + dy * dy, t = l2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / l2)) : 0;
+      best = Math.min(best, Math.sqrt((ax + t * dx) * (ax + t * dx) + (ay + t * dy) * (ay + t * dy)));
+    }
+    return best;
+  }
+  /** Metres from a point to a listed park's outline — 0 inside it, as 我出門遛狗 decides (localAt) — or null when the
+      park is not in the list. A known park counts through its OpenStreetMap ids. For 「離你多遠」: inside a long river
+      park it is 就在你附近, not the 2 km to the middle of its box (審查 2026-10-29). */
+  function edgeM(pk, lat, lng) {
+    var L = api._local, best = null;
+    if (!L || !L.ids || !pk || !isFinite(lat) || !isFinite(lng)) return null;
+    [].concat(pk.osm || []).forEach(function (o) {
+      var i = L.ids[String(o).replace('/', '')], ring = i == null ? [] : ringOf(L.rows[i]);
+      if (ring.length < 3) return;
+      var d = inRing(lat, lng, ring) ? 0 : ringM(lat, lng, ring);
+      if (best == null || d < best) best = d;
+    });
+    return best;
   }
   /** The park at a point from the shipped list (dog park first, then the smallest), or null. */
   function localAt(lat, lng) {
@@ -3616,7 +3648,7 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
   }
 
   var api = App.osm = {
-    parkAt: parkAt, pick: pick, nameOf: nameOf, loadLocal: loadLocal, districtNear: districtNear, nearest: nearest, search: search, samePark: samePark,
+    parkAt: parkAt, pick: pick, nameOf: nameOf, loadLocal: loadLocal, districtNear: districtNear, nearest: nearest, search: search, samePark: samePark, edgeM: edgeM,
     lastError: null,
     _fetch: function (u, i) { return window.fetch(u, i); },
     _fetchLocal: function (u) { return window.fetch(u); },
@@ -3642,7 +3674,14 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
 
   /** OpenStreetMap's tile policy needs a Referer, but the page sends none (meta referrer no-referrer keeps health-card
       links private). Tiles alone send the site's origin only — never the path, query or hash. */
-  function tileOptions() { return { maxZoom: 19, attribution: C.map.attribution, referrerPolicy: 'origin' }; }
+  // detectRetina: phone screens get the next zoom's pictures at half size — sharp lines, smaller map text (Willie's
+  // friend 2026-10-29: 「地圖有點模糊」; OpenStreetMap has no sharp pictures with the same text size). Leaflet takes one
+  // zoom off a retina layer, so it is told 20 (→ 19, the map's own maximum) and never asks for more than OpenStreetMap's
+  // 19 (18 + the retina step); at the closest zoom a phone gets the zoom-19 pictures stretched, not a grey map (審查).
+  function tileOptions(retina) {
+    if (retina == null) retina = !!(window.L && L.Browser && L.Browser.retina);
+    return { maxZoom: 20, maxNativeZoom: retina ? 18 : 19, attribution: C.map.attribution, referrerPolicy: 'origin', detectRetina: true };
+  }
   function create() {
     var L = window.L;
     el = document.createElement('div');
@@ -3719,13 +3758,19 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
     Object.keys(walks).forEach(function (id) { if (!seen[id]) { map.removeLayer(walks[id].circle); map.removeLayer(walks[id].marker); delete walks[id]; } });
   }
   var lastFail = null; // why the last position() gave null: 'denied' (the phone said no) | 'failed' (too slow, no fix, no API)
-  /** The phone's position once, without moving the map: {lat, lng} or null. Never stored here. */
+  /** The phone's position once, without moving the map: {lat, lng} or null. Kept in this page only (api.lastPos, for
+      「離你多遠」), never stored or sent. */
   function position() {
     var geo = api._geo || (navigator && navigator.geolocation);
     return new Promise(function (resolve) {
       if (!geo) { lastFail = 'failed'; resolve(null); return; }
       try {
-        geo.getCurrentPosition(function (pos) { lastFail = null; resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }); },
+        geo.getCurrentPosition(function (pos) {
+          lastFail = null;
+          // kept in this page only, for 「離你多遠」 in the park lists (never stored or sent)
+          api.lastPos = { lat: pos.coords.latitude, lng: pos.coords.longitude, at: Date.now() };
+          resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        },
           function (e) { lastFail = e && e.code === 1 ? 'denied' : 'failed'; resolve(null); }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
       } catch (e) { lastFail = 'failed'; resolve(null); }
     });
@@ -3767,7 +3812,7 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
   function zoom() { return map ? map.getZoom() : C.map.zoom; }
 
   // _geo / _ua stand in for the phone's in tests; _helped = the 「打開位置權限」 sheet was shown this visit (tests reset it)
-  var api = App.map = { attach: attach, setLabels: setLabels, setWalks: setWalks, locate: locate, position: position, locationHelp: locationHelp, noPosition: noPosition, inView: inView, zoom: zoom, _geo: null, _ua: null, _helped: false, _tileOptions: tileOptions };
+  var api = App.map = { attach: attach, setLabels: setLabels, setWalks: setWalks, locate: locate, position: position, locationHelp: locationHelp, noPosition: noPosition, inView: inView, zoom: zoom, _geo: null, _ua: null, _helped: false, lastPos: null, _tileOptions: tileOptions };
   Object.defineProperty(api, '_leaflet', { get: function () { return map; } });
   api._walkCircles = function () { return Object.keys(walks).map(function (id) { return { id: id, r: walks[id].r }; }); };
 })(window.App = window.App || {});
@@ -3792,6 +3837,23 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
     var inV = [], rest = [];
     all.forEach(function (p) { var v = !!(App.map && App.map.inView(p)); (v ? inV : rest).push({ park: p, inView: v }); });
     return inV.concat(rest);
+  }
+  /** Where the phone said it is in the last 15 minutes (App.map.lastPos, this page only), or null. */
+  function here() {
+    var p = App.map && App.map.lastPos;
+    return p && Date.now() - p.at < 15 * 60000 ? p : null;
+  }
+  /** 「離你 650 公尺」 (Willie 2026-10-29: 看得出多近; no compass direction — 「東北 不用方位」). Only from where the
+      phone is — without its position, no distance at all (「若未取得定位權限，可以不顯示距離嗎？」). Measured to the
+      park's outline when the park list has it (App.osm.edgeM: inside a long river park it is 就在你附近 — 審查
+      2026-10-29), else to the park's point. */
+  function away(pk) {
+    var o = here(), P = C.parkSearch;
+    if (!o || !pk || !isFinite(pk.lat) || !isFinite(pk.lng)) return '';
+    var e = App.osm && App.osm.edgeM ? App.osm.edgeM(pk, o.lat, o.lng) : null;
+    var d = e == null ? App.data.distM(o, pk) : e, m = Math.round(d / 10) * 10;
+    if (d < 50) return P.hereMe;
+    return P.fromMe + (m < 1000 ? m + ' 公尺' : (d / 1000).toFixed(1) + ' 公里'); // 998 m is 1.0 公里, not 1000 公尺
   }
   /** Where 「附近」 is measured from: the map's centre (where the person is looking, or where they are). */
   function center() {
@@ -3858,18 +3920,18 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
         var on = o.selected === pk.id, sub = o.sub ? o.sub(pk) : (pk.area || '');
         return html`<button type="button" class="park-choice" data-act="${o.act || 'pick'}"${ui.data({ park: pk.id })}${ui.attrs({ 'aria-pressed': String(on) })}>
         <span class="row-icon">${ui.icon('parkPin', { size: 22 })}</span>
-        <span class="row-main"><span class="row-title">${pk.name}</span>${sub ? html`<span class="row-sub">${sub}</span>` : ''}</span>
+        <span class="row-main"><span class="row-title">${pk.name}</span>${sub ? html`<span class="row-sub">${sub}</span>` : ''}${away(pk) ? html`<span class="row-sub">${away(pk)}</span>` : ''}</span>
         ${on ? ui.icon('checkSmall', { size: 22, color: 'var(--teal-ink)' }) : ''}</button>`;
       })}`;
     })}</div>`;
   }
-  /** A sheet to choose a park (and optionally a shop). o: {title, current, includeShops, sub(park), onPick(park | shopPlace)} —
+  /** A sheet to choose a park (and optionally a shop). o: {title, current, includeShops, sub(park), focus (the cursor in the search box), onPick(park | shopPlace)} —
       onPick may return a promise; the sheet closes when it resolves. */
   function open(o) {
     o = o || {};
     return ui.sheet({
       title: o.title || '選公園',
-      autofocus: false, // no keyboard over the list on open (審查 2026-10-29)
+      autofocus: o.focus === true, // no keyboard over the list on open (審查 2026-10-29) — but the home 搜尋公園 bar asks for it
       state: { sel: o.current || null },
       render: function (s) {
         var shops = o.includeShops ? C.places().filter(function (pl) { return pl.kind === 'shop'; }) : [];
@@ -3909,7 +3971,7 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
     </div>`;
   }
 
-  App.parkPick = { rows: rows, open: open, ordered: ordered, groups: groups, resolve: resolve, ensureList: ensureList, searchBox: searchBox, noneNote: noneNote, statusChips: statusChips };
+  App.parkPick = { rows: rows, open: open, ordered: ordered, groups: groups, resolve: resolve, ensureList: ensureList, searchBox: searchBox, noneNote: noneNote, away: away, statusChips: statusChips };
 })(window.App = window.App || {});
 
 ;
@@ -7260,7 +7322,7 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
   }
   function getProfile(id) { if (id && !ok(id)) return Promise.resolve(null); return S().doc('people/' + (id || actor())).get().then(docData); }
   function getChip() { return getPrivate().then(function (p) { return p.chip || ''; }); }
-  /** Yellow 「今天需要空間」. mode 'today' expires at local midnight automatically. */
+  /** Yellow 「請保持距離」. mode 'today' expires at local midnight automatically. */
   function setSpace(on, mode) {
     var who = actor();
     return S().doc('people/' + who).update({ dog: { space: { on: !!on, mode: mode === 'long' ? 'long' : 'today', since: now() } }, updatedAt: now() });
@@ -7612,8 +7674,8 @@ window.APP_BUILD = {"version":"2026-10-29.b8f5cd33","seedUrl":"seed-data.json"};
       var condition = own({ good: 1, cough: 1, diarrhea: 1, heat: 1 }, opts.condition) ? opts.condition : 'good';
       var status = condition !== 'good' ? 'rest' : (ev.approval && ev.hostId !== who ? 'pending' : 'going');
       var prev = ev.attendees && ev.attendees[who];
-      // 法定攻擊性犬種只能參加牽繩團 (4_安全設計.md) — enforced here too, not only in the UI
-      need(!(ev.type !== 'leash' && ev.hostId !== who && App.dogs.isAggressive(p.dog && p.dog.breed)),'這場不是牽繩團，法定攻擊性犬種只能參加牽繩團');
+      // 出門有特別規定的犬種只能參加牽繩團 (4_安全設計.md) — enforced here too, not only in the UI
+      need(!(ev.type !== 'leash' && ev.hostId !== who && App.dogs.isAggressive(p.dog && p.dog.breed)), '這場不是牽繩團，出門有特別規定的犬種只能參加牽繩團');
       need(!(prev && prev.status === 'declined'), '主揪這次婉拒了');
       var wasActive = prev && (prev.status === 'going' || prev.status === 'pending');
       var entry = {
@@ -13284,7 +13346,7 @@ try {
           var on = ctx.state.placeId === pl.id;
           return html`<button type="button" class="ce-place" data-act="pick"${ui.data({ id: pl.id })}${ui.attrs({ 'aria-pressed': String(on) })}>
             <span class="row-icon">${ui.icon(icon, { size: 22 })}</span>
-            <span class="row-main"><span class="row-title">${pl.name}${pl.example ? html`<span class="ex">（範例）</span>` : ''}</span>${sub ? html`<span class="row-sub">${sub}</span>` : ''}</span>
+            <span class="row-main"><span class="row-title">${pl.name}${pl.example ? html`<span class="ex">（範例）</span>` : ''}</span>${sub ? html`<span class="row-sub">${sub}</span>` : ''}${pl.at && App.parkPick.away(pl.at) ? html`<span class="row-sub">${App.parkPick.away(pl.at)}</span>` : ''}</span>
             ${on ? ui.icon('checkSmall', { size: 22, color: 'var(--teal-ink)' }) : ''}</button>`;
         }
         var q = String(s.state.ppq || '').trim();
@@ -13295,7 +13357,7 @@ try {
           ${!groups.length || !q ? App.parkPick.noneNote(q) : ''}
           ${groups.map(function (g) {
             return html`<p class="note mt-12">${g.title}</p><div class="mt-8" role="group"${ui.attrs({ 'aria-label': g.title })}>${g.parks.map(function (pk) {
-              return row({ id: pk.id, name: pk.name }, pk.rule || pk.area || '', 'parkPin');
+              return row({ id: pk.id, name: pk.name, at: pk }, pk.rule || pk.area || '', 'parkPin');
             })}</div>`;
           })}
           ${shops.length ? html`<div class="label mt-20">店家</div>
@@ -13845,7 +13907,7 @@ try {
     return html`${head}
       <section class="dm-card px" aria-labelledby="dm-name">
         <div style="display:flex;align-items:center;gap:16px">
-          <span class="dm-face">${ui.dogAvatar(p, { size: 72, label: (dog.name || '狗狗') + (space ? '，今天需要空間' : '') })}</span>
+          <span class="dm-face">${ui.dogAvatar(p, { size: 72, label: (dog.name || '狗狗') + (space ? '，請保持距離' : '') })}</span>
           <div class="grow" style="min-width:0;display:flex;flex-direction:column;gap:4px">
             <h2 class="dm-name" id="dm-name">${dog.name || '狗狗'}</h2>
             <div class="note">${dogMeta(ctx, id) || App.dogs.describe(dog)}</div>
@@ -14871,7 +14933,7 @@ try {
     var arrived = r.checkedIn.indexOf(a.id) !== -1;
     var sub = arrived ? '已到' : a.id === ev.hostId ? '主揪' : App.dogs.showTags(dog.tags)[0] || App.dogs.sizeLabel(dog.size) || '';
     var name = dog.name || '狗狗';
-    var label = name + (ring ? '，今天需要空間' : '') + (arrived ? '，已到' : '') + (a.id === ev.hostId ? '，主揪' : '');
+    var label = name + (ring ? '，請保持距離' : '') + (arrived ? '，已到' : '') + (a.id === ev.hostId ? '，主揪' : '');
     var inner = html`${ui.dogAvatar(p || { dog: {} }, { size: 48, label: false })}<span class="n">${name}</span><span class="t ${arrived ? 'on' : ''}">${sub}</span>`;
     if (a.id === App.me.actorId) return html`<li><div class="ev-mem" role="group"${ui.attrs({ 'aria-label': label + '（你）' })}>${inner}</div></li>`;
     return html`<li><button type="button" class="ev-mem"${ui.go('DM_Invite', { id: a.id })}${ui.attrs({ 'aria-label': label + '，看狗狗名片' })}>${inner}</button></li>`;
@@ -18692,6 +18754,7 @@ try {
     var walking = mine && mine.kind === 'walk';
     var cta = mine ? (walking ? '散步中・' + (mine.r > 100 ? (mine.area || '附近') : '這一帶') : minePark ? '我在' + shortPark(minePark.name) : '我在附近') : '🐾 我出門遛狗';
     return html`
+      <div class="px mt-8"><button type="button" class="map-search" data-act="findPark">🔍 ${C.parkSearch.label}</button></div>
       <section class="map map-real px mt-8" aria-label="地圖：點公園可以打卡、揪團，標籤是現在有狗的公園">
         <div class="map-slot"></div>
         <button type="button" class="map-locate" data-act="locate">📍 回到我這裡</button>
@@ -19002,6 +19065,13 @@ try {
     },
     actions: {
       checkin: function (ctx) { openCheckin(ctx); },
+      // 首頁地圖的「搜尋公園」 (Willie's friend 2026-10-29): the found park on the map, then its sheet
+      findPark: function (ctx) {
+        App.parkPick.open({ title: C.parkSearch.label, focus: true, onPick: function (pk) {
+          if (App.map._leaflet && isFinite(pk.lat) && isFinite(pk.lng)) App.map._leaflet.setView([pk.lat, pk.lng], 16, { animate: false });
+          setTimeout(function () { if (!ctx.dead) openPark(ctx, pk); }, 0);
+        } });
+      },
       walk: function (ctx) { return walkNow(ctx); },
       feedMore: function (ctx) { ctx.set({ feedAll: true }); },
       status: function (ctx) { openStatus(ctx); },
@@ -19755,7 +19825,7 @@ try {
 try {
 /* Profile（我的・狗狗檔案）— dog card (real photo, edit / share), badges, received stickers, followed dogs,
    狗狗健康卡 row (+ dot for clinic uploads waiting), 家人 (一個家: the family, 找回碼 and LINE live there now —
-   screens/Family.js), and links to 今天需要空間 / 日記 / 隱私 /
+   screens/Family.js), and links to 請保持距離 / 日記 / 隱私 /
    隱私說明 / 提醒 / 走失協尋 / 速查卡. 2026-10-27（Willie：重複的都拿掉）: 私訊 and my events live in their own
    tabs (訊息, 狗聚), so this screen no longer lists them; 狗語圖卡 has no entry. */
 (function (App) {
@@ -19916,7 +19986,7 @@ try {
       // the avatar is the photo button (camera badge); the drawn face shows when there is no photo
       var photoBtn = ui.photoInput({
         act: 'photo', cls: 'pf-photo',
-        content: html`${ui.dogAvatar(p, { size: 88, bg: 'white', label: false })}<span class="pf-cam" aria-hidden="true">${ui.icon('camera', { size: 16 })}</span><span class="sr-only">${(hasPhoto ? C.photo.change : C.photo.pick) + '：' + name + (spaceOn ? '（今天需要空間）' : '')}</span>`
+        content: html`${ui.dogAvatar(p, { size: 88, bg: 'white', label: false })}<span class="pf-cam" aria-hidden="true">${ui.icon('camera', { size: 16 })}</span><span class="sr-only">${(hasPhoto ? C.photo.change : C.photo.pick) + '：' + name + (spaceOn ? '（請保持距離）' : '')}</span>`
       });
 
       return html`
@@ -19955,7 +20025,7 @@ try {
           ${ui.listRow({ icon: 'hospital', iconSize: 20, title: C.health.entry, sub: healthInbox ? C.health.inbox.title + '（' + healthInbox + '）' : C.health.entrySub, go: 'Health_Card', right: healthInbox ? ui.dot({ label: C.health.inbox.title }) : '' })}
           ${ui.listRow({
             lead: html`<span class="pf-ring" aria-hidden="true">${ui.dogAvatar(p, { size: 36, ring: true, label: false })}</span>`,
-            title: '今天需要空間', sub: spaceSub, go: 'Yellow_Space',
+            title: '請保持距離', sub: spaceSub, go: 'Yellow_Space',
             right: spaceOn ? html`<span class="pf-on">開著</span>` : ''
           })}
           ${ui.listRow({ icon: 'photo', iconSize: 20, title: '狗狗日記', sub: '照片和小故事', go: 'Diary' })}
@@ -20017,7 +20087,7 @@ try {
 /* Profile_Create — 30 秒建立狗狗名片（first run）, 編輯名片（mode:'edit'）and 新增一隻狗（mode:'add', 一個家: only the
    name, the size and the breed; the rest is filled in later from the new dog's own card）.
    Photo = a real photo (resized + uploaded on save) or, as the fallback, a drawn look; name required; size, breed
-   (brachy → 怕熱體質, aggressive → law reminder), nickname; optional tags, heat switch, 今天需要空間, rabies date,
+   (brachy → 怕熱體質, aggressive → law reminder), nickname; optional tags, heat switch, 今天請保持距離, rabies date,
    chip number (private). First run: 「我有找回碼」 (換手機找回) and the 隱私說明 link. */
 (function (App) {
   'use strict';
@@ -20139,7 +20209,7 @@ try {
       </button>
       ${info && info.brachy ? html`<span class="field-note">短鼻犬，已幫你勾「怕熱體質」</span>` : ''}
     </div>
-    ${info && info.aggressive ? html`<div class="mt-12">${ui.warnPanel({ icon: 'muzzle', title: '這是法定攻擊性犬種', body: html`${dogs.aggressiveRule}<br>${dogs.aggressiveShort}` })}</div>` : ''}`;
+    ${info && info.aggressive ? html`<div class="mt-12">${ui.warnPanel({ icon: 'muzzle', title: C.dogs.ruleBreeds.title, body: html`${dogs.aggressiveRule}<br>${dogs.aggressiveShort}` })}</div>` : ''}`;
   }
 
   function moreSection(s, ctx) {
@@ -20175,8 +20245,8 @@ try {
           })}
           ${ui.listRow({
             lead: html`<span class="pc-switch-icon" aria-hidden="true">${ui.dogAvatar(previewDog(s), { size: 36, ring: true, label: false })}</span>`,
-            title: '今天需要空間', sub: '頭像會出現黃圈',
-            right: ui.switchCtl({ checked: !!s.space, act: 'space', label: '今天需要空間' }),
+            title: '今天請保持距離', sub: '開了以後頭像會出現黃圈，提醒別人今天不要靠太近（例如生病、剛結紮、在發情、或心情不好）',
+            right: ui.switchCtl({ checked: !!s.space, act: 'space', label: '今天請保持距離' }),
             cls: 'plain'
           })}
         </ul>
@@ -20198,9 +20268,9 @@ try {
         function chipFor(b) { return ui.chip(b.name, { pressed: s.breed === b.name, act: 'pick', data: { breed: b.name } }); }
         return html`<p class="sub">選了會幫你帶入體型；短鼻犬會自動勾「怕熱體質」。</p>
           <div class="chips mt-12" role="group" aria-label="品種">${normal.map(chipFor)}</div>
-          <h3 class="h3 mt-20">法定攻擊性犬種</h3>
-          <p class="note mt-4">${dogs.aggressiveBreeds.join('、')}，${dogs.aggressiveNote}。</p>
-          <div class="chips mt-8" role="group" aria-label="法定攻擊性犬種">${aggr.map(chipFor)}</div>
+          <h3 class="h3 mt-20">${C.dogs.ruleBreeds.title}</h3>
+          <p class="note mt-4">${C.dogs.ruleBreeds.note}</p>
+          <div class="chips mt-8" role="group"${ui.attrs({ 'aria-label': C.dogs.ruleBreeds.title })}>${aggr.map(chipFor)}</div>
           <div class="sheet-actions">${ui.quietBtn('不填品種', { act: 'clear' })}</div>`;
       },
       actions: {
@@ -20402,7 +20472,7 @@ try {
         return D.saveProfile(input).then(function () {
           if (s.space !== s.spaceOrig || (!hadProfile && s.space)) {
             return D.setSpace(!!s.space, s.spaceMode).catch(function (e) {
-              ui.reportError(e, '名片存好了，但「今天需要空間」沒有改到，請再試一次');
+              ui.reportError(e, '名片存好了，但「今天請保持距離」沒有改到，請再試一次');
             });
           }
         }).then(function () {
@@ -21499,7 +21569,7 @@ try {
 ;
 /* ---- screens/Yellow_Space.js ---- */
 try {
-/* Yellow_Space — 黃色「今天需要空間」: turn the yellow ring on/off (只限今天 / 長期), see what others see, what it means. */
+/* Yellow_Space — 黃色「請保持距離」 (was 今天需要空間 until 2026-10-29): turn the yellow ring on/off (只限今天 / 長期), see what others see, what it means. */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, C = App.content;
@@ -21539,7 +21609,7 @@ try {
   }
 
   App.register('Yellow_Space', {
-    title: '黃色：今天需要空間',
+    title: '黃色：請保持距離',
     tab: null,
 
     mount: function (ctx) {
@@ -21562,7 +21632,7 @@ try {
         : (on ? '只限今天：過了午夜會自動關掉。' : '打開後，過了午夜會自動關掉。');
 
       return html`${ui.topBar({ backLabel: '回狗狗檔案' })}
-        <h1 class="h1 px">黃色：今天需要空間</h1>
+        <h1 class="h1 px">黃色：請保持距離</h1>
 
         <div class="ys-preview px">
           <div class="ys-face"${ui.attrs({ role: 'img', 'aria-label': name + '的頭像' + (on ? '，外面有一圈黃色' : '，現在沒有黃圈') })}>${ui.dogAvatar(p, { size: 78, bg: 'white', ring: on, label: false })}</div>
@@ -21570,7 +21640,7 @@ try {
             <span class="small">別人看到的樣子</span>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <span class="ys-name">${name}</span>
-              ${on ? html`<span class="ys-need">${ui.art('yellowDot', { width: 16 })}需要空間</span>` : ''}
+              ${on ? html`<span class="ys-need">${ui.art('yellowDot', { width: 16 })}請保持距離</span>` : ''}
             </div>
             <span class="note">${breedSize(dog)}</span>
             ${on ? '' : html`<span class="small">現在沒有黃圈</span>`}
@@ -21580,7 +21650,7 @@ try {
         <section class="ys-toggle px">
           <div style="min-height:48px;display:flex;align-items:center;gap:12px">
             <div class="grow" style="min-width:0;display:flex;flex-direction:column;gap:2px">
-              <span class="ys-toggle-title" id="ys-toggle">今天需要空間</span>
+              <span class="ys-toggle-title" id="ys-toggle">請保持距離</span>
               <span class="note" id="ys-toggle-sub">打開後，頭像會出現黃圈</span>
             </div>
             ${ui.switchCtl({ checked: on, act: 'toggle', labelledby: 'ys-toggle', describedby: 'ys-toggle-sub' })}
