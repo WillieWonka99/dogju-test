@@ -1035,7 +1035,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-29.e8236ab2","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-30.03bfffc0","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2898,6 +2898,9 @@ window.APP_BUILD = {"version":"2026-10-29.e8236ab2","seedUrl":"seed-data.json"};
     joinOne: '報名：{dog}',
     joined: '報名好了：{dogs}',
     joinedWait: '{dogs}排候補，有人取消就自動補上',
+    // 帶誰去 leaves out a dog that cannot sign up, and says why (審查 2026-10-29: a 帶誰去 never stops halfway)
+    leashOnlyDogs: '這場不是牽繩團，{dogs}不能去（出門有特別規定的犬種只能參加牽繩團）',
+    declinedDogs: '主揪這次婉拒了{dogs}',
     leaveDog: '{dog}這次不來了',
     alsoBring: '也帶別隻狗去',
     // 訊息、私訊、名片
@@ -7728,14 +7731,31 @@ window.APP_BUILD = {"version":"2026-10-29.e8236ab2","seedUrl":"seed-data.json"};
       });
     });
   }
+  /** Why one of my dogs cannot sign up for this meetup — what joinEvent refuses dog by dog: 'leash' (出門有特別規定的
+      犬種 and not a 牽繩團), 'declined' (the host said no to it this time) or ''. */
+  function joinProblem(ev, id) {
+    var p = person(id), prev = ev && ev.attendees && ev.attendees[id];
+    if (ev && ev.type !== 'leash' && ev.hostId !== id && App.dogs.isAggressive(p && p.dog && p.dog.breed)) return 'leash';
+    if (prev && prev.status === 'declined') return 'declined';
+    return '';
+  }
   /** 一個家 「帶誰去」: sign several of my dogs up, in the order given (seats fill in that order; past capacity a dog
-      waits on the list). Resolves [{dog, status}]. */
+      waits on the list). Resolves [{dog, status}]. Every dog is checked before the first one is signed up, so it never
+      stops halfway with one dog on the list (審查 2026-10-29); the message names the dog. */
   function joinEventDogs(id, dogs, opts) {
-    var list = (dogs || []).map(function (d) { return dogOf(d); }), out = [];
+    var list = (dogs || []).map(function (d) { return dogOf(d); }), out = [], H = App.content.home;
     need(list.length, '先勾一隻狗');
-    return list.reduce(function (p, d) {
-      return p.then(function () { return joinEvent(id, Object.assign({}, opts || {}, { dog: d })); }).then(function (r) { out.push({ dog: d, status: r.status }); });
-    }, Promise.resolve()).then(function () { return out; });
+    return getEvent(id).then(function (ev) {
+      need(ev, '找不到這場狗聚');
+      list.forEach(function (d) {
+        var why = joinProblem(ev, d);
+        need(why !== 'leash', H.leashOnlyDogs.split('{dogs}').join(dogName(d)));
+        need(why !== 'declined', H.declinedDogs.split('{dogs}').join(dogName(d)));
+      });
+      return list.reduce(function (p, d) {
+        return p.then(function () { return joinEvent(id, Object.assign({}, opts || {}, { dog: d })); }).then(function (r) { out.push({ dog: d, status: r.status }); });
+      }, Promise.resolve());
+    }).then(function () { return out; });
   }
   /** Host approves or declines a pending dog. An approved dog queues by APPROVAL time, so approving never
       pushes an already-going dog onto the waitlist (if full, the approved dog waits). */
@@ -10804,7 +10824,7 @@ window.APP_BUILD = {"version":"2026-10-29.e8236ab2","seedUrl":"seed-data.json"};
     watchEvent: watchEvent, getEvent: getEvent, watchEvents: watchEvents, createEvent: createEvent, updateEvent: updateEvent,
     cancelEvent: cancelEvent, setEventStatus: setEventStatus, setAnnouncement: setAnnouncement,
     eventStatus: eventStatus, eventEnd: eventEnd, eventTags: eventTags, sizesLabel: sizesLabel, roster: roster, myStatus: myStatus, isHost: isHost,
-    joinEvent: joinEvent, joinEventDogs: joinEventDogs, leaveEvent: leaveEvent, approveAttendee: approveAttendee, checkInEvent: checkInEvent, arriveOpen: arriveOpen,
+    joinEvent: joinEvent, joinEventDogs: joinEventDogs, joinProblem: joinProblem, leaveEvent: leaveEvent, approveAttendee: approveAttendee, checkInEvent: checkInEvent, arriveOpen: arriveOpen,
     startLive: startLive, callBreak: callBreak, endEvent: endEvent, liveInfo: liveInfo,
     // chat
     watchMessages: watchMessages, sendMessage: sendMessage, maxMessages: MAX_MSGS, postSystem: postSystem, systemText: systemText, chatState: chatState,
@@ -15215,7 +15235,7 @@ try {
             buttons.push(ui.listRow({ lead: ui.dogAvatar(D.person(d) || { dog: {} }, { size: 36, label: false }), title: D.dogName(d), sub: statusWord(D.myStatus(ev, d)),
               right: ui.textBtn('這次不來了', { act: 'leaveDog', data: { id: d } }) }));
           });
-          if (D.myDogs().length > myDogsIn(ev).length) buttons.push(ui.listRow({ icon: 'plus', title: C.home.alsoBring, go: 'Join_Link', params: { id: ev.id } }));
+          if (D.myDogs().some(function (d) { return IN.indexOf(D.myStatus(ev, d)) === -1 && !D.joinProblem(ev, d); })) buttons.push(ui.listRow({ icon: 'plus', title: C.home.alsoBring, go: 'Join_Link', params: { id: ev.id } }));
         } else {
           if (mine === 'going' || mine === 'rest') buttons.push(ui.listRow({ icon: 'edit', title: mine === 'rest' ? '狀況好了，重新報名' : '改今天狀態或誰牽繩', go: 'Join_Link', params: { id: ev.id } }));
           if (mine !== 'none' && mine !== 'left' && mine !== 'declined') buttons.push(ui.listRow({ icon: 'alertCircle', iconKind: 'warn', title: mine === 'pending' ? '取消報名' : '這次不來了', sub: mine === 'going' ? '名額會自動讓給候補的狗' : '', act: 'leave' }));
@@ -17657,16 +17677,25 @@ try {
   function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) { /* ignore: tips just show again */ } }
   function trim(v) { return String(v == null ? '' : v).trim(); }
-  // 一個家 「帶誰去？」: two or more dogs — sign up the ones not on the list yet
+  // 一個家 「帶誰去？」: two or more dogs — sign up the ones not on the list yet that may go (D.joinProblem: the checks
+  // D.joinEventDogs makes first, so a 帶誰去 never stops halfway — 審查 2026-10-29)
   function many() { return !App.me.isPersona && D.myDogs().length > 1; }
   function active(ev, d) { return ['going', 'waitlist', 'pending', 'rest'].indexOf(D.myStatus(ev, d)) !== -1; }
-  function avail(ev) { return many() && ev ? D.myDogs().filter(function (d) { return !active(ev, d); }) : []; }
+  function avail(ev) { return many() && ev ? D.myDogs().filter(function (d) { return !active(ev, d) && !D.joinProblem(ev, d); }) : []; }
+  /** My dogs not on the list that cannot go, for one reason ('leash' | 'declined'). */
+  function leftOut(ev, why) { return many() && ev ? D.myDogs().filter(function (d) { return !active(ev, d) && D.joinProblem(ev, d) === why; }) : []; }
+  function ruleBreed(d) { var q = D.person(d); return App.dogs.isAggressive(q && q.dog && q.dog.breed); }
   function picked(ctx, ev) { var a = avail(ev), sel = ctx.state.dogs || a; return a.filter(function (d) { return sel.indexOf(d) !== -1; }); }
   function bringBlock(ctx, ev) {
     var H = C.home, a = avail(ev), sel = picked(ctx, ev), r = D.roster(ev);
     var left = ev.approval ? sel.length : r.spotsLeft, wait = sel.slice(Math.max(0, left));
+    var why = [['leash', H.leashOnlyDogs], ['declined', H.declinedDogs]].map(function (x) {
+      var l = leftOut(ev, x[0]);
+      return l.length ? html`<p class="note mt-4">${x[1].split('{dogs}').join(l.map(D.dogName).join('、'))}</p>` : '';
+    });
     return html`<div class="px mt-20">
         ${a.length > 1 ? ui.dogPicker({ dogs: a, selected: sel }) : html`<p class="h3">${H.joinOne.split('{dog}').join(D.dogName(a[0]))}</p>`}
+        ${why}
         <p class="note mt-8">${H.seatNote}</p>
         ${wait.length ? html`<p class="note mt-4" role="status">${H.seatWait.split('{dog}').join(wait.map(D.dogName).join('、'))}</p>` : ''}
       </div>`;
@@ -17731,7 +17760,7 @@ try {
     return '';
   }
 
-  function notes(ev) {
+  function notes(ctx, ev) {
     var out = [];
     var mine = D.myStatus(ev), r = D.roster(ev), st = D.eventStatus(ev);
     if (st === 'paused') out.push(ui.warnPanel({ icon: 'typhoon', title: D.sim().typhoon ? C.texts.typhoonPaused : '主揪先暫停了這場', body: '一樣可以先報名，恢復後照常進行。' }));
@@ -17740,7 +17769,9 @@ try {
     if (sizes.length && sizes.length < 3 && dog.size && sizes.indexOf(dog.size) === -1 && mine === 'none') {
       out.push(ui.warnPanel({ icon: 'alertCircle', title: sizeTitle(sizes), body: (dog.name || '你家狗狗') + '是' + App.dogs.sizeLabel(dog.size) + '，想去的話先跟主揪說一聲。' }));
     }
-    if (App.dogs.isAggressive(dog.breed)) out.push(ui.warnPanel({ icon: 'muzzle', title: C.texts.aggressiveRemind, body: App.dogs.aggressiveRule }));
+    // the law reminder for each dog that goes (一個家: the ticked ones, not only the dog on this phone — 審查 2026-10-29)
+    var aggr = avail(ev).length ? picked(ctx, ev).some(ruleBreed) : App.dogs.isAggressive(dog.breed);
+    if (aggr) out.push(ui.warnPanel({ icon: 'muzzle', title: C.texts.aggressiveRemind, body: App.dogs.aggressiveRule }));
     if (mine === 'none' || mine === 'left') {
       if (ev.approval && ev.hostId !== App.me.actorId) out.push(ui.infoPanel({ icon: 'waitlist', title: '這團需主揪核准', body: '送出後，等主揪確認就會出現在名單上。' }));
       else if (r.full) out.push(ui.infoPanel({ icon: 'waitlist', title: '名額滿了，報名會先排候補', body: C.texts.waitlist }));
@@ -17922,7 +17953,7 @@ try {
       var status = statusPanel(ev);
       return html`${head}
         ${status ? html`<div class="px mt-16">${status}${ui.textBtn('看狗聚資訊', { go: 'Event', params: { id: ev.id }, icon: 'chevronRight', iconAfter: true })}</div>` : ''}
-        ${notes(ev)}
+        ${notes(ctx, ev)}
         <form data-act="join" class="jl-form" style="display:flex;flex-direction:column;flex:1" novalidate>
           ${form(ctx, ev)}
           <div class="px jl-foot">
