@@ -1033,7 +1033,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-29.94a41660","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-29.623f0fd8","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2946,7 +2946,7 @@ window.APP_BUILD = {"version":"2026-10-29.94a41660","seedUrl":"seed-data.json"};
     failed: '名片圖做不出來，可以先分享名片文字和連結。',
     scan: '掃描看名片',
     tagline: '約附近的狗一起散步',
-    footer: '豆米特的狗狗名片',
+    invite: '我是{dog}，想認識你家的狗！在豆米特看我的名片、一起約散步', // 分享時跟著圖的文字（狗的口吻，Willie 2026-10-29），後面接「：」和連結
     // Dog_Card（收到連結的人）
     join: '加入豆米特',
     joinNote: '30 秒建立你家狗狗的名片，就能約附近的狗一起散步、玩。不用下載、不用註冊。',
@@ -4140,7 +4140,7 @@ window.APP_BUILD = {"version":"2026-10-29.94a41660","seedUrl":"seed-data.json"};
    make(person, link?) → Promise<Blob>: a 1080 x 1350 PNG drawn on this phone — the dog's photo (or its drawn face), name,
    breed・size, personality (要注意 first), owner, a QR code of the link (when there is one: a picture shared without its
    text still opens the card) and the 豆米特 bar. Nothing is uploaded. layout(person, link) → what goes on it.
-   text(person, id) → the 名片 lines + the link; link(id) → the address that opens Dog_Card (null where the page cannot
+   text(person, id) → the dog's hello + the link; link(id) → the address that opens Dog_Card (null where the page cannot
    know its own address: the claude.ai viewer). open(person, id): the sheet with the picture, 分享 and 複製連結 — 分享
    works without the picture too (text + link), so a slow photo never blocks it. */
 (function (App) {
@@ -4164,17 +4164,14 @@ window.APP_BUILD = {"version":"2026-10-29.94a41660","seedUrl":"seed-data.json"};
 
   /** The personality tags in the order the card shows them: 要注意 first, so a warning is never the one left out. */
   function tagsOf(dog) { return App.dogs.showTags(dog.tags); }
-  /** The 名片 lines: 「豆花｜小型犬・米克斯」, 個性, 主人, 豆米特的狗狗名片. */
-  function lines(p) {
-    var dog = (p && p.dog) || {}, d = App.dogs.describe(dog), out = [String(dog.name || '') + (d ? '｜' + d : '')];
-    var tags = tagsOf(dog);
-    if (tags.length) out.push('個性：' + tags.join('、'));
-    if (p && p.nickname) out.push('主人：' + p.nickname);
-    out.push(C.shareCard.footer);
-    return out;
-  }
   function link(id) { return id ? App.shareUrl('Dog_Card', { id: id }, { frameOk: api._frameOk }) : null; }
-  function text(p, id) { var u = link(id); return lines(p).join('\n') + (u ? '\n' + u : ''); }
+  /** The words that go with the picture: the dog says hello and invites (Willie 2026-10-29: the name, breed, personality
+      and owner are on the picture already — 「有點多餘」), then the link. */
+  function text(p, id) {
+    var u = link(id), name = String(((p && p.dog) || {}).name || '狗狗');
+    var say = C.shareCard.invite.replace('{dog}', /^[A-Za-z0-9]/.test(name) ? ' ' + name : name); // 「我是 Dog」、「我是豆豆」
+    return say + (u ? '：\n' + u : '。');
+  }
 
   /** What goes on the picture: the tags that fit on one row (the QR code takes the right side when there is a link). */
   function layout(p, url) {
@@ -4208,10 +4205,20 @@ window.APP_BUILD = {"version":"2026-10-29.94a41660","seedUrl":"seed-data.json"};
     g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
     g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
   }
-  /** Fill the box with the photo, cropped like CSS object-fit: cover. */
-  function cover(g, img, x, y, w, h) {
-    var s = Math.max(w / img.naturalWidth, h / img.naturalHeight), dw = img.naturalWidth * s, dh = img.naturalHeight * s;
-    g.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+  /** The whole photo inside the photo box (960 x 760), never cut (Willie 2026-10-29: 「照片的頭被切掉了」): {w, h}. */
+  function photoRect(iw, ih) { var s = Math.min(960 / iw, 760 / ih); return { w: iw * s, h: ih * s }; }
+  /** The photo whole, on a soft copy of itself: shrunk to 24 px and stretched back (a blur that works on every phone —
+      canvas filters do not), with a light veil so the photo stands out. */
+  function drawPhoto(g, img, x, y, w, h) {
+    var t = document.createElement('canvas'), tw = 24, th = Math.max(1, Math.round(24 * h / w)), tg = t.getContext('2d');
+    t.width = tw; t.height = th;
+    var s = Math.max(tw / img.naturalWidth, th / img.naturalHeight);
+    tg.drawImage(img, (tw - img.naturalWidth * s) / 2, (th - img.naturalHeight * s) / 2, img.naturalWidth * s, img.naturalHeight * s);
+    g.imageSmoothingEnabled = true;
+    g.drawImage(t, x, y, w, h);
+    g.fillStyle = 'rgba(255, 250, 243, 0.35)'; g.fillRect(x, y, w, h);
+    var r = photoRect(img.naturalWidth, img.naturalHeight);
+    g.drawImage(img, x + (w - r.w) / 2, y + (h - r.h) / 2, r.w, r.h);
   }
   /** The largest font size (≤ px) that fits the text in maxW. */
   function fit(g, t, px, family, maxW) {
@@ -4223,7 +4230,7 @@ window.APP_BUILD = {"version":"2026-10-29.94a41660","seedUrl":"seed-data.json"};
     g.fillStyle = COL.page; g.fillRect(0, 0, W, H);
     g.textBaseline = 'alphabetic';
     g.save(); box(g, 60, 60, 960, 760, 48); g.clip();
-    if (photo) cover(g, photo, 60, 60, 960, 760);
+    if (photo) drawPhoto(g, photo, 60, 60, 960, 760);
     else { g.fillStyle = COL.tealTint; g.fillRect(60, 60, 960, 760); if (face) g.drawImage(face, 260, 160, 560, 560); }
     g.restore();
     fit(g, L.name, 96, HEAD, L.right - 80); g.fillStyle = COL.ink; g.fillText(L.name, 80, 950);
@@ -4309,7 +4316,7 @@ window.APP_BUILD = {"version":"2026-10-29.94a41660","seedUrl":"seed-data.json"};
 
   // _frameOk: the tests run the app in a frame, where sharing and links are normally off; _photoMs: how long the photo
   // may take before the card uses the drawn face
-  var api = App.shareCard = { make: make, layout: layout, text: text, link: link, open: open, _frameOk: false, _photoMs: 8000 };
+  var api = App.shareCard = { make: make, layout: layout, text: text, link: link, open: open, _photoRect: photoRect, _frameOk: false, _photoMs: 8000 };
 })(window.App);
 
 ;
@@ -14200,8 +14207,10 @@ try {
     if (document.getElementById('css-Dog_Card')) return;
     var s = document.createElement('style'); s.id = 'css-Dog_Card';
     s.textContent = [
-      '.dc-pic{margin:16px 16px 0;border-radius:24px;overflow:hidden;background:var(--teal-tint);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}',
-      '.dc-pic img{width:100%;height:100%;object-fit:cover;display:block}',
+      '.dc-pic{margin:16px 16px 0;border-radius:24px;overflow:hidden;background:var(--teal-tint);display:flex;align-items:center;justify-content:center}',
+      '.dc-pic.face{aspect-ratio:4/3}',
+      // the whole photo, never cut (Willie 2026-10-29: 「照片的頭被切掉了」)
+      '.dc-pic img{display:block;width:100%;height:auto;max-height:60vh;object-fit:contain}',
       '.dc-name{margin-top:16px;font-family:var(--font-head);font-size:32px;line-height:40px;color:var(--ink);overflow-wrap:anywhere}',
       '.dc-meta{margin-top:2px;font-size:16px;line-height:22px;color:var(--muted)}',
       '.dc-owner{margin-top:10px;font-size:15px;line-height:20px;color:var(--body)}',
@@ -14233,7 +14242,7 @@ try {
       }
       var ph = D.photoOf(p), tags = Array.isArray(dog.tags) ? dog.tags.filter(function (t) { return typeof t === 'string' && t; }) : [];
       return html`${ui.appHead('豆米特', { logo: true })}
-        <div class="dc-pic">${ph ? html`<img src="${ph.url}" alt="${dog.name || ''}" width="${ph.w || 1024}" height="${ph.h || 768}">` : App.dogs.face(dog, { size: 200 })}</div>
+        <div class="dc-pic${ph ? '' : ' face'}">${ph ? html`<img src="${ph.url}" alt="${dog.name || ''}" width="${ph.w || 1024}" height="${ph.h || 768}">` : App.dogs.face(dog, { size: 200 })}</div>
         <div class="px">
           <h2 class="dc-name">${dog.name || ''}</h2>
           <p class="dc-meta">${App.dogs.describe(dog)}</p>
