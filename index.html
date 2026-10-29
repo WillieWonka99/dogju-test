@@ -17,6 +17,14 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>豆米特 DogMeet</title>
 <meta name="description" content="豆米特 DogMeet 試辦版：約附近的狗一起散步、玩。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="豆米特 DogMeet">
+<meta property="og:title" content="豆米特 DogMeet">
+<meta property="og:description" content="約附近的狗一起散步、玩。不用下載 App、不用註冊。">
+<meta property="og:image" content="https://williewonka99.github.io/dogju-test/icons/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" media="print" onload="this.media='all'">
@@ -1025,7 +1033,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-29.d00ee669","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-29.94a41660","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2924,6 +2932,27 @@ window.APP_BUILD = {"version":"2026-10-29.d00ee669","seedUrl":"seed-data.json"};
     broken: '（照片載入不了）'
   };
   // 第一次打開（建立狗狗名片頁）最上面的說明
+  // 分享狗狗名片（core/sharecard.js、screens/Dog_Card.js；Willie 2026-10-29：「這個分享的太簡單了，看起來很假…讓得到的人
+  // 可以看到狗狗的照片」）。分享出去的是一張名片圖＋名片文字＋一個連結；連結打開 Dog_Card。
+  var SHARE_CARD = {
+    title: '分享狗狗名片',
+    alt: '{dog}的狗狗名片',
+    making: '名片做好中…',
+    share: '分享',
+    copy: '複製連結',
+    copied: '連結已複製，可以貼到 LINE',
+    copiedText: '名片已複製，可以貼到 LINE',
+    saveHint: '這裡不能直接分享圖片：長按圖片可以存起來，再傳到 LINE。',
+    failed: '名片圖做不出來，可以先分享名片文字和連結。',
+    scan: '掃描看名片',
+    tagline: '約附近的狗一起散步',
+    footer: '豆米特的狗狗名片',
+    // Dog_Card（收到連結的人）
+    join: '加入豆米特',
+    joinNote: '30 秒建立你家狗狗的名片，就能約附近的狗一起散步、玩。不用下載、不用註冊。',
+    notFound: '找不到這張名片',
+    notFoundNote: '這張名片可能已經刪掉了。'
+  };
   var FIRST_RUN = {
     lead: '豆米特 DogMeet（試辦版）：約附近的狗一起散步、玩。不用註冊。'
   };
@@ -3298,7 +3327,7 @@ window.APP_BUILD = {"version":"2026-10-29.d00ee669","seedUrl":"seed-data.json"};
     weekly: WEEKLY, themeDays: THEME_DAYS, prizes: PRIZES, stampsPerDraw: STAMPS_PER_DRAW, stampTexts: STAMP_TEXTS,
     reminderText: REMINDER_TEXT, reminderRules: REMINDER_RULES, heatLevels: HEAT_LEVELS, heatLabel: HEAT_LABEL,
     dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, tagGroups: TAG_GROUPS, tagRenames: TAG_RENAMES, neuter: NEUTER, ie: IE, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, aggressiveShort: TEXTS.aggressiveShort },
-    privacyNote: PRIVACY_NOTE, terms: TERMS, home: HOME, recovery: RECOVERY, login: LOGIN, push: PUSH, feedback: FEEDBACK, deleteMine: DELETE_MINE, updateBanner: UPDATE_BANNER, photo: PHOTO, firstRun: FIRST_RUN,
+    privacyNote: PRIVACY_NOTE, terms: TERMS, home: HOME, recovery: RECOVERY, shareCard: SHARE_CARD, login: LOGIN, push: PUSH, feedback: FEEDBACK, deleteMine: DELETE_MINE, updateBanner: UPDATE_BANNER, photo: PHOTO, firstRun: FIRST_RUN,
     freePlan: FREE_PLAN, health: HEALTH,
     map: MAP, parkStatus: PARK_STATUS,
     /** A park by id: the three legacy parks, then the shared registry (parks/<id>, installed by core/data.js). null = unknown. */
@@ -4103,6 +4132,185 @@ window.APP_BUILD = {"version":"2026-10-29.d00ee669","seedUrl":"seed-data.json"};
     describe: function (dog) { if (!dog) return ''; return [has(SIZES, dog.size) ? SIZES[dog.size] : '', typeof dog.breed === 'string' ? dog.breed : ''].filter(Boolean).join('・'); }
   };
 })(window.App = window.App || {});
+
+;
+/* ---- core/sharecard.js ---- */
+/* App.shareCard — 分享狗狗名片 (Willie 2026-10-29: 「這個分享的太簡單了，看起來很假，是否可以做個連結，讓得到的人可以
+   看到狗狗的照片，這樣讓他們更想加入豆米特」).
+   make(person, link?) → Promise<Blob>: a 1080 x 1350 PNG drawn on this phone — the dog's photo (or its drawn face), name,
+   breed・size, personality (要注意 first), owner, a QR code of the link (when there is one: a picture shared without its
+   text still opens the card) and the 豆米特 bar. Nothing is uploaded. layout(person, link) → what goes on it.
+   text(person, id) → the 名片 lines + the link; link(id) → the address that opens Dog_Card (null where the page cannot
+   know its own address: the claude.ai viewer). open(person, id): the sheet with the picture, 分享 and 複製連結 — 分享
+   works without the picture too (text + link), so a slow photo never blocks it. */
+(function (App) {
+  'use strict';
+  var ui = App.ui, html = ui.html, C = App.content;
+  var W = 1080, H = 1350, QR = { x: 820, y: 850, size: 200 };
+  var COL = { page: '#FFFAF3', ink: '#342824', body: '#3B3430', muted: '#6E5E52', teal2: '#4FAFBC', tealInk: '#1F6670', tealTint: '#E7F3F4', cream: '#F5EEE4', coral: '#E8775A' };
+  var HEAD = "Huninn, -apple-system, 'PingFang TC', 'Noto Sans CJK TC', sans-serif";
+  var BODY = "-apple-system, BlinkMacSystemFont, 'PingFang TC', 'Heiti TC', 'Noto Sans CJK TC', 'Microsoft JhengHei', sans-serif";
+
+  (function () {
+    if (document.getElementById('css-sharecard')) return;
+    var s = document.createElement('style'); s.id = 'css-sharecard';
+    // the picture stays short enough that 分享 shows under it on a 375 x 667 phone (審查 2026-10-29)
+    s.textContent = [
+      '.sc-pic{display:block;height:min(42vh,42dvh);width:auto;max-width:100%;aspect-ratio:1080/1350;margin:0 auto;border-radius:16px;background:var(--cream)}',
+      '.sc-wait{height:min(42vh,42dvh);aspect-ratio:1080/1350;max-width:100%;margin:0 auto;border-radius:16px;background:var(--cream);display:flex;align-items:center;justify-content:center;padding:12px;text-align:center;font-size:14px;color:var(--muted)}'
+    ].join('');
+    document.head.appendChild(s);
+  })();
+
+  /** The personality tags in the order the card shows them: 要注意 first, so a warning is never the one left out. */
+  function tagsOf(dog) { return App.dogs.showTags(dog.tags); }
+  /** The 名片 lines: 「豆花｜小型犬・米克斯」, 個性, 主人, 豆米特的狗狗名片. */
+  function lines(p) {
+    var dog = (p && p.dog) || {}, d = App.dogs.describe(dog), out = [String(dog.name || '') + (d ? '｜' + d : '')];
+    var tags = tagsOf(dog);
+    if (tags.length) out.push('個性：' + tags.join('、'));
+    if (p && p.nickname) out.push('主人：' + p.nickname);
+    out.push(C.shareCard.footer);
+    return out;
+  }
+  function link(id) { return id ? App.shareUrl('Dog_Card', { id: id }, { frameOk: api._frameOk }) : null; }
+  function text(p, id) { var u = link(id); return lines(p).join('\n') + (u ? '\n' + u : ''); }
+
+  /** What goes on the picture: the tags that fit on one row (the QR code takes the right side when there is a link). */
+  function layout(p, url) {
+    var dog = (p && p.dog) || {}, right = url ? QR.x - 40 : 1000, g = document.createElement('canvas').getContext('2d'), x = 80, tags = [];
+    g.font = 'bold 40px ' + BODY;
+    tagsOf(dog).forEach(function (t) {
+      var w = g.measureText(t).width + 56;
+      if (x + w > right) return;
+      tags.push(t); x += w + 16;
+    });
+    return { name: String(dog.name || ''), meta: App.dogs.describe(dog), tags: tags, owner: (p && p.nickname) || '', qr: url || null, right: right };
+  }
+
+  /** A picture, or null when it fails or takes longer than ms (a stalled photo must not hold the card). */
+  function loadImg(src, cors, ms) {
+    return new Promise(function (resolve) {
+      var img = new Image(), done = false;
+      function end(v) { if (!done) { done = true; resolve(v); } }
+      if (cors) img.crossOrigin = 'anonymous'; // the photo comes from the storage bucket: drawable only with CORS
+      img.onload = function () { end(img.naturalWidth ? img : null); };
+      img.onerror = function () { end(null); };
+      if (ms) setTimeout(function () { end(null); }, ms);
+      img.src = src;
+    });
+  }
+  /** SafeHtml <svg> (no xmlns: inline in the page) → a picture the canvas can draw. */
+  function svgImg(svg) {
+    return loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(String(svg).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ')), false, 0);
+  }
+  function box(g, x, y, w, h, r) {
+    g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+  }
+  /** Fill the box with the photo, cropped like CSS object-fit: cover. */
+  function cover(g, img, x, y, w, h) {
+    var s = Math.max(w / img.naturalWidth, h / img.naturalHeight), dw = img.naturalWidth * s, dh = img.naturalHeight * s;
+    g.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+  }
+  /** The largest font size (≤ px) that fits the text in maxW. */
+  function fit(g, t, px, family, maxW) {
+    for (; px > 24; px -= 4) { g.font = px + 'px ' + family; if (g.measureText(t).width <= maxW) return; }
+  }
+  function draw(L, photo, face, paw) {
+    var c = document.createElement('canvas'); c.width = W; c.height = H;
+    var g = c.getContext('2d');
+    g.fillStyle = COL.page; g.fillRect(0, 0, W, H);
+    g.textBaseline = 'alphabetic';
+    g.save(); box(g, 60, 60, 960, 760, 48); g.clip();
+    if (photo) cover(g, photo, 60, 60, 960, 760);
+    else { g.fillStyle = COL.tealTint; g.fillRect(60, 60, 960, 760); if (face) g.drawImage(face, 260, 160, 560, 560); }
+    g.restore();
+    fit(g, L.name, 96, HEAD, L.right - 80); g.fillStyle = COL.ink; g.fillText(L.name, 80, 950);
+    g.font = '44px ' + BODY; g.fillStyle = COL.muted; g.fillText(L.meta, 80, 1015);
+    var x = 80;
+    g.font = 'bold 40px ' + BODY;
+    L.tags.forEach(function (t) {
+      var w = g.measureText(t).width + 56;
+      g.fillStyle = COL.tealTint; box(g, x, 1050, w, 76, 38); g.fill();
+      g.fillStyle = COL.tealInk; g.fillText(t, x + 28, 1102);
+      x += w + 16;
+    });
+    if (L.owner) { g.font = '40px ' + BODY; g.fillStyle = COL.body; g.fillText('主人：' + L.owner, 80, 1190); }
+    if (L.qr) {
+      g.fillStyle = '#FFFFFF'; box(g, QR.x, QR.y, QR.size, QR.size, 20); g.fill();
+      ui.drawQr(g, L.qr, QR.x + 10, QR.y + 10, QR.size - 20);
+      g.font = '28px ' + BODY; g.fillStyle = COL.muted; g.textAlign = 'center'; g.fillText(C.shareCard.scan, QR.x + QR.size / 2, QR.y + QR.size + 40); g.textAlign = 'left';
+    }
+    g.fillStyle = COL.cream; box(g, 60, 1225, 960, 90, 45); g.fill();
+    if (paw) g.drawImage(paw, 96, 1246, 48, 48);
+    g.font = '48px ' + HEAD; g.fillStyle = COL.coral; g.fillText('豆米特 DogMeet', 160, 1288);
+    g.font = '34px ' + BODY; g.fillStyle = COL.muted; g.textAlign = 'right'; g.fillText(C.shareCard.tagline, 990, 1284); g.textAlign = 'left';
+    return c;
+  }
+  function toBlob(c) {
+    return new Promise(function (resolve, reject) {
+      try { c.toBlob(function (b) { if (b) resolve(b); else reject(new Error('toBlob gave nothing')); }, 'image/png'); } catch (e) { reject(e); }
+    });
+  }
+  function make(p, url) {
+    var L = layout(p, url), dog = (p && p.dog) || {}, ph = App.data.photoOf(p);
+    // the rounded heading font for the characters on the card (a bare load() fetches only its Latin part), if it comes
+    // within 3 s (a slow network must not hold the card)
+    var fonts = document.fonts && document.fonts.load ? Promise.race([
+      Promise.all([document.fonts.load('96px Huninn', L.name || '狗'), document.fonts.load('48px Huninn', '豆米特 DogMeet')]).catch(function () { return null; }),
+      new Promise(function (r) { setTimeout(r, 3000); })
+    ]) : Promise.resolve();
+    return Promise.all([fonts, ph && ph.url ? loadImg(ph.url, true, api._photoMs) : null, svgImg(App.dogs.face(dog, { size: 560 })), svgImg(ui.icon('paw', { size: 48, color: COL.teal2 }))]).then(function (r) {
+      // a photo served without CORS taints the canvas (toBlob throws): the drawn face instead
+      return toBlob(draw(L, r[1], r[2], r[3])).catch(function () { return toBlob(draw(L, null, r[2], r[3])); });
+    });
+  }
+
+  /** The share sheet can hand the picture itself to another app (iPhone Safari / Android Chrome; not LINE's browser). */
+  function canFiles(file) {
+    var n = window.navigator;
+    try { return !!(n.share && n.canShare && n.canShare({ files: [file] })); } catch (e) { return false; }
+  }
+  /** Called right from the 分享 tap, so the phone still counts it as the person's own tap. blob null: text + link only. */
+  function share(p, id, blob) {
+    var t = text(p, id), n = window.navigator, S = C.shareCard;
+    if (!(api._frameOk || window.top === window.self) || !n.share) return ui.copyText(t, S.copiedText);
+    var file = blob ? new File([blob], ((p.dog && p.dog.name) || '狗狗') + '的狗狗名片.png', { type: 'image/png' }) : null;
+    return n.share(file && canFiles(file) ? { files: [file], text: t } : { text: t }).catch(function (e) {
+      if (!e || e.name !== 'AbortError') return ui.copyText(t, S.copiedText);
+    });
+  }
+  function open(p, id) {
+    var S = C.shareCard, url = link(id), st = { blob: null, url: null, files: true, failed: false };
+    var s = ui.sheet({
+      title: S.title,
+      render: function () {
+        var pic = st.url ? html`<img class="sc-pic" src="${st.url}" alt="${S.alt.replace('{dog}', (p.dog && p.dog.name) || '')}" width="1080" height="1350">`
+          : html`<div class="sc-wait" role="status">${st.failed ? S.failed : S.making}</div>`;
+        return html`${pic}
+          ${st.url && !st.files ? html`<p class="note mt-8">${S.saveHint}</p>` : ''}
+          <div class="sheet-actions">${ui.quietBtn(S.copy, { act: 'copy' })}${ui.primaryBtn(S.share, { act: 'share', icon: 'share', iconSize: 20, disabled: !st.blob && !st.failed })}</div>`;
+      },
+      actions: {
+        share: function () { return share(p, id, st.blob); },
+        copy: function () { return url ? ui.copyText(url, S.copied) : ui.copyText(text(p, id), S.copiedText); }
+      },
+      onClose: function () { if (st.url) URL.revokeObjectURL(st.url); }
+    });
+    api.make(p, url).then(function (blob) {
+      if (s.closed) return;
+      st.blob = blob; st.url = URL.createObjectURL(blob);
+      st.files = canFiles(new File([blob], 'x.png', { type: 'image/png' })) && (api._frameOk || window.top === window.self);
+      s.update();
+    }, function (e) { console.warn('[shareCard] no picture, text + link only', e); if (!s.closed) { st.failed = true; s.update(); } });
+    return s;
+  }
+
+  // _frameOk: the tests run the app in a frame, where sharing and links are normally off; _photoMs: how long the photo
+  // may take before the card uses the drawn face
+  var api = App.shareCard = { make: make, layout: layout, text: text, link: link, open: open, _frameOk: false, _photoMs: 8000 };
+})(window.App);
 
 ;
 /* ---- core/store.js ---- */
@@ -11107,10 +11315,11 @@ window.APP_BUILD = {"version":"2026-10-29.d00ee669","seedUrl":"seed-data.json"};
     } catch (e) { /* sandboxed: ignore */ }
   }
   /** A link that opens screen `name` with `params` (e.g. Join_Link {id}) — or null when the page cannot know its own
-      address: inside the claude.ai viewer it runs in a sandboxed frame, so people share the artifact link instead. */
-  App.shareUrl = function (name, params) {
+      address: inside the claude.ai viewer it runs in a sandboxed frame, so people share the artifact link instead.
+      opts.frameOk: build it in a frame anyway (the tests run the app in frames; App.shareCard._frameOk). */
+  App.shareUrl = function (name, params, opts) {
     try {
-      if (window.top !== window.self) return null;
+      if (window.top !== window.self && !(opts && opts.frameOk)) return null;
       if (!/^https?:$/.test(location.protocol)) return null;
       // openExternalBrowser=1: tapped inside LINE, the link opens in Safari/Chrome instead of LINE's own browser,
       // so a friend stays the same person (LINE's browser keeps separate storage). Other apps ignore it.
@@ -13976,6 +14185,72 @@ try {
 })(window.App);
 
 } catch (e) { console.error("[build] screens/Diary_Post.js failed to load", e); }
+;
+/* ---- screens/Dog_Card.js ---- */
+try {
+/* Dog_Card — the page a shared 狗狗名片 link opens (#/Dog_Card?id=…, App.shareCard; Willie 2026-10-29: 「讓得到的人可以
+   看到狗狗的照片」). Someone with a dog card goes straight to that dog's full card (DM_Invite:
+   追蹤 / 想跟你家狗玩). A visitor without one sees the card — photo or drawn face, name, breed・size, personality, owner —
+   and the join button (the first-run form). Only what the card already shows to everyone; no check-ins, diary or health. */
+(function (App) {
+  'use strict';
+  var ui = App.ui, html = ui.html, D = App.data, C = App.content;
+
+  (function () {
+    if (document.getElementById('css-Dog_Card')) return;
+    var s = document.createElement('style'); s.id = 'css-Dog_Card';
+    s.textContent = [
+      '.dc-pic{margin:16px 16px 0;border-radius:24px;overflow:hidden;background:var(--teal-tint);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}',
+      '.dc-pic img{width:100%;height:100%;object-fit:cover;display:block}',
+      '.dc-name{margin-top:16px;font-family:var(--font-head);font-size:32px;line-height:40px;color:var(--ink);overflow-wrap:anywhere}',
+      '.dc-meta{margin-top:2px;font-size:16px;line-height:22px;color:var(--muted)}',
+      '.dc-owner{margin-top:10px;font-size:15px;line-height:20px;color:var(--body)}',
+      '.dc-join{margin-top:24px;padding:16px;border-radius:20px;background:var(--cream)}',
+      '.dc-join p{margin:0 0 12px;font-size:14px;line-height:20px;color:var(--body)}'
+    ].join('');
+    document.head.appendChild(s);
+  })();
+
+  App.register('Dog_Card', {
+    title: '狗狗名片',
+    needsProfile: false,
+
+    mount: function (ctx) {
+      // already uses 豆米特: the full card (follow, invite) instead
+      if (D.me() || App.me.isPersona) setTimeout(function () { if (!ctx.dead) App.go('DM_Invite', { id: String(ctx.params.id || '') }, { replace: true }); }, 0);
+    },
+
+    render: function (ctx) {
+      var S = C.shareCard, id = String(ctx.params.id || ''), p = id ? D.person(id) : null, dog = (p && p.dog) || null;
+      var join = html`<section class="dc-join">
+          <p>${S.joinNote}</p>
+          ${ui.primaryBtn(S.join, { act: 'join' })}
+        </section>`;
+      if (D.me() || App.me.isPersona) return ui.loading();
+      if (!dog) {
+        return html`${ui.appHead('豆米特', { logo: true })}
+          <div class="px mt-16">${D.peopleLoaded() ? ui.emptyState({ icon: 'paw', title: S.notFound, body: S.notFoundNote }) : ui.loading()}${join}</div>`;
+      }
+      var ph = D.photoOf(p), tags = Array.isArray(dog.tags) ? dog.tags.filter(function (t) { return typeof t === 'string' && t; }) : [];
+      return html`${ui.appHead('豆米特', { logo: true })}
+        <div class="dc-pic">${ph ? html`<img src="${ph.url}" alt="${dog.name || ''}" width="${ph.w || 1024}" height="${ph.h || 768}">` : App.dogs.face(dog, { size: 200 })}</div>
+        <div class="px">
+          <h2 class="dc-name">${dog.name || ''}</h2>
+          <p class="dc-meta">${App.dogs.describe(dog)}</p>
+          ${tags.length ? html`<div class="tags mt-12">${tags.map(function (t) { return ui.tag(t); })}</div>` : ''}
+          ${p.nickname ? html`<p class="dc-owner">主人：${p.nickname}</p>` : ''}
+          ${join}
+        </div>`;
+    },
+
+    actions: {
+      // the first-run form (Main needs a dog card), then the app
+      join: function () { App.go('Main', {}, { root: true }); }
+    }
+  });
+})(window.App);
+
+} catch (e) { console.error("[build] screens/Dog_Card.js failed to load", e); }
 ;
 /* ---- screens/Dog_Language.js ---- */
 try {
@@ -19350,15 +19625,6 @@ try {
     var sub = st === 'on' ? P.onSub : st === 'denied' ? P.denied : P.offSub;
     return ui.listRow({ icon: 'bell', iconSize: 20, title: P.title, sub: sub, act: 'push', right: st === 'on' ? html`<span class="pf-on">${P.on}</span>` : '' });
   }
-  function shareText(p) {
-    var dog = p.dog || {};
-    var lines = [dog.name + (dogs.describe(dog) ? '｜' + dogs.describe(dog) : '')];
-    var tags = Array.isArray(dog.tags) ? dog.tags.filter(function (t) { return typeof t === 'string'; }) : [];
-    if (tags.length) lines.push('個性：' + tags.join('、'));
-    if (p.nickname) lines.push('主人：' + p.nickname);
-    lines.push('豆米特的狗狗名片');
-    return lines.join('\n');
-  }
 
   App.register('Profile', {
     title: '狗狗檔案',
@@ -19456,10 +19722,11 @@ try {
     actions: {
       /** 一個家: switch 現在這隻狗 (the router re-mounts the screen as that dog). */
       dog: function (ctx, d) { App.me.setDog(d.id); },
+      // 分享名片: a picture card + the 名片 lines + a link that opens this dog's card (App.shareCard, 2026-10-29)
       share: function () {
         var p = D.me();
         if (!p) return;
-        return ui.share(shareText(p), '名片已複製，可以貼到 LINE');
+        App.shareCard.open(p, App.me.actorId);
       },
       /** 換照片: dataset.file = the picture chosen in the hidden file input (resized + uploaded by App.data). */
       photo: function (ctx, d) {
