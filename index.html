@@ -868,7 +868,7 @@ button.row, a.row { cursor: pointer; }
 .dateblock .d { font-family: var(--font-head); font-size: 24px; line-height: 30px; color: var(--ink); }
 
 /* ---------- Bottom nav ---------- */
-.nav { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 430px; height: calc(var(--nav-h) + var(--safe-b)); padding-bottom: calc(4px + var(--safe-b)); border-top: 1px solid var(--hairline); background: var(--page); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); z-index: 20; }
+.nav { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 430px; height: calc(var(--nav-h) + var(--safe-b)); padding-bottom: calc(4px + var(--safe-b)); border-top: 1px solid var(--hairline); background: var(--page); display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); z-index: 20; }
 .nav-item { border: none; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: 12px; line-height: 16px; font-weight: 500; }
 .nav-item .pill { width: 52px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
 .nav-item[aria-current="page"] { color: var(--teal-ink); font-weight: 700; }
@@ -1025,7 +1025,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-29.d00ee669","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1845,6 +1845,8 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
   function toast(msg, o) {
     o = o || {};
     if (!toastWrap) { toastWrap = document.createElement('div'); toastWrap.className = 'toast-wrap'; toastWrap.setAttribute('role', 'status'); toastWrap.setAttribute('aria-live', 'polite'); document.body.appendChild(toastWrap); }
+    // the same words again (a second tap): one copy, shown the full time again — never two stacked (Willie 2026-10-29)
+    Array.prototype.slice.call(toastWrap.children).forEach(function (old) { if (old.textContent === String(msg)) toastWrap.removeChild(old); });
     var t = document.createElement('div');
     t.className = 'toast';
     t.textContent = String(msg);
@@ -2449,6 +2451,9 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
   // =====================================================================================================
   // on: false = 首頁不顯示固定狗聚日卡片（Willie 2026-10-27：beta 先收起來；要打開改成 true）
   var WEEKLY = { on: false, weekday: 6, time: '09:00', parkId: 'daan', title: '固定狗聚日（範例）' };
+  // on: false = 集章先收起來：沒有「集章」分頁，開團選地點也不出現範例店家（Willie 2026-10-29：店家要放真實的、
+  // 談好合作再放，「當作下一個 phase 的新功能」；要打開改成 true）
+  var STAMPS = { on: false };
   var THEME_DAYS = [
     { date: '2026-11-21', title: '柯基日', parkId: 'daan', example: true, note: '不是柯基也來，其他狗一律當「榮譽柯基」' }
   ];
@@ -2464,21 +2469,39 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
   ];
 
   // =====================================================================================================
-  // 報名：今天狀態、開團規則（最多選 3 個）、活動類型
+  // 報名：今天狀態、開團規則（最多選 5 個）、活動類型
   // =====================================================================================================
   var CONDITIONS = [
     { id: 'good', label: '精神好' }, { id: 'cough', label: '有點咳' }, { id: 'diarrhea', label: '拉肚子' }, { id: 'heat', label: '發情中' }
   ];
-  // 開團規則（最多選 3 個）。只改字，不要改順序：程式用「第幾個」決定規則做什麼——
+  // 開團規則（最多選 RULES_MAX 個）。只改字，不要改順序：程式用「第幾個」決定規則做什麼——
   //   第 1 個要跟下面 TYPES.leash 一模一樣（預設選的牽繩團）、第 2 個＝限小型犬（會自動只收小型犬）、
   //   第 3 個＝需主揪核准（會打開核准）、第 4 個要跟下面 TYPES.indoor 一模一樣。新規則加在最後面。
-  var RULES = ['牽繩散步團', '限小型犬', '需主揪核准', '室內']; // Create_Event: pick 0–3
+  //   第 5 個以後只是標示（App 不會檢查，例如不會去查疫苗打了沒）；字要短（最多 4 個字），開團頁排成三欄才整齊。
+  var RULES = ['牽繩散步團', '限小型犬', '需主揪核准', '室內',
+    '已打疫苗', '已結紮', '發情勿來', '零食先問', '雨天取消', '新手友善', '老狗友善', '親子友善']; // Willie 2026-10-29：加更多、簡短點
+  var RULES_MAX = 5; // 一場狗聚最多選幾個規則（Willie 2026-10-29）
   var TYPES = { leash: '牽繩散步團', offleash: '放繩玩', indoor: '室內' }; // leash / indoor 的字要跟上面 RULES 第 1、4 個一樣
   var QUICK_TIMES = ['08:30', '09:00', '16:30', '19:00']; // 開團「選時間」的快速選項（24 小時制 'HH:MM'）
   var BREAK_EVERY_MIN = 10; // 主揪現場模式：每幾分鐘提醒一次中場休息（下面 TEXTS.breakVibrate 不寫數字，改這裡就好）
   var CHAT_CLOSE_DAYS = 7;  // 狗聚結束後幾天，聊天室自動收起（下面 TEXTS.chatCloses 的 {n} 會換成這個數字）
   var PACKING = '水・自己的碗・撿便袋';
-  var KIDS_TIPS = { title: '跟狗狗打招呼的三個步驟', lead: '摸狗之前，先這樣做：', steps: ['先問主人', '讓狗聞', '從下巴摸起'], note: '名單上可以看狗狗的「親小孩」「怕小孩」標籤。' };
+  // 手機擋住位置時的說明（core/map.js noPosition：同一次打開只跳一次）。照手機寫：iPhone、iPad 的 Safari 或其他瀏覽器、
+  // Android 的瀏覽器或主畫面、在不在 LINE 裡。最後一句 after 不說「重新整理」：從主畫面打開的沒有那個按鈕（審查 2026-10-29）。
+  var LOCATION_HELP = {
+    title: '打開位置權限',
+    lead: '手機沒有讓豆米特用位置。想讓豆米特自動找到你：',
+    iphone: 'iPhone、iPad：設定 → 隱私權與安全性 → 定位服務（要打開）→ Safari 網站 → 選「使用 App 期間」。',
+    iphoneBrowser: 'iPhone 上的 Chrome 等瀏覽器：設定 → 那個瀏覽器（例如 Chrome）→ 位置 → 選「使用 App 期間」。',
+    iphoneLine: '在 LINE 裡打開的：iPhone 設定 → LINE → 位置 → 選「使用 App 期間」。也可以改用 Safari 打開這個網址。',
+    android: 'Android（Chrome）：點網址列左邊的圖示 → 權限 → 位置 → 允許。',
+    androidHome: 'Android 從主畫面打開的：Chrome → 設定 → 網站設定 → 位置 → 允許這個網站。',
+    androidLine: '在 LINE 裡打開的：手機設定 → 應用程式 → LINE → 權限 → 位置 → 允許。也可以改用 Chrome 打開這個網址。',
+    other: '到瀏覽器的網站設定，允許這個網站使用位置。',
+    after: '改好以後，重新打開豆米特再試一次。',
+    ok: '我知道了'
+  };
+  var KIDS_TIPS ={ title: '跟狗狗打招呼的三個步驟', lead: '摸狗之前，先這樣做：', steps: ['先問主人', '讓狗聞', '從下巴摸起'], note: '名單上可以看狗狗的「親小孩」「怕小孩」標籤。' };
 
   // =====================================================================================================
   // 狗語圖卡（5 張，看完拿「狗語畢業章」）
@@ -2515,6 +2538,7 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
   var TEXTS = {
     leashDefault: '預設已選：公共場所依各縣市規定要牽繩',
     placeOnly: '只能選公園或店家，不能填住家',
+    placeOnlyParks: '只能選公園，不能填住家', // 集章收起來時（STAMPS.on = false）沒有店家可選
     waitlist: '額滿自動候補，有人退出就自動遞補',
     leashAge: '牽繩的人要 7 歲以上（動保法第 20 條）',
     conditionNote: '選其他狀態會建議這次先休息、名額幫你留',
@@ -2846,6 +2870,8 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
     placeholder: '例如 ABCD-EFGH-JKLM',
     renew: '換一組新的找回碼',
     renewBody: '換了之後，舊的找回碼就不能再用來加入這個家。已經加入的家人手機照常能用；要讓某支手機離開，到「家人」按「移除」。',
+    // 上線那天 SQL 貼好之前（App.me.homeReady false）資料庫還是舊的規則：換一組會讓用舊碼的其他手機斷掉（審查 2026-10-29）
+    renewBodyOld: '換了之後，舊的找回碼就不能用了；用舊碼找回的其他手機，下次打開會變成新的人。',
     wrong: '找回碼不對，請再確認一次',
     limit: '試太多次了，請一小時後再試',
     format: '找回碼是 12 個英文字母和數字',
@@ -3263,7 +3289,8 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
       .concat(SHOPS.map(function (s) { return { id: s.id, kind: 'shop', parkId: null, name: s.name, example: true, sub: s.kindLabel }; }));
   }
   App.content = {
-    parks: PARKS, parksNote: PARKS_NOTE, mapArea: MAP_AREA, shops: SHOPS, stickers: STICKERS, conditions: CONDITIONS, rules: RULES, types: TYPES,
+    parks: PARKS, parksNote: PARKS_NOTE, mapArea: MAP_AREA, shops: SHOPS, stickers: STICKERS, conditions: CONDITIONS, rules: RULES, rulesMax: RULES_MAX, types: TYPES,
+    stamps: STAMPS, locationHelp: LOCATION_HELP,
     packing: PACKING, breakEveryMin: BREAK_EVERY_MIN, chatCloseDays: CHAT_CLOSE_DAYS, kidsTips: KIDS_TIPS, yellowActions: YELLOW_ACTIONS, yellowSuggestTags: YELLOW_SUGGEST_TAGS, quickTimes: QUICK_TIMES,
     privacyFixed: PRIVACY_FIXED, dmReportReasons: DM_REPORT_REASONS, badges: BADGES, badgeHow: BADGE_HOW, reminderUi: REMINDER_UI,
     dogLanguage: DOG_LANGUAGE, dogLanguageEnd: DOG_LANGUAGE_END, dogLanguageLead: DOG_LANGUAGE_LEAD,
@@ -3285,6 +3312,10 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
     shop: function (id) { return SHOPS.filter(function (s) { return s.id === id; })[0] || null; },
     places: placeList,
     place: function (id) { return placeList().filter(function (p) { return p.id === id; })[0] || null; },
+    /** Where a new meetup can be: the parks, plus the (sample) shops only while 集章 is on (STAMPS.on). keepId: a
+        meetup's own place stays pickable when it is edited. */
+    meetPlaces: function (keepId) { return placeList().filter(function (p) { return p.kind !== 'shop' || STAMPS.on !== false || p.id === keepId; }); },
+    placeNote: function () { return STAMPS.on === false ? TEXTS.placeOnlyParks : TEXTS.placeOnly; },
     /** '寵物友善咖啡廳（範例）' / '大安森林公園' — accepts a place/shop object or an event.place */
     placeName: function (p) { return p ? p.name + (p.example ? '（範例）' : '') : ''; },
     sticker: function (id) { return STICKERS.filter(function (s) { return s.id === id; })[0] || null; }
@@ -3577,25 +3608,56 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
     });
     Object.keys(walks).forEach(function (id) { if (!seen[id]) { map.removeLayer(walks[id].circle); map.removeLayer(walks[id].marker); delete walks[id]; } });
   }
-  /** Ask the phone for its position once and move the map there. Resolves {lat, lng} or null (denied / failed). */
+  var lastFail = null; // why the last position() gave null: 'denied' (the phone said no) | 'failed' (too slow, no fix, no API)
   /** The phone's position once, without moving the map: {lat, lng} or null. Never stored here. */
   function position() {
     var geo = api._geo || (navigator && navigator.geolocation);
     return new Promise(function (resolve) {
-      if (!geo) { resolve(null); return; }
+      if (!geo) { lastFail = 'failed'; resolve(null); return; }
       try {
-        geo.getCurrentPosition(function (pos) { resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }); },
-          function () { resolve(null); }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
-      } catch (e) { resolve(null); }
+        geo.getCurrentPosition(function (pos) { lastFail = null; resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }); },
+          function (e) { lastFail = e && e.code === 1 ? 'denied' : 'failed'; resolve(null); }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
+      } catch (e) { lastFail = 'failed'; resolve(null); }
     });
   }
+  /** Ask the phone for its position once and move the map there. Resolves {lat, lng} or null (denied / failed). */
   function locate() {
     return position().then(function (p) { if (p && map) map.setView([p.lat, p.lng], 16, { animate: false }); return p; });
+  }
+  /** How to turn location on, for this phone (C.locationHelp): iPhone / iPad — Safari, another browser (its own switch in
+      設定) or LINE; Android — the browser, a home-screen app (no address bar) or LINE; else any browser. touch:
+      navigator.maxTouchPoints (an iPad says it is a Mac); home: opened from the home screen. */
+  function locationHelp(ua, touch, home) {
+    var H = C.locationHelp;
+    ua = String(ua || '');
+    var line = /\bLine\//i.test(ua);
+    if (/iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && touch > 1)) return line ? H.iphoneLine : /CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua) ? H.iphoneBrowser : H.iphone;
+    if (/Android/i.test(ua)) return line ? H.androidLine : home ? H.androidHome : H.android;
+    return H.other;
+  }
+  function fromHomeScreen() {
+    try { return !!(navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)); } catch (e) { return false; }
+  }
+  /** After locate() / position() gave null. The phone said no: once a visit, a sheet says how to turn location on, then
+      the screen's own hint (Willie 2026-10-29: 「沒有拿到位置」 told nobody why). Too slow / no fix: the hint at once. */
+  function noPosition(hint, ms) {
+    var ui = App.ui, H = C.locationHelp;
+    function say() { if (hint) ui.toast(hint, ms ? { ms: ms } : undefined); }
+    if (lastFail !== 'denied' || api._helped) { say(); return; }
+    api._helped = true;
+    var steps = locationHelp(api._ua || (navigator && navigator.userAgent), navigator && navigator.maxTouchPoints, fromHomeScreen());
+    ui.sheet({
+      title: H.title,
+      render: function () { return ui.html`<p class="sub mt-4">${H.lead}</p><p class="mt-8">${steps}</p><p class="note mt-8">${H.after}</p><div class="sheet-actions">${ui.primaryBtn(H.ok, { act: 'ok' })}</div>`; },
+      actions: { ok: function (s) { s.close(); } },
+      onClose: say
+    });
   }
   function inView(p) { return !!(map && p && isFinite(p.lat) && isFinite(p.lng) && map.getBounds().contains([p.lat, p.lng])); }
   function zoom() { return map ? map.getZoom() : C.map.zoom; }
 
-  var api = App.map = { attach: attach, setLabels: setLabels, setWalks: setWalks, locate: locate, position: position, inView: inView, zoom: zoom, _geo: null, _tileOptions: tileOptions };
+  // _geo / _ua stand in for the phone's in tests; _helped = the 「打開位置權限」 sheet was shown this visit (tests reset it)
+  var api = App.map = { attach: attach, setLabels: setLabels, setWalks: setWalks, locate: locate, position: position, locationHelp: locationHelp, noPosition: noPosition, inView: inView, zoom: zoom, _geo: null, _ua: null, _helped: false, _tileOptions: tileOptions };
   Object.defineProperty(api, '_leaflet', { get: function () { return map; } });
   api._walkCircles = function () { return Object.keys(walks).map(function (id) { return { id: id, r: walks[id].r }; }); };
 })(window.App = window.App || {});
@@ -4964,6 +5026,8 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
        polls while realtime is down), and when the page comes back to the foreground (phones drop websockets). */
   var SB_NET_MSG = '連不上網路，請確認網路後再試一次。';
   var SB_SETUP_MSG = '共用資料庫還沒設定好（Supabase 的 SQL 還沒執行），請告訴開這個 App 的人。';
+  // a server function newer than the SQL pasted (上線 day: the new app is out, the paste comes ~30 min later)
+  var SB_NOT_YET_MSG = '這個功能還在準備中，晚一點再試。';
   var SB_CONN_MSG = '連線不穩，正在重新連線，畫面可能不是最新的。';
   var SB_OFFLINE_MSG = '連不上共用資料。請確認網路後按「再試一次」；網路正常的話，可能是 Supabase 專案暫停了（一週沒人用會自動暫停），請告訴開這個 App 的人。';
   var SB_LINGER_MS = 20000;
@@ -5050,9 +5114,12 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
         e.userMessage = '這筆資料不能由你修改，沒有存進去。';
       } else if (code === '42P01' || code === '42883' || code === 'PGRST202' || code === 'PGRST205' || code === 'PGRST106' || /does not exist|could not find the (table|function)/i.test(msg)) {
         e = dbError('not_configured', msg);
-        e.userMessage = SB_SETUP_MSG;
-        // an OPTIONAL server function (newer than the SQL Willie pasted) is just not there yet: no banner
-        if (String(path || '').indexOf('rpc?:') !== 0) setupProblem(msg);
+        // a server function newer than the SQL Willie pasted (上線 day, before the paste) is just not there yet: 「還在
+        // 準備中」 and no banner (Willie 2026-10-29: the red banner on 新增一隻狗). A missing table = the SQL never ran.
+        var fn = /^rpc\??:/.test(String(path || '')) && (code === '42883' || code === 'PGRST202' || /could not find the function|function .* does not exist/i.test(msg));
+        e.userMessage = fn ? SB_NOT_YET_MSG : SB_SETUP_MSG;
+        // an OPTIONAL server function is never a banner either
+        if (!fn && String(path || '').indexOf('rpc?:') !== 0) setupProblem(msg);
       } else if (code === '22P05' || /unicode|surrogate|\\u0000/i.test(msg)) {
         // jsonb refuses \u0000 and half an emoji (App.data cleans text; this is the backstop)
         e = dbError('invalid_argument', msg + ' (' + path + ')');
@@ -6990,7 +7057,7 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
   }
   var SIZE_KEYS = ['S', 'M', 'L'];
   function cleanSizes(v) { var s = (Array.isArray(v) ? v : []).filter(function (x, i, a) { return SIZE_KEYS.indexOf(x) !== -1 && a.indexOf(x) === i; }); return s.length ? s : SIZE_KEYS.slice(); }
-  function cleanRules(v) { return (Array.isArray(v) ? v : []).filter(function (r, i, a) { return RULES.indexOf(r) !== -1 && a.indexOf(r) === i; }).slice(0, 3); }
+  function cleanRules(v) { return (Array.isArray(v) ? v : []).filter(function (r, i, a) { return RULES.indexOf(r) !== -1 && a.indexOf(r) === i; }).slice(0, C.rulesMax); }
   function cleanCapacity(v) { return Math.max(2, Math.min(30, Math.round(Number(v)) || 8)); }
   function cleanTime(v) { var n = typeof v === 'number' ? v : fmt().parseInput(v); return isFinite(n) ? n : NaN; }
   function sizesLabel(sizes) {
@@ -7009,7 +7076,7 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
     return tags.filter(function (x, i) { return typeof x === 'string' && x && tags.indexOf(x) === i; });
   }
   /**
-   * createEvent({title, placeId, startAt, endAt?, type:'leash'|'offleash'|'indoor', sizes:['S'..], capacity, rules:[...<=3], approval, theme})
+   * createEvent({title, placeId, startAt, endAt?, type:'leash'|'offleash'|'indoor', sizes:['S'..], capacity, rules:[...<=C.rulesMax], approval, theme})
    * The host auto-joins. Aggressive-breed hosts can only open leash events. Resolves the new id.
    */
   function createEvent(input) {
@@ -10496,6 +10563,7 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
     selfId: null,       // the person (linked actor or viewerId) — private data + own docs
     homeId: null,       // 一個家: the home (= selfId)
     dogs: [],           // 一個家: the home's dogs, the first dog first (a one-dog home: [selfId])
+    homeReady: true,    // 一個家: false while the database has no home functions yet (上線 day, before the SQL paste)
     actorId: null,      // id used for every write (現在這隻狗, or a demo persona for the admin)
     isPersona: false,
     anonymous: false,   // cloud viewer without an identity: no private subtree
@@ -10562,9 +10630,12 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
       function done(list) { me.dogs = list && list.length ? list : (self ? [self] : []); return me.dogs; }
       if (!self || me.anonymous || (st.backend !== 'supabase' && st.backend !== 'mock')) return Promise.resolve(done(null));
       return st.rpc('home_dogs_list', {}, { optional: true }).then(function (r) {
+        me.homeReady = true;
         return done(r && Array.isArray(r.dogs) ? r.dogs.filter(function (x) { return typeof x === 'string' && st.validSegment(x); }) : null);
       }, function (e) {
         console.warn('[me] home_dogs_list', e && (e.code || e.message));
+        // the function is missing (not a network hiccup): 新增一隻狗 / 家人的手機 / 加入家人的家 wait for the paste
+        if (e && e.code === 'not_configured') me.homeReady = false;
         return done(me.dogs.length ? me.dogs : null);
       });
     },
@@ -10947,6 +11018,9 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
     { id: 'stamps', screen: 'Stamps', label: '集章', icon: 'navStamps' },
     { id: 'me', screen: 'Profile', label: '我的', icon: 'navMe' }
   ];
+  /** A screen put away for now: 集章 while App.content.stamps.on is false (Willie 2026-10-29: the next phase). It has no
+      tab and a link to it opens the map; App.go still reaches it (the feature and its tests are kept). */
+  function hidden(name) { var s = App.content.stamps; return name === 'Stamps' && !!s && s.on === false; }
 
   /**
    * App.register(name, {
@@ -11150,7 +11224,7 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
     var u = App.data.unread ? App.data.unread() : {};
     var dots = { events: u.eventCount > 0, msgs: u.eventCount > 0 || u.dmCount > 0 || u.invites > 0, me: u.healthInbox > 0 };
     var onlyHealth = true;
-    navEl.innerHTML = String(ui.join(TABS.map(function (t) {
+    navEl.innerHTML = String(ui.join(TABS.filter(function (t) { return !hidden(t.screen); }).map(function (t) {
       var d = !!dots[t.id];
       var why = t.id === 'me' && onlyHealth ? '（醫院傳來檔案）' : '（有新訊息）';
       return ui.html`<button type="button" class="nav-item" data-tab="${t.screen}"${ui.attrs({ 'aria-current': t.id === tab ? 'page' : null })}><span class="pill">${ui.icon(t.icon, { size: 24 })}${d ? ui.html`<span class="nav-dot" aria-hidden="true"></span>` : ''}</span>${t.label}${d ? ui.html`<span class="sr-only">${why}</span>` : ''}</button>`;
@@ -11264,11 +11338,12 @@ window.APP_BUILD = {"version":"2026-10-29.b5d49e70","seedUrl":"seed-data.json"};
       // the router's own pushState/replaceState does not)
       window.addEventListener('hashchange', function () {
         var nh = readHash();
+        if (nh && hidden(nh.name)) nh = { name: 'Main', params: {} };
         // (the browser already made an entry for the new address: no second one)
         if (nh && has(nh.name) && (!cur || nh.name !== cur.name || JSON.stringify(nh.params) !== JSON.stringify(cur.params))) App.go(nh.name, nh.params, { noHistory: true });
       });
       var h = readHash();
-      var first = h && has(h.name) ? h : { name: 'Main', params: {} };
+      var first = h && has(h.name) && !hidden(h.name) ? h : { name: 'Main', params: {} };
       stack = [];
       // a public page (vet / clinic link) opens on its own: no map under it
       if (first.name !== 'Main' && !screens[first.name].tab && !screens[first.name].public) stack.push({ name: 'Main', params: {} });
@@ -12742,7 +12817,7 @@ try {
 ;
 /* ---- screens/Create_Event.js ---- */
 try {
-/* Create_Event（三步開團）— pick place + time, who can come (sizes, capacity), 0–3 rules, then publish. */
+/* Create_Event（三步開團）— pick place + time, who can come (sizes, capacity), 0–5 rules (C.rulesMax), then publish. */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, C = App.content, fmt = ui.fmt;
@@ -12776,7 +12851,9 @@ try {
       '.ce-place{width:100%;min-height:60px;padding:8px 12px;border:none;border-radius:18px;background:var(--cream);display:flex;align-items:center;gap:12px;text-align:left;color:var(--body)}',
       '.ce-place[aria-pressed="true"]{background:var(--teal-tint)}',
       '.ce-place + .ce-place{margin-top:8px}',
-      '.ce-when{margin-top:4px;font-family:var(--font-head);font-size:20px;line-height:26px;color:var(--ink)}'
+      '.ce-when{margin-top:4px;font-family:var(--font-head);font-size:20px;line-height:26px;color:var(--ink)}',
+      // 12 rules in three even columns (Willie 2026-10-29: 讓版面工整); no check mark, so 5-character rules fit at 360 px
+      '.ce-rules .chip{padding:0 6px;font-size:14px}'
     ].join('');
     document.head.appendChild(s);
   })();
@@ -12814,7 +12891,7 @@ try {
     ui.sheet({
       title: '選地點',
       render: function () {
-        var shops = C.places().filter(function (p) { return p.kind === 'shop'; });
+        var shops = C.meetPlaces().filter(function (p) { return p.kind === 'shop'; }); // none while 集章 is off
         var parks = App.parkPick.ordered().map(function (x) { return placeOf({ placeId: x.park.id }); });
         function row(pl) {
           var on = ctx.state.placeId === pl.id;
@@ -12826,12 +12903,12 @@ try {
             <span class="row-main"><span class="row-title">${pl.name}${pl.example ? html`<span class="ex">（範例）</span>` : ''}</span>${sub ? html`<span class="row-sub">${sub}</span>` : ''}</span>
             ${on ? ui.icon('checkSmall', { size: 22, color: 'var(--teal-ink)' }) : ''}</button>`;
         }
-        return html`<p class="ce-note" style="margin-top:0">${ui.icon('noHome', { size: 16 })}${C.texts.placeOnly}</p>
+        return html`<p class="ce-note" style="margin-top:0">${ui.icon('noHome', { size: 16 })}${C.placeNote()}</p>
           <div class="label mt-16">公園</div>
           <p class="note mt-4">${C.parksNote}</p>
           <div class="mt-8" role="group" aria-label="公園">${parks.map(row)}</div>
-          <div class="label mt-20">店家</div>
-          <div class="mt-8" role="group" aria-label="店家">${shops.map(row)}</div>`;
+          ${shops.length ? html`<div class="label mt-20">店家</div>
+          <div class="mt-8" role="group" aria-label="店家">${shops.map(row)}</div>` : ''}`;
       },
       actions: {
         pick: function (s, d) { if (placeOf({ placeId: d.id })) ctx.set({ placeId: d.id }); s.close(); }
@@ -12923,7 +13000,7 @@ try {
               <span class="chev">${ui.icon('chevronRight', { size: 16 })}</span>
             </button>
           </div>
-          <p class="ce-note">${ui.icon('noHome', { size: 16 })}${C.texts.placeOnly}</p>
+          <p class="ce-note">${ui.icon('noHome', { size: 16 })}${C.placeNote()}</p>
           <div class="mt-12">${ui.field({ label: '名稱', model: 'title', value: st.title, placeholder: (place ? place.name : '') + '狗聚', maxlength: 30, id: 'ce-title' })}</div>
         </section>
 
@@ -12946,9 +13023,9 @@ try {
         </section>
 
         <section class="px mt-20" aria-labelledby="ce-step3">
-          ${step(3, '規則', '最多 3 個', 'ce-step3')}
-          <div class="chips mt-8" role="group" aria-labelledby="ce-step3" style="gap:8px">
-            ${C.rules.map(function (r) { return ui.chip(r, { pressed: st.rules.indexOf(r) !== -1, act: 'rule', data: { r: r } }); })}
+          ${step(3, '規則', '最多 ' + C.rulesMax + ' 個', 'ce-step3')}
+          <div class="chip-grid ce-rules mt-8" role="group" aria-labelledby="ce-step3">
+            ${C.rules.map(function (r) { return ui.chip(r, { pressed: st.rules.indexOf(r) !== -1, act: 'rule', data: { r: r }, check: false }); })}
           </div>
           <p class="ce-note teal">${C.texts.leashDefault}</p>
           ${aggr ? '' : offleashWarn}
@@ -12989,7 +13066,7 @@ try {
           ctx.set({ rules: rules });
           return;
         }
-        if (rules.length >= 3) { ui.toast('規則最多選 3 個'); return; }
+        if (rules.length >= C.rulesMax) { ui.toast('規則最多選 ' + C.rulesMax + ' 個'); return; }
         rules.push(r);
         var patch = { rules: rules };
         if (r === SMALL) patch.sizes = ['S'];
@@ -13014,7 +13091,7 @@ try {
           type: aggr ? 'leash' : typeOf(rules),
           sizes: st.sizes,
           capacity: st.capacity,
-          rules: rules.slice(0, 3),
+          rules: rules.slice(0, C.rulesMax),
           approval: rules.indexOf(APPROVE) !== -1
         }).then(function (id) {
           if (ctx.dead) return;
@@ -14638,7 +14715,7 @@ try {
   function openEdit(ctx) {
     var ev = ctx.state.event;
     if (!ev) return;
-    var places = C.places();
+    var places = C.meetPlaces(ev.place && ev.place.id); // no sample shops while 集章 is off (this meetup's own place stays)
     ui.sheet({
       title: '改時間、地點或人數',
       autofocus: false,
@@ -14651,7 +14728,7 @@ try {
             ${ui.field({ label: '幾點', type: 'time', model: 'time', value: s.state.time, id: 'ev-edit-time' })}
           </div>
           <div class="mt-12">${ui.field({ label: '地點', type: 'select', model: 'placeId', value: s.state.placeId, options: opts, id: 'ev-edit-place' })}</div>
-          <p class="note mt-8">${C.texts.placeOnly}</p>
+          <p class="note mt-8">${C.placeNote()}</p>
           <div class="between mt-12" style="min-height:44px"><span class="title-strong" id="ev-capLbl">人數上限</span>
             <span class="row-flex" role="group" aria-labelledby="ev-capLbl">
               <button type="button" class="iconbtn tint" data-act="cap" data-d="-1" aria-label="少一隻"${ui.attrs({ disabled: s.state.capacity <= 2 })}>${ui.icon('minus', { size: 18 })}</button>
@@ -14817,6 +14894,7 @@ try {
 
   // ---------------------------------------------------------------- the family's phones
   function loadMembers(ctx) {
+    ctx.state.membersAsked = true;
     return D.homeMembers().then(function (rows) { if (!ctx.dead) ctx.set({ members: rows, membersErr: false }); },
       function (e) { console.info('[Family] members', e && (e.userMessage || e.message)); if (!ctx.dead) ctx.set({ members: [], membersErr: true }); });
   }
@@ -14908,11 +14986,18 @@ try {
       ctx.state.members = null;
       ctx.state.nick = D.myNick();
       if (recoveryOn()) loadCode(ctx);
-      if (App.me.canPrivate()) loadMembers(ctx);
+      ctx.state.membersAsked = false;
+      if (App.me.canPrivate()) {
+        if (App.me.homeReady !== false) loadMembers(ctx);
+        // the database had no home functions when the app started: ask again (Willie may have pasted the SQL since)
+        else App.me.loadDogs().then(function () { if (!ctx.dead && App.me.homeReady !== false) loadMembers(ctx); });
+      }
     },
 
     render: function (ctx) {
-      var H = C.home, s = ctx.state, mine = App.me.canPrivate();
+      // ready: false while the database has no home functions (上線 day, before the paste): the nickname and 邀請家人
+      // only — the family's phones and 加入家人的家 wait (Willie 2026-10-29: no red 「資料庫還沒設定好」)
+      var H = C.home, s = ctx.state, mine = App.me.canPrivate(), ready = App.me.homeReady !== false && s.membersAsked;
       var list = s.members === null ? html`<p class="note" role="status">載入中…</p>`
         : s.membersErr ? html`<p class="note">${H.membersFail}</p>`
           : html`<ul class="list fm-rows mt-8">${s.members.map(memberRow)}</ul>`;
@@ -14928,7 +15013,7 @@ try {
           </form>
         </section>` : ''}
 
-        ${mine ? html`<section class="px mt-24" aria-labelledby="fm-members">
+        ${mine && ready ? html`<section class="px mt-24" aria-labelledby="fm-members">
           <h2 class="fm-h" id="fm-members">${H.members}</h2>
           ${list}
           <div class="fm-leave">${ui.textBtn(H.leave, { act: 'leave', muted: true })}</div>
@@ -14936,7 +15021,7 @@ try {
 
         ${inviteCard(ctx)}
 
-        ${mine ? html`<section class="px mt-24" aria-labelledby="fm-merge">
+        ${mine && ready ? html`<section class="px mt-24" aria-labelledby="fm-merge">
           <h2 class="fm-h" id="fm-merge">${H.mergeEntry}</h2>
           <p class="note mt-4">${H.mergeNote}</p>
           <div class="mt-8">${ui.secondaryBtn(H.mergeEntry, { act: 'merge', block: false })}</div>
@@ -14963,7 +15048,9 @@ try {
       },
       retryCode: function (ctx) { ctx.set({ codeErr: false }); return loadCode(ctx); },
       renewCode: function (ctx) {
-        return ui.confirm({ title: C.recovery.renew + '？', body: C.recovery.renewBody, ok: C.recovery.renewOk }).then(function (yes) {
+        // before the 上線 paste the database still cuts the other phones off (審查 2026-10-29): say so
+        var body = App.me.homeReady === false ? C.recovery.renewBodyOld : C.recovery.renewBody;
+        return ui.confirm({ title: C.recovery.renew + '？', body: body, ok: C.recovery.renewOk }).then(function (yes) {
           if (!yes || ctx.dead) return;
           return loadCode(ctx, true).then(function () {
             if (ctx.dead || !ctx.state.code) return null;
@@ -17076,8 +17163,10 @@ try {
     var rule = siteRule(ev);
     var panel = '';
     if (c !== 'good') {
-      panel = rule ? ui.warnPanel({ icon: 'alertCircle', title: '場地規定不能進', body: rule.rule + '。' + C.texts.restSuggest + '，照樣送你一枚' + C.badges.leave + '。' }) :
-        ui.warnPanel({ icon: 'heat', title: C.texts.restSuggest, body: '照樣送你一枚' + C.badges.leave + '，狀況好了再來。' });
+      // the 請假章 is only mentioned while 集章 is on (C.stamps.on; put away 2026-10-29 — nowhere to see it)
+      var stamp = C.stamps.on !== false;
+      panel = rule ? ui.warnPanel({ icon: 'alertCircle', title: '場地規定不能進', body: rule.rule + '。' + C.texts.restSuggest + (stamp ? '，照樣送你一枚' + C.badges.leave : '') + '。' }) :
+        ui.warnPanel({ icon: 'heat', title: C.texts.restSuggest, body: (stamp ? '照樣送你一枚' + C.badges.leave + '，' : '') + '狀況好了再來。' });
     }
     return html`<div class="px mt-20">
       <div class="label" id="jl-statusLabel">今天狀態</div>
@@ -17311,7 +17400,7 @@ try {
             var msg = res.status === 'going' ? '報名好了，' + fmt.dayLabel(ev.startAt) + '見' :
               res.status === 'waitlist' ? '額滿了，先幫你排候補，有人退出會自動遞補' :
               res.status === 'pending' ? '已送出，等主揪核准' :
-              res.status === 'rest' ? C.texts.restSuggest + '，送你一枚' + C.badges.leave : '已送出';
+              res.status === 'rest' ? C.texts.restSuggest + (C.stamps.on !== false ? '，送你一枚' + C.badges.leave : '') : '已送出';
             ui.toast(msg);
             App.go('Event', { id: id }, { replace: true }); // (狗語圖卡 no longer comes first — 2026-10-27)
           });
@@ -18144,7 +18233,7 @@ try {
     return App.map.locate().then(function (p) {
       looking = false;
       if (ctx.dead) return;
-      if (!p) { pickWalk = true; pickWalkDogs = dogs || null; ui.toast('沒有拿到位置，在地圖上點一下你大概在哪裡', { ms: 5000 }); return; }
+      if (!p) { pickWalk = true; pickWalkDogs = dogs || null; App.map.noPosition('沒有拿到位置，在地圖上點一下你大概在哪裡', 5000); return; }
       return startWalk(ctx, p, dogs);
     }, function (e) { looking = false; throw e; });
   }
@@ -18395,7 +18484,7 @@ try {
         return D.rsvpMeetup(wk.dateKey, going, wk).then(function () { ui.toast(going ? '好，' + ui.fmt.weekday(wk.at) + '見' : '已取消'); });
       },
       locate: function () {
-        return App.map.locate().then(function (p) { if (!p) ui.toast('沒有拿到位置，可以自己拖地圖'); });
+        return App.map.locate().then(function (p) { if (!p) App.map.noPosition('沒有拿到位置，可以自己拖地圖'); });
       }
     }
   });
@@ -19111,7 +19200,7 @@ try {
       home: function (ctx) { openHomeSheet(ctx); },
       homeHere: function () {
         return App.map.position().then(function (p) {
-          if (!p) { ui.toast('沒有拿到位置，可以改用「在地圖上點」'); return; }
+          if (!p) { App.map.noPosition('沒有拿到位置，可以改用「在地圖上點」'); return; }
           return saveHomeAt(p);
         });
       },
@@ -19283,6 +19372,8 @@ try {
       // 推播通知 (beta): on / off on this phone (async: the browser's subscription)
       ctx.state.push = undefined;
       if (App.push.supported() || App.push.needInstall()) App.push.state().then(function (v) { if (!ctx.dead) ctx.set({ push: v }); });
+      // 一個家: the database had no home functions when the app started — ask again (the SQL may be pasted by now)
+      if (App.me.homeReady === false) App.me.loadDogs().then(function () { if (!ctx.dead && App.me.homeReady !== false) ctx.set({}); });
     },
 
     render: function (ctx) {
@@ -19338,7 +19429,7 @@ try {
         </div>
 
         <ul class="list pf-rows px mt-24">
-          ${App.me.canPrivate() ? ui.listRow({ icon: 'plus', iconSize: 20, title: C.home.addDog, go: 'Profile_Create', params: { mode: 'add' } }) : ''}
+          ${App.me.canPrivate() && App.me.homeReady !== false ? ui.listRow({ icon: 'plus', iconSize: 20, title: C.home.addDog, go: 'Profile_Create', params: { mode: 'add' } }) : ''}
           ${recoveryOn() ? ui.listRow({ icon: 'lockAlt', iconSize: 20, title: C.home.family, sub: C.home.familyRowSub, go: 'Family' }) : ''}
           ${pushRow(ctx)}
           ${ui.listRow({ icon: 'hospital', iconSize: 20, title: C.health.entry, sub: healthInbox ? C.health.inbox.title + '（' + healthInbox + '）' : C.health.entrySub, go: 'Health_Card', right: healthInbox ? ui.dot({ label: C.health.inbox.title }) : '' })}
@@ -21001,7 +21092,7 @@ try {
           </div>
         </div>
 
-        <button type="button" class="ys-scarf px"${ui.go('Stamps')}>${ui.icon('scarf', { size: 20 })}${C.stampTexts.scarf}${ui.icon('chevronRight', { size: 18 })}</button>
+        ${C.stamps.on !== false ? html`<button type="button" class="ys-scarf px"${ui.go('Stamps')}>${ui.icon('scarf', { size: 20 })}${C.stampTexts.scarf}${ui.icon('chevronRight', { size: 18 })}</button>` : ''}
 
         <div class="bottom-actions">${ui.primaryBtn('完成', { act: 'done', icon: 'checkWhite' })}</div>`;
     },
