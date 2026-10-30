@@ -889,6 +889,10 @@ button.row, a.row { cursor: pointer; }
 .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; }
 .sheet-actions { margin-top: 20px; display: flex; gap: 12px; }
 .sheet-actions .btn { flex: 1; }
+/* a long list above (我在公園: every nearby park): the buttons stay in sight, with what they will do (Willie 2026-10-30:
+   「從公園打卡沒效果？」 — the 打卡 button was two screens down) */
+.sheet-sticky { position: sticky; bottom: calc(-20px - var(--safe-b)); z-index: 2; flex-wrap: wrap; margin: 16px calc(-1 * var(--gutter)) 0; padding: 12px var(--gutter) calc(20px + var(--safe-b)); background: var(--page); box-shadow: 0 -10px 16px -14px rgba(52, 40, 36, .45); }
+.sheet-sticky-at { flex-basis: 100%; margin: 0; overflow-wrap: anywhere; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: .6; } to { transform: none; opacity: 1; } }
 
@@ -1040,7 +1044,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-30.211c0119","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-30.4885903c","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2464,6 +2468,7 @@ window.APP_BUILD = {"version":"2026-10-30.211c0119","seedUrl":"seed-data.json"};
     attribution: '© OpenStreetMap',
     // Google 地圖版（branch google-map）：地圖角落的公園資料來源，和 Google 地圖打不開時地圖那一格的字
     parkCredit: '公園資料 © OpenStreetMap',
+    navigate: '🧭 導航', // 公園頁和狗聚頁：打開 Google 地圖帶路過去
     googleFailed: '地圖暫時打不開，請稍後再試。',
     // 全台灣有名字的公園（從 OpenStreetMap 抓下來放在 App 裡；更新方法見 tools/build_parks.py）。點地圖先查這份
     parksUrl: 'data/parks-tw.json',
@@ -2774,7 +2779,7 @@ window.APP_BUILD = {"version":"2026-10-30.211c0119","seedUrl":"seed-data.json"};
     sections: [
       { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到；打開驅蟲徽章時，名片上會有驅蟲的到期日）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
       { title: '誰看得到', body: '用豆米特的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
-      { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位。位置只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。' },
+      { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位。位置只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。' },
       { title: '我出門遛狗', body: '按「我出門遛狗」才會用一次手機定位，不會一直追蹤。在公園裡就打卡在那座公園；在外面，別人只看到你大約在哪個 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。不存精確位置，也不送給任何人。家的位置只有你知道，存在你自己的資料裡。' },
       { title: '還是測試', body: '試辦版的保護還不完整：狗聚、聊天和協尋這些共用的資料，懂技術的人可能改得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
       { title: '通知（選用）', body: '在「我的」打開通知，手機會給豆米特一個推播地址，由 Google、Apple、Mozilla 或 Microsoft 的推播服務轉送。有人在你的狗聚聊天室說話、私訊你或邀請你時，手機會跳出狗聚名稱或狗狗名字，不會有訊息內容。關掉通知或刪除我的資料，這個地址就刪掉。' },
@@ -2829,7 +2834,7 @@ window.APP_BUILD = {"version":"2026-10-30.211c0119","seedUrl":"seed-data.json"};
 
   // Google 地圖版（branch google-map）：Google 規定隱私說明和使用條款要寫地圖由 Google 提供，並連到 Google 的政策和條款。
   // 沒有 Google 地圖的 key 時，上面原本的字一字不改。
-  var MAP_PRIVACY_GOOGLE = '地圖由 Google 提供：看地圖時，手機會跟 Google 要地圖，Google 會知道你在看哪一帶的地圖，也適用 Google 的隱私權政策。點地圖上的公園時，先在手機裡的公園清單查（公園資料來自 OpenStreetMap）；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位。位置只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。';
+  var MAP_PRIVACY_GOOGLE = '地圖由 Google 提供：看地圖時，手機會跟 Google 要地圖，Google 會知道你在看哪一帶的地圖，也適用 Google 的隱私權政策。點地圖上的公園時，先在手機裡的公園清單查（公園資料來自 OpenStreetMap）；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位。位置只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。';
   var MAP_PRIVACY_LINKS = [{ label: 'Google 隱私權政策', url: 'https://policies.google.com/privacy' }];
   var MAP_TERMS = { title: '地圖', body: '豆米特的地圖由 Google 提供。使用地圖，也要遵守 Google 地圖/Google 地球附加服務條款。',
     links: [{ label: 'Google 地圖/Google 地球附加服務條款', url: 'https://maps.google.com/help/terms_maps/' }] };
@@ -3890,6 +3895,11 @@ window.APP_BUILD = {"version":"2026-10-30.211c0119","seedUrl":"seed-data.json"};
     if (dotLayer) { dotLayer.setLatLng([pt.lat, pt.lng]); return; }
     dotLayer = window.L.circleMarker([pt.lat, pt.lng], { radius: 10, color: '#1F6670', weight: 3, fillColor: '#E8775A', fillOpacity: 0.9, className: 'dj-dot' }).addTo(map);
   }
+  /** 導航 (Willie 2026-10-30: 「加上導航吧」): Google Maps (the app when installed) routes from where the phone is to
+      there. A plain link: no key, not a map load. */
+  function navUrl(lat, lng) {
+    return isFinite(lat) && isFinite(lng) ? 'https://www.google.com/maps/dir/?api=1&destination=' + Number(lat).toFixed(5) + ',' + Number(lng).toFixed(5) : '';
+  }
   function inView(p) {
     if (useG()) { var b = gMap && gMap.getBounds(); return !!(b && p && isFinite(p.lat) && isFinite(p.lng) && b.contains({ lat: p.lat, lng: p.lng })); }
     return !!(map && p && isFinite(p.lat) && isFinite(p.lng) && map.getBounds().contains([p.lat, p.lng]));
@@ -4082,7 +4092,7 @@ window.APP_BUILD = {"version":"2026-10-30.211c0119","seedUrl":"seed-data.json"};
   }
 
   // _geo / _ua stand in for the phone's in tests; _helped = the 「打開位置權限」 sheet was shown this visit (tests reset it)
-  var api = App.map = { attach: attach, setLabels: setLabels, setWalks: setWalks, locate: locate, position: position, locationHelp: locationHelp, noPosition: noPosition, inView: inView, zoom: zoom, setView: setView, center: center, dot: dot, provider: provider,
+  var api = App.map = { attach: attach, setLabels: setLabels, setWalks: setWalks, locate: locate, position: position, locationHelp: locationHelp, noPosition: noPosition, inView: inView, zoom: zoom, setView: setView, center: center, dot: dot, navUrl: navUrl, provider: provider,
     failed: function () { return gState === 'failed'; }, _gmUrl: gmUrl, _gWaitMs: 15000, _gRetryMs: 10000, _geo: null, _ua: null, _helped: false, lastPos: null, _tileOptions: tileOptions };
   Object.defineProperty(api, '_leaflet', { get: function () { return map; } });
   Object.defineProperty(api, '_google', { get: function () { return gMap; } });
@@ -15384,7 +15394,7 @@ try {
         <div class="grow">
           <div class="ev-when">${fmt.dateTime(ev.startAt)}${ev.endAt ? '–' + fmt.time(ev.endAt) : ''}</div>
           <h1 class="h1">${ev.title}</h1>
-          <div class="ev-place">${C.placeName(ev.place)}${spotLink(ev.place)}</div>
+          <div class="ev-place">${C.placeName(ev.place)}${spotLink(ev.place)}${navLink(ev.place)}</div>
           <div class="ev-host">${ui.dogAvatar(host || { dog: {} }, { size: 22, label: false })}主揪 ${D.ownerName(ev.hostId)}${D.isHost(ev) ? '（你）' : ''}</div>
         </div>
         <span class="ev-hero">${ui.art('eventHero', { width: 124 })}</span>
@@ -15628,6 +15638,13 @@ try {
     if (!pl || pl.kind !== 'spot' || !isFinite(pl.lat) || !isFinite(pl.lng)) return '';
     var url = 'https://www.google.com/maps/search/?api=1&query=' + Number(pl.lat).toFixed(4) + ',' + Number(pl.lng).toFixed(4);
     return html` <a class="link" href="${url}" target="_blank" rel="noopener noreferrer">${C.spot.onMap}</a>`;
+  }
+
+  /** 導航 to the meetup's place: a park (its point) or a 其他地點 (the host's point). */
+  function navLink(pl) {
+    var at = pl && pl.kind === 'spot' ? pl : pl && pl.parkId ? C.park(pl.parkId) : null;
+    var url = at ? App.map.navUrl(at.lat, at.lng) : '';
+    return url ? html` <a class="link" href="${url}" target="_blank" rel="noopener noreferrer">${C.map.navigate}</a>` : '';
   }
 
   App.register('Event', {
@@ -19217,6 +19234,7 @@ try {
         return html`
           <p class="sub">${park.area ? park.area + '・' : ''}${n ? '現在 ' + n + ' 隻' : '現在沒有狗'}</p>
           ${park.rule ? html`<p class="note mt-8">${park.rule}</p>` : ''}
+          ${App.map.navUrl(park.lat, park.lng) ? html`<p class="mt-8"><a class="link" href="${App.map.navUrl(park.lat, park.lng)}" target="_blank" rel="noopener noreferrer">${C.map.navigate}</a></p>` : ''}
           ${App.parkPick.statusChips(pstat)}
           <div class="sheet-actions">
             ${D.parkShared(park.id) ? ui.quietBtn('常客榜', { act: 'board' }) : ''}
@@ -19284,6 +19302,8 @@ try {
         var hours = pv.checkinHours === 2 ? 2 : 3;
         var home = pv.hideNearHome ? D.myHomePark() : null;
         var multi = many();
+        // the chosen park stays in sight next to the button (Willie 2026-10-30: 「從公園打卡沒效果？」)
+        var at = (C.park(s.state.park) || App.parkPick.resolve(s.state.park) || {}).name || '';
         return html`
           <p class="sub">打卡只顯示哪個公園，${hours} 小時後自動消失。${C.parksNote}</p>
           ${multi ? html`${ui.dogPicker({ dogs: D.myDogs(), selected: s.state.dogs })}<p class="note mt-4">${C.home.bringNote}</p>` : ''}
@@ -19292,7 +19312,7 @@ try {
             return (n ? '現在 ' + n + ' 隻' : '現在沒有狗') + (home === pk.id ? '・家附近，只顯示「在附近」' : '');
           } })}
           <div class="mt-12">${ui.infoPanel({ icon: 'privacy', body: (pv.checkinAudience === 'public' ? '所有人都看得到你的打卡' : C.texts.checkinPrivacy) + '・不顯示精準位置', action: ui.textBtn('設定', { go: 'Privacy', icon: 'chevronRight', iconAfter: true }) })}</div>
-          <div class="sheet-actions">${pres.mine && !multi ? ui.quietBtn('離開公園', { act: 'out' }) : ''}${ui.primaryBtn(multi ? C.home.checkinCta.replace('{n}', s.state.dogs.length) : pres.mine ? '改到這裡' : '打卡', { act: 'go' })}</div>`;
+          <div class="sheet-actions sheet-sticky">${at ? html`<p class="note sheet-sticky-at">在「${at}」打卡</p>` : ''}${pres.mine && !multi ? ui.quietBtn('離開公園', { act: 'out' }) : ''}${ui.primaryBtn(multi ? C.home.checkinCta.replace('{n}', s.state.dogs.length) : pres.mine ? '改到這裡' : '打卡', { act: 'go' })}</div>`;
       },
       actions: {
         pick: function (s, d) { var pk = App.parkPick.resolve(d.park); if (pk) { s.state.park = pk.id; s.update(); } },
