@@ -1044,7 +1044,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab">豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-30.4885903c","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-10-30.018a5237","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2650,7 +2650,6 @@ window.APP_BUILD = {"version":"2026-10-30.4885903c","seedUrl":"seed-data.json"};
     regularsRule: '近 28 天打卡天數',
     regularsHidden: '一隻只給狗友看的狗',             // 常客榜上，打卡只給狗友看的狗不顯示名字
     typhoonMaybePaused: '颱風警報中，這次可能暫停',
-    albumNote: '這裡的照片是示意圖，狗聚日的相簿還不能上傳照片。',
     // 追蹤的說明（試辦版沒有推播：追蹤的狗寫日記、打卡、散步、開團會出現在首頁的狗友動態）
     followNote: '牠們寫日記、打卡、開團時，會出現在首頁的狗友動態',
     followNoteOne: '牠寫日記、打卡、開團時，會出現在首頁的狗友動態',
@@ -8132,8 +8131,9 @@ window.APP_BUILD = {"version":"2026-10-30.4885903c","seedUrl":"seed-data.json"};
     var closesAt = ev ? eventEnd(ev) + CHAT_CLOSE_DAYS * 24 * HOUR : 0;
     return { closed: !!ev && (t > closesAt || ev.status === 'cancelled'), closesAt: closesAt };
   }
-  /** sendMessage(eventId, text, [opts]) — opts.art = an App.art key (e.g. 'chatPhoto', 'album1') sends a 'photo' message
-      (the prototype has no camera/uploads; a photo is one of the hand-drawn pictures). opts.full = the sender's live list
+  /** sendMessage(eventId, text, [opts]) — opts.photoFile = a real photo (resized and uploaded here) sends a 'photo' message;
+      opts.art = an App.art key (e.g. 'chatPhoto', 'album1') sends a drawn picture (only old app versions still do: the Chat
+      screen stopped offering them 2026-10-30). opts.full = the sender's live list
       is already at MAX_MSGS (prune now). Same rule as the Chat screen: the host, or a dog that signed up
       (going / waitlist / pending / rest), while the chat is open. */
   /** 一個家: the dog of mine that talks in this meetup's chat — the actor when it is the host or on the list, else the first
@@ -13136,7 +13136,7 @@ try {
 /* ---- screens/Chat.js ---- */
 try {
 /* Chat（活動聊天室）— live event chat: 主揪公告, day separators, system lines, real photos (tap = full size) and the
-   drawn pictures, send box. Only people in the event can read and send (2026-10-28: the database lets nobody else read
+   drawn pictures sent before 2026-10-30 (no longer offered), send box. Only people in the event can read and send (2026-10-28: the database lets nobody else read
    it — the others see 「報名的狗才看得到聊天室」 and the 主揪公告); the chat closes 7 days after the event (read-only).
    Being on this screen marks the chat read (unread dots; D.markEventRead writes only when something new arrived).
    No 「回報問題」 footer (the fixed send bar leaves no room): the link sits in the header instead.
@@ -13145,7 +13145,9 @@ try {
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, C = App.content, fmt = ui.fmt;
-  var PHOTOS = ['chatPhoto', 'album1', 'album2', 'album3', 'album4']; // drawn pictures offered next to real photos
+  // drawn pictures: no longer offered (Willie 2026-10-30, 「好，拿掉」: they looked like a photo that would not load);
+  // the ones sent before still draw
+  var PHOTOS = ['chatPhoto', 'album1', 'album2', 'album3', 'album4'];
   var GROUP_MS = 5 * 60e3;
 
   (function () {
@@ -13190,10 +13192,6 @@ try {
       '.chat-join{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;line-height:20px;color:var(--body)}',
       '.chat-join .btn-primary{flex-shrink:0}',
       '.chat-closed{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;line-height:20px;color:var(--muted)}',
-      '.chat-pics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}',
-      '.chat-pic{padding:0;border:3px solid transparent;border-radius:16px;background:var(--map-water);overflow:hidden;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center}',
-      '.chat-pic[aria-pressed="true"]{border-color:var(--teal)}',
-      '.chat-pic svg{width:100%;height:100%}',
       '.chat-title{display:flex;align-items:center;justify-content:space-between;gap:8px}',
       '.chat-title .fb-link{flex-shrink:0;margin-right:-6px}',
       '.chat-stack{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:4px}',
@@ -13324,33 +13322,28 @@ try {
   }
 
   // ------------------------------------------------------------------ sheets
-  /** 傳照片: a real photo from the phone (resized before upload by App.data) or one of the drawn pictures. */
+  /** 傳照片: a real photo from the phone (resized before upload by App.data). */
   function openPhotos(ctx) {
     ui.sheet({
       title: '傳照片',
       autofocus: false,
-      state: { file: null, preview: null, art: null, caption: '', busy: false },
+      state: { file: null, preview: null, caption: '', busy: false },
       render: function (s) {
         var st = s.state;
-        var chosen = !!(st.file || st.art);
         return html`<div class="chat-pick">
             ${st.preview ? html`<div class="chat-prev">${st.preview}</div>` : st.file ? ui.loading() : ''}
             ${ui.photoInput({ act: 'file', label: st.file ? C.photo.change : C.photo.pick })}
           </div>
           <p class="note mt-8">${C.photo.publicNote}</p>
-          <div class="label mt-16" id="chat-pics-l">或傳一張插畫</div>
-          <div class="chat-pics mt-8" role="group" aria-labelledby="chat-pics-l">${PHOTOS.map(function (a, i) {
-            return html`<button type="button" class="chat-pic" data-act="pick"${ui.data({ a: a })}${ui.attrs({ 'aria-pressed': String(st.art === a), 'aria-label': '插畫 ' + (i + 1) })}>${ui.art(a, { fit: 'xMidYMid slice' })}</button>`;
-          })}</div>
           <div class="mt-16">${ui.field({ label: '說明', model: 'caption', value: st.caption, placeholder: '例如：上次散步的合照', maxlength: 40, id: 'chat-cap' })}</div>
           ${st.busy && st.file ? html`<p class="note mt-8" role="status">${C.photo.busy}</p>` : ''}
-          <div class="sheet-actions">${ui.quietBtn('取消', { act: 'close' })}${ui.secondaryBtn('傳出去', { act: 'send', icon: 'send', disabled: !chosen || st.busy })}</div>`;
+          <div class="sheet-actions">${ui.quietBtn('取消', { act: 'close' })}${ui.secondaryBtn('傳出去', { act: 'send', icon: 'send', disabled: !st.file || st.busy })}</div>`;
       },
       actions: {
         file: function (s, d) {
           var file = d.file;
           if (!file) return;
-          s.state.file = file; s.state.art = null; s.state.preview = null;
+          s.state.file = file; s.state.preview = null;
           s.update();
           return ui.photoPreview(file, { size: 200, square: false, radius: 16, alt: '要傳的照片' }).then(function (img) {
             if (s.state.file === file) { s.state.preview = img; s.update(); }
@@ -13359,7 +13352,6 @@ try {
             throw e; // → toast (請選照片檔 / 這張照片打不開…)
           });
         },
-        pick: function (s, d) { if (PHOTOS.indexOf(d.a) !== -1) { s.state.art = d.a; s.state.file = null; s.state.preview = null; s.update(); } },
         close: function (s) { s.close(); },
         send: function (s) {
           var st = s.state;
@@ -13367,9 +13359,8 @@ try {
           var ev = ctx.state.event;
           if (!ev) return;
           if (!inChat(ev) || D.chatState(ev).closed) { ui.toast('報名後就能聊天'); return; }
-          if (!st.file && !st.art) { ui.toast('先選一張照片'); return; }
-          var opts = { full: (ctx.state.msgs || []).length >= D.maxMessages };
-          if (st.file) opts.photoFile = st.file; else opts.art = st.art;
+          if (!st.file) { ui.toast('先選一張照片'); return; }
+          var opts = { full: (ctx.state.msgs || []).length >= D.maxMessages, photoFile: st.file };
           st.busy = true; s.update();
           return D.sendMessage(ev.id, String(st.caption || '').trim(), opts).then(function () {
             s.close();
@@ -21669,7 +21660,8 @@ try {
 try {
 /* Theme_Day（狗聚日與主題日）— 固定狗聚日 (this Saturday 09:00 大安森林公園): live count + faces, 這週我要去 toggle,
    paused while the typhoon simulation is on; 本季主題日 (柯基日（範例）) 我要去 toggle + 加到行事曆 (copy text);
-   之前的狗聚 = past meetups from the db (tap a tile to see who said they would go). */
+   之前的狗聚 = past meetups from the db: a tile shows the faces of the dogs that said they would go (tap it to see them
+   all) — no drawn pictures, they looked like photos (Willie 2026-10-30: 「一起換掉」). */
 (function (App) {
   'use strict';
   var ui = App.ui, html = ui.html, D = App.data, C = App.content, fmt = ui.fmt;
@@ -21700,8 +21692,8 @@ try {
       '.td-btns > .btn-secondary{font-size:15px}',
       '.td-album{margin-top:10px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}',
       '.td-tile{width:100%;padding:0;border:none;background:none;display:flex;flex-direction:column;gap:4px;text-align:left}',
-      '.td-tile .ph{height:76px;border-radius:16px;overflow:hidden}',
-      '.td-tile .ph svg{width:100%;height:76px}',
+      // its own class: a dog's photo inside an avatar is an img.ph (審查 2026-10-30: `.td-tile .ph` stretched it to 76 px)
+      '.td-tile .td-faces{height:76px;border-radius:16px;overflow:hidden;background:var(--cream);color:var(--teal-ink);display:flex;align-items:center;justify-content:center}',
       '.td-tile .lb{font-size:12px;line-height:16px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '.td-who{margin-top:12px;display:flex;flex-wrap:wrap;gap:12px 16px}',
       '.td-who > li{width:56px}',
@@ -21712,8 +21704,8 @@ try {
   })();
 
   function myId() { return App.me.actorId; }
-  function faces(ids, n) {
-    return ids.slice(0, n).map(function (id) { return ui.dogAvatar(D.person(id), { size: 32, bg: 'white', label: false, ring: false }); });
+  function faces(ids, n, size) {
+    return ids.slice(0, n).map(function (id) { return ui.dogAvatar(D.person(id), { size: size || 32, bg: 'white', label: false, ring: false }); });
   }
   /** The theme day's big face: its `look` in App.content when given, else the default look of a breed named in the
       title (柯基日 → the corgi, from App.content's breed list), else the first drawn look. */
@@ -21789,13 +21781,13 @@ try {
 
   function albumSection(ctx) {
     var list = ctx.state.meetups;
-    var head = html`<div class="sec-head"><h2 class="h3" id="albumTitle" style="font-size:18px;line-height:24px">之前的狗聚</h2><span class="small">大家傳的照片</span></div>`;
+    var head = html`<div class="sec-head"><h2 class="h3" id="albumTitle" style="font-size:18px;line-height:24px">之前的狗聚</h2></div>`;
     if (list === undefined) return html`<section class="px mt-24" aria-labelledby="albumTitle">${head}${ui.loading()}</section>`;
     var past = pastMeetups(list);
-    var body = past.length ? html`<ul class="td-album">${past.slice(0, 8).map(function (m, i) {
-      var at = meetupAt(m);
+    var body = past.length ? html`<ul class="td-album">${past.slice(0, 8).map(function (m) {
+      var at = meetupAt(m), ids = goingIds(m);
       return html`<li><button type="button" class="td-tile"${ui.act('album', { key: m.dateKey })}${ui.attrs({ 'aria-label': fmt.md(at) + ' 狗聚，' + m.count + ' 隻說要去' })}>
-        <span class="ph">${ui.art('album' + (i % 4 + 1), { width: 80, height: 76, fit: 'xMidYMid slice' })}</span>
+        <span class="td-faces">${ids.length ? html`<span class="avatar-stack">${faces(ids, 3, 28)}</span>` : ui.icon('calendar', { size: 28 })}</span>
         <span class="lb">${fmt.md(at)}・${m.count} 隻</span>
       </button></li>`;
     })}</ul>` : html`<div class="mt-8">${ui.emptyState({ icon: 'calendar', title: '還沒有之前的狗聚', body: C.weekly.title + '去一次，這裡就會留下紀錄。' })}</div>`;
@@ -21804,6 +21796,11 @@ try {
   /** a meetup's start: its stored time, else that day at the weekly meetup's time (App.content.weekly.time) */
   function meetupAt(m) {
     return typeof m.at === 'number' && isFinite(m.at) ? m.at : fmt.parseKey(m.dateKey, C.weekly.time);
+  }
+  /** the dogs that said they would go, from a meetup's `going` map (as watchMeetups gives it) */
+  function goingIds(m) {
+    var map = m.going && typeof m.going === 'object' && !Array.isArray(m.going) ? m.going : {};
+    return Object.keys(map).filter(function (k) { return map[k] != null && map[k] !== false; });
   }
   /** past meetups (ended: 2 hours after the start) with at least one dog, newest first */
   function pastMeetups(list) {
@@ -21859,8 +21856,7 @@ try {
         if (!m) return;
         var at = meetupAt(m);
         var park = C.park(m.parkId) || C.park(C.weekly.parkId);
-        var map = m.going && typeof m.going === 'object' && !Array.isArray(m.going) ? m.going : {};
-        var ids = Object.keys(map).filter(function (k) { return map[k] != null && map[k] !== false; });
+        var ids = goingIds(m);
         ui.sheet({
           title: fmt.date(at) + ' ' + (m.kind === 'theme' && typeof m.title === 'string' ? m.title : C.weekly.title),
           render: function () {
@@ -21869,8 +21865,7 @@ try {
               <ul class="td-who">${ids.slice(0, 24).map(function (id) {
                 var inner = html`${ui.dogAvatar(D.person(id), { size: 48 })}<span class="nm">${D.dogName(id)}</span>`;
                 return html`<li>${id === myId() ? html`<div style="display:flex;flex-direction:column;align-items:center;gap:4px">${inner}<span class="small teal">（你家）</span></div>` : html`<button type="button"${ui.go('DM_Invite', { id: id })}>${inner}</button>`}</li>`;
-              })}</ul>
-              <p class="note mt-16">${C.texts.albumNote}</p>`;
+              })}</ul>`;
           }
         });
       }
