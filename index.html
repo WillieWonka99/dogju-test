@@ -777,9 +777,16 @@ button.app-banner.reload { text-decoration: underline; text-underline-offset: 3p
 
 /* ---------- Bars ---------- */
 .topbar { height: 56px; flex-shrink: 0; padding: 6px 12px 0; display: flex; align-items: center; justify-content: space-between; gap: 4px; }
-.topbar-title { flex: 1; min-width: 0; font-size: 15px; font-weight: 500; color: var(--ink); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar-title { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px; font-weight: 500; color: var(--ink); }
+.topbar-title > span { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar-brand { display: flex; align-items: center; justify-content: center; }
 .apphead { height: 76px; flex-shrink: 0; padding: 16px var(--gutter) 0; display: flex; align-items: center; gap: 4px; }
 .apphead .h1-tab { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; }
+/* the logo (ui.brandMark) and the home header's 豆米特 with 「Dog Meet」 under it, spread to the same width */
+.brand-mark { display: block; flex-shrink: 0; }
+.brand-name { display: inline-flex; flex-direction: column; min-width: 0; }
+.brand-zh { font-size: 30px; line-height: 32px; }
+.brand-en { display: flex; justify-content: space-between; padding: 0 1px; font-size: 14px; line-height: 18px; color: var(--teal); }
 .iconbtn { width: 44px; height: 44px; flex-shrink: 0; padding: 0; border: none; border-radius: 22px; background: transparent; color: var(--ink); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .iconbtn.tint { background: var(--teal-tint); color: var(--teal-ink); }
 .iconbtn:disabled { opacity: .45; }
@@ -1033,9 +1040,9 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <script src="app-config.js" defer></script>
 </head>
 <body>
-<div id="app"><div class="boot" role="status"><div class="h1-tab">豆米特</div><p class="sub">載入中…</p></div></div>
+<div id="app"><div class="boot" role="status"><div class="h1-tab"><svg class="brand-mark" width="48" height="48" viewBox="0 0 64 64" aria-hidden="true"><g transform="matrix(0.5676 0 0 0.5676 -1.6622 25.1081)"><g fill="#E8775A"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><path d="M49 21C48.5 14 47 8.5 44.5 5.5C43.4 4.3 42 4.4 41 5.4C38.5 8 36.5 10.5 35 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#C9603F"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.4 16.2C44.9 12.6 44 9.9 42.9 8.6C42.4 8.1 41.8 8.1 41.3 8.6C40 10.1 38.8 11.6 38 12.8Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.5676 0 0 0.5676 29.3378 25.1081)"><g fill="#4FAFBC"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#2F8592"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.6216 0 0 0.6216 12.1081 20.0946)"><circle cx="32" cy="28" r="18.5" fill="#2F8592"/><g fill="#1F6670"><path d="M18.5 15.5C12.5 16 10 23.5 11.5 30C12.7 34.2 17 33.8 18.2 29.2C19.4 24.7 21 19 18.5 15.5Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><rect x="4" y="47" width="56" height="11" rx="5.5" fill="#1F6670"/><g fill="#E8775A"><ellipse cx="12.5" cy="48" rx="2.6" ry="2"/><ellipse cx="20.5" cy="48" rx="2.6" ry="2"/></g><g fill="#2F8592"><ellipse cx="27.6" cy="48" rx="2.6" ry="2"/><ellipse cx="36.4" cy="48" rx="2.6" ry="2"/></g><g fill="#4FAFBC"><ellipse cx="43.5" cy="48" rx="2.6" ry="2"/><ellipse cx="51.5" cy="48" rx="2.6" ry="2"/></g><g transform="matrix(0.34 0 0 0.34 21.12 -0.56)"><path d="M32 60C32 60 13.5 41.5 13.5 28C13.5 17.5 21.8 9 32 9C42.2 9 50.5 17.5 50.5 28C50.5 41.5 32 60 32 60Z" fill="#E8775A"/><circle cx="32" cy="28" r="7.5" fill="#FFFAF3"/></g></svg>豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-10-30.d372b29b","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-11-02.b9c62768","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1465,6 +1472,16 @@ window.APP_BUILD = {"version":"2026-10-30.d372b29b","seedUrl":"seed-data.json"};
     var style = opts.color ? 'color:' + opts.color : null;
     return html`<svg class="ic ${opts.cls || ''}" width="${size}" height="${size}" viewBox="${def[0]}"${attrs({ style: style, 'aria-hidden': opts.label ? null : 'true', role: opts.label ? 'img' : null, 'aria-label': opts.label || null })}>${raw(def[1])}</svg>`;
   }
+  // the 豆米特 logo (Willie 2026-11-01, J1 「頭上小圖釘」: 「J1 我覺得不錯」): three dogs peeking over a bench, a small coral
+  // pin above them. One line on purpose: tools/build_web.py reads it for the app icons, favicon.svg and the loading screen.
+  var BRAND_SVG = '<g transform="matrix(0.5676 0 0 0.5676 -1.6622 25.1081)"><g fill="#E8775A"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><path d="M49 21C48.5 14 47 8.5 44.5 5.5C43.4 4.3 42 4.4 41 5.4C38.5 8 36.5 10.5 35 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#C9603F"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.4 16.2C44.9 12.6 44 9.9 42.9 8.6C42.4 8.1 41.8 8.1 41.3 8.6C40 10.1 38.8 11.6 38 12.8Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.5676 0 0 0.5676 29.3378 25.1081)"><g fill="#4FAFBC"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#2F8592"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.6216 0 0 0.6216 12.1081 20.0946)"><circle cx="32" cy="28" r="18.5" fill="#2F8592"/><g fill="#1F6670"><path d="M18.5 15.5C12.5 16 10 23.5 11.5 30C12.7 34.2 17 33.8 18.2 29.2C19.4 24.7 21 19 18.5 15.5Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><rect x="4" y="47" width="56" height="11" rx="5.5" fill="#1F6670"/><g fill="#E8775A"><ellipse cx="12.5" cy="48" rx="2.6" ry="2"/><ellipse cx="20.5" cy="48" rx="2.6" ry="2"/></g><g fill="#2F8592"><ellipse cx="27.6" cy="48" rx="2.6" ry="2"/><ellipse cx="36.4" cy="48" rx="2.6" ry="2"/></g><g fill="#4FAFBC"><ellipse cx="43.5" cy="48" rx="2.6" ry="2"/><ellipse cx="51.5" cy="48" rx="2.6" ry="2"/></g><g transform="matrix(0.34 0 0 0.34 21.12 -0.56)"><path d="M32 60C32 60 13.5 41.5 13.5 28C13.5 17.5 21.8 9 32 9C42.2 9 50.5 17.5 50.5 28C50.5 41.5 32 60 32 60Z" fill="#E8775A"/><circle cx="32" cy="28" r="7.5" fill="#FFFAF3"/></g>';
+  var BRAND_EN = 'Dog Meet';
+  /** The 豆米特 logo (a 64 x 64 drawing) at o.size px (default 44). Decorative: the name or the page title is beside it. */
+  function brandMark(o) {
+    o = o || {};
+    var size = Number(o.size) || 44;
+    return html`<svg class="brand-mark" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true" focusable="false">${raw(BRAND_SVG)}</svg>`;
+  }
   function art(name, opts) {
     opts = opts || {};
     var def = own(App.art, name);
@@ -1578,17 +1595,21 @@ window.APP_BUILD = {"version":"2026-10-30.d372b29b","seedUrl":"seed-data.json"};
     return html`<button type="button" class="iconbtn ${o.tint ? 'tint' : ''} ${o.cls || ''}"${attrs({ 'aria-label': o.label || name, disabled: !!o.disabled })}${o.act ? act(o.act, o.data) : ''}${o.go ? go(o.go, o.params) : ''}>${icon(name, { size: o.size || 24 })}</button>`;
   }
 
-  /** Top bar for non-tab screens. back: true (App.back) | false. right: SafeHtml. */
+  /** Top bar for non-tab screens: back, the logo in the middle (left of the title when there is one), right.
+   *  back: true (App.back) | false. right: SafeHtml. The logo is on every screen's top (Willie 2026-11-01 「在個頁面上面都要有」). */
   function topBar(o) {
     o = o || {};
     var back = o.back === false ? html`<span style="width:44px"></span>` :
       html`<button type="button" class="iconbtn" data-act="__back" aria-label="${o.backLabel || '返回'}">${icon('back')}</button>`;
-    return html`<div class="topbar">${back}${o.title ? html`<div class="topbar-title">${o.title}</div>` : html`<span class="grow"></span>`}${o.right || html`<span style="width:44px"></span>`}</div>`;
+    var mid = o.title ? html`<div class="topbar-title">${brandMark({ size: 28 })}<span>${o.title}</span></div>` : html`<span class="grow topbar-brand">${brandMark({ size: 34 })}</span>`;
+    return html`<div class="topbar">${back}${mid}${o.right || html`<span style="width:44px"></span>`}</div>`;
   }
-  /** Big header for tab screens: paw logo optional. */
+  /** Big header for tab screens: the logo, then the title. brand: the home header, 豆米特 with 「Dog Meet」 under it spread to
+   *  the same width (Willie 2026-10-30 「英文是要跟中文一樣長度」); screen readers hear 「Dog Meet」 once, as words. */
   function appHead(title, o) {
     o = o || {};
-    return html`<header class="apphead"><h1 class="h1-tab">${o.logo ? icon('paw', { size: 26, color: 'var(--teal-2)' }) : ''}${title}</h1>${o.right || ''}</header>`;
+    var name = o.brand ? html`<span class="brand-name"><span class="brand-zh">${title}</span><span class="brand-en" aria-hidden="true">${BRAND_EN.split('').map(function (ch) { return html`<span>${ch === ' ' ? raw('&nbsp;') : ch}</span>`; })}</span><span class="sr-only"> ${BRAND_EN}</span></span>` : title;
+    return html`<header class="apphead"><h1 class="h1-tab">${brandMark({ size: 44 })}${name}</h1>${o.right || ''}</header>`;
   }
   function sectionHead(title, right, o) {
     o = o || {};
@@ -2372,7 +2393,7 @@ window.APP_BUILD = {"version":"2026-10-30.d372b29b","seedUrl":"seed-data.json"};
   App.SafeHtml = SafeHtml;
   App.ui = {
     html: html, raw: raw, esc: esc, join: join, attrs: attrs, data: data, isSafe: isSafe, go: go, act: act, own: own,
-    icon: icon, art: art, fmt: fmt,
+    icon: icon, art: art, brandMark: brandMark, fmt: fmt,
     primaryBtn: primaryBtn, secondaryBtn: secondaryBtn, quietBtn: quietBtn, whiteBtn: whiteBtn, textBtn: textBtn, iconBtn: iconBtn,
     topBar: topBar, appHead: appHead, sectionHead: sectionHead,
     chip: chip, tag: tag, badge: badge, switchCtl: switchCtl, field: field, listRow: listRow,
@@ -4439,7 +4460,7 @@ window.APP_BUILD = {"version":"2026-10-30.d372b29b","seedUrl":"seed-data.json"};
   function fit(g, t, px, family, maxW) {
     for (; px > 24; px -= 4) { g.font = px + 'px ' + family; if (g.measureText(t).width <= maxW) return; }
   }
-  function draw(L, photo, face, paw) {
+  function draw(L, photo, face, logo) {
     var c = document.createElement('canvas'); c.width = W; c.height = H;
     var g = c.getContext('2d');
     g.fillStyle = COL.page; g.fillRect(0, 0, W, H);
@@ -4465,8 +4486,8 @@ window.APP_BUILD = {"version":"2026-10-30.d372b29b","seedUrl":"seed-data.json"};
       g.font = '28px ' + BODY; g.fillStyle = COL.muted; g.textAlign = 'center'; g.fillText(C.shareCard.scan, QR.x + QR.size / 2, QR.y + QR.size + 40); g.textAlign = 'left';
     }
     g.fillStyle = COL.cream; box(g, 60, 1225, 960, 90, 45); g.fill();
-    if (paw) g.drawImage(paw, 96, 1246, 48, 48);
-    g.font = '48px ' + HEAD; g.fillStyle = COL.coral; g.fillText('豆米特 DogMeet', 160, 1288);
+    if (logo) g.drawImage(logo, 92, 1238, 64, 64); // the 豆米特 logo (Willie 2026-11-01, J1)
+    g.font = '48px ' + HEAD; g.fillStyle = COL.coral; g.fillText('豆米特 DogMeet', 168, 1288);
     g.font = '34px ' + BODY; g.fillStyle = COL.muted; g.textAlign = 'right'; g.fillText(C.shareCard.tagline, 990, 1284); g.textAlign = 'left';
     return c;
   }
@@ -4483,7 +4504,7 @@ window.APP_BUILD = {"version":"2026-10-30.d372b29b","seedUrl":"seed-data.json"};
       Promise.all([document.fonts.load('96px Huninn', L.name || '狗'), document.fonts.load('48px Huninn', '豆米特 DogMeet')]).catch(function () { return null; }),
       new Promise(function (r) { setTimeout(r, 3000); })
     ]) : Promise.resolve();
-    return Promise.all([fonts, ph && ph.url ? loadImg(ph.url, true, api._photoMs) : null, svgImg(App.dogs.face(dog, { size: 560 })), svgImg(ui.icon('paw', { size: 48, color: COL.teal2 }))]).then(function (r) {
+    return Promise.all([fonts, ph && ph.url ? loadImg(ph.url, true, api._photoMs) : null, svgImg(App.dogs.face(dog, { size: 560 })), svgImg(ui.brandMark({ size: 64 }))]).then(function (r) {
       // a photo served without CORS taints the canvas (toBlob throws): the drawn face instead
       return toBlob(draw(L, r[1], r[2], r[3])).catch(function () { return toBlob(draw(L, null, r[2], r[3])); });
     });
@@ -11841,7 +11862,7 @@ window.APP_BUILD = {"version":"2026-10-30.d372b29b","seedUrl":"seed-data.json"};
   /** The boot screen. retry: a 「再試一次」 button (an iPhone home-screen app has no reload button). */
   function shell(msg, retry) {
     var ui = App.ui;
-    root().innerHTML = String(ui.html`<div class="boot" role="status"><div class="h1-tab">${ui.icon('paw', { size: 30, color: 'var(--teal-2)' })}豆米特</div><p class="sub">${msg || '載入中…'}</p>${retry ? ui.html`<button type="button" class="btn btn-secondary" id="boot-retry">再試一次</button>` : ''}</div>`);
+    root().innerHTML = String(ui.html`<div class="boot" role="status"><div class="h1-tab">${ui.brandMark({ size: 48 })}豆米特</div><p class="sub">${msg || '載入中…'}</p>${retry ? ui.html`<button type="button" class="btn btn-secondary" id="boot-retry">再試一次</button>` : ''}</div>`);
     var b = document.getElementById('boot-retry');
     if (b) b.addEventListener('click', function () { b.disabled = true; try { window.location.reload(); } catch (e) { /* ignore */ } });
     if (ui._reattachBanner) ui._reattachBanner(root()); // a sync-lost banner raised during boot stays visible
@@ -14547,11 +14568,11 @@ try {
         </section>`;
       if (D.me() || App.me.isPersona) return ui.loading();
       if (!dog) {
-        return html`${ui.appHead('豆米特', { logo: true })}
+        return html`${ui.appHead('豆米特', { brand: true })}
           <div class="px mt-16">${D.peopleLoaded() ? ui.emptyState({ icon: 'paw', title: S.notFound, body: S.notFoundNote }) : ui.loading()}${join}</div>`;
       }
       var ph = D.photoOf(p), tags = Array.isArray(dog.tags) ? dog.tags.filter(function (t) { return typeof t === 'string' && t; }) : [];
-      return html`${ui.appHead('豆米特', { logo: true })}
+      return html`${ui.appHead('豆米特', { brand: true })}
         <div class="dc-pic${ph ? '' : ' face'}">${ph ? html`<img src="${ph.url}" alt="${dog.name || ''}" width="${ph.w || 1024}" height="${ph.h || 768}">` : App.dogs.face(dog, { size: 200 })}</div>
         <div class="px">
           <h2 class="dc-name">${dog.name || ''}</h2>
@@ -16861,7 +16882,7 @@ try {
     if (!p) return '';
     return p.y === y ? fmt.dateTime(ts) : p.y + '/' + p.m + '/' + p.d + ' ' + fmt.time(ts);
   }
-  function brand() { return html`<div class="hu-brand">${ui.icon('paw', { size: 18 })}${H.title}</div>`; }
+  function brand() { return html`<div class="hu-brand">${ui.brandMark({ size: 28 })}${H.title}</div>`; }
   function failedOpen() { return { ok: false, reason: 'failed', title: V.failed.title, message: V.failed.body }; }
 
   /** Add chosen / dropped files (only pictures and PDFs, at most what the link still takes). */
@@ -17430,7 +17451,7 @@ try {
     </div>`;
   }
 
-  function brand() { return html`<span class="hv-brand">${ui.icon('paw', { size: 18 })}${H.title}</span>`; }
+  function brand() { return html`<span class="hv-brand">${ui.brandMark({ size: 28 })}${H.title}</span>`; }
   /** A medicine given within the last day: its 「3 小時前」 label needs refreshing. */
   function recentDose(v) {
     var t = Date.now();
@@ -19077,7 +19098,7 @@ try {
       var dog = (p && p.dog) || {};
       return html`
         ${ui.appHead('豆米特', {
-          logo: true,
+          brand: true,
           right: html`<button type="button" class="iconbtn" data-tab="Profile" aria-label="${'我的狗狗：' + (dog.name || '')}">${ui.dogAvatar(p, { size: 44, bg: 'tint', label: false })}</button>`
         })}
         ${mapSection(ctx)}
@@ -20660,7 +20681,7 @@ try {
       var p = D.me();
       return html`
         <div class="rm-top">
-          <div class="topbar"><button type="button" class="iconbtn" data-act="back" aria-label="回狗狗檔案">${ui.icon('back')}</button><span class="grow"></span></div>
+          <div class="topbar"><button type="button" class="iconbtn" data-act="back" aria-label="回狗狗檔案">${ui.icon('back')}</button><span class="grow topbar-brand">${ui.brandMark({ size: 34 })}</span><span style="width:44px"></span></div>
           <h1 class="h1 px">提醒中心</h1>
           <div class="px">${ui.dogSwitch({ dogs: App.me.isPersona ? [] : D.myDogs(), current: App.me.actorId, act: 'dog' })}</div>
           ${p ? html`<span class="rm-face" aria-hidden="true">${ui.dogAvatar(p, { size: 72, label: false, ring: false })}</span>` : ''}
