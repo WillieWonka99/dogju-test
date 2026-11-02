@@ -15,7 +15,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-CLKD4oxcjg3SKpaTLST4uoQ9t7ew29uQ0VaPKDn2Ouo=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://bxoaolzovbcdulqacaur.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://bxoaolzovbcdulqacaur.supabase.co wss://bxoaolzovbcdulqacaur.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-dZIeWCSIFHIUhuV73BfSqZJyGjYDHxHHMoJMFvvE7v8=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://bxoaolzovbcdulqacaur.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://bxoaolzovbcdulqacaur.supabase.co wss://bxoaolzovbcdulqacaur.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
 <title>豆米特 DogMeet</title>
 <meta name="description" content="豆米特 DogMeet 試辦版：約附近的狗一起散步、玩。">
 <meta property="og:type" content="website">
@@ -943,6 +943,7 @@ button.row, a.row { cursor: pointer; }
 .dj-walk { display: inline-flex; align-items: center; transform: translate(-50%, -50%); padding: 3px 9px; min-height: 26px; border: none; border-radius: 13px; background: var(--white); color: var(--ink); font: inherit; font-size: 12px; line-height: 18px; white-space: nowrap; box-shadow: 0 1px 5px rgba(0, 0, 0, .18); cursor: pointer; }
 /* Google 地圖版 (branch google-map): our labels sit on Google's map as on Leaflet's */
 .dj-gpin { position: absolute; }
+.dj-rdot { width: 14px; height: 14px; transform: translate(-50%, -50%); border: 2px solid #FFFFFF; border-radius: 50%; box-sizing: border-box; pointer-events: none; }
 .dj-gdot { width: 20px; height: 20px; transform: translate(-50%, -50%); border: 3px solid #1F6670; border-radius: 50%; background: rgba(232, 119, 90, 0.9); box-sizing: border-box; pointer-events: none; }
 .dj-gcredit { margin: 0 0 4px 4px; padding: 0 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.8); color: #333; font-size: 10px; line-height: 16px; }
 .dj-gfail { position: absolute; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--cream); color: var(--ink); font-size: 15px; line-height: 22px; text-align: center; }
@@ -988,6 +989,14 @@ img.photo { display: block; max-width: 100%; height: auto; background: var(--cre
 .fb-link { font-size: 13px; min-height: 44px; }
 .update-banner { position: sticky; top: 0; z-index: 31; width: 100%; min-height: 44px; padding: calc(10px + var(--safe-t)) var(--gutter) 10px; border: none; background: var(--teal-tint); color: var(--teal-ink); font-size: 14px; line-height: 20px; font-weight: 700; text-align: center; }
 .app-banner + .update-banner { padding-top: 10px; }
+/* 遛狗紀錄: the 狗友 line (Main 狗友動態): the row opens its comments, 汪 is its own button beside it */
+.fd-walk { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--hairline); }
+.fd-walk .fd-walk-main { flex: 1; min-width: 0; border-bottom: none; }
+.fd-walk .dy-woof { flex-shrink: 0; }
+/* 遛狗紀錄: 「散步中 mm:ss」 on every other screen while a walk records (core/walkrec.js); a tap goes back to 散步中 */
+.walk-bar { position: sticky; top: 0; z-index: 29; display: block; width: 100%; min-height: 44px; margin: 0; padding: calc(10px + var(--safe-t)) var(--gutter) 10px; border: none; background: #1F2A2C; color: #F4F1EC; font-family: inherit; font-size: 15px; line-height: 22px; font-weight: 700; text-align: left; font-variant-numeric: tabular-nums; cursor: pointer; }
+.app-banner + .walk-bar, .update-banner + .walk-bar { padding-top: 10px; }
+#app.app-chat > .walk-bar { flex-shrink: 0; position: relative; }
 
 /* ---------- 狗狗健康卡 (SPEC §17): QR, print, wallet card ---------- */
 svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
@@ -1042,6 +1051,11 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 .dog-pick-b[aria-checked="true"]{border-color:var(--teal);background:var(--teal-tint);color:var(--teal-ink);font-weight:700}
 .dog-pick-b .nm{max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dog-pick-b .tick{position:absolute;top:4px;right:4px}
+/* 掃 QR 碼 (core/qrscan.js, 2026-11-02): the camera in a rounded square, a frame to aim with */
+.qrscan{position:relative;width:100%;max-width:360px;height:300px;margin-left:auto;margin-right:auto;border-radius:20px;overflow:hidden;background:var(--ink)}
+@supports (aspect-ratio:1/1){.qrscan{height:auto;aspect-ratio:1/1}}
+.qrscan-video{display:block;width:100%;height:100%;object-fit:cover}
+.qrscan-frame{position:absolute;inset:16%;border:3px solid #fff;border-radius:16px;box-shadow:0 0 0 999px rgba(0,0,0,.28);pointer-events:none}
 
 /* ---- web build (GitHub Pages) ---- */
 #app { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
@@ -1053,7 +1067,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <div id="app"><div class="boot" role="status"><div class="h1-tab"><svg class="brand-mark" width="48" height="48" viewBox="0 0 64 64" aria-hidden="true"><g transform="matrix(0.5676 0 0 0.5676 -1.6622 25.1081)"><g fill="#E8775A"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><path d="M49 21C48.5 14 47 8.5 44.5 5.5C43.4 4.3 42 4.4 41 5.4C38.5 8 36.5 10.5 35 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#C9603F"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.4 16.2C44.9 12.6 44 9.9 42.9 8.6C42.4 8.1 41.8 8.1 41.3 8.6C40 10.1 38.8 11.6 38 12.8Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.5676 0 0 0.5676 29.3378 25.1081)"><g fill="#4FAFBC"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#2F8592"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.6216 0 0 0.6216 12.1081 20.0946)"><circle cx="32" cy="28" r="18.5" fill="#2F8592"/><g fill="#1F6670"><path d="M18.5 15.5C12.5 16 10 23.5 11.5 30C12.7 34.2 17 33.8 18.2 29.2C19.4 24.7 21 19 18.5 15.5Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><rect x="4" y="47" width="56" height="11" rx="5.5" fill="#1F6670"/><g fill="#E8775A"><ellipse cx="12.5" cy="48" rx="2.6" ry="2"/><ellipse cx="20.5" cy="48" rx="2.6" ry="2"/></g><g fill="#2F8592"><ellipse cx="27.6" cy="48" rx="2.6" ry="2"/><ellipse cx="36.4" cy="48" rx="2.6" ry="2"/></g><g fill="#4FAFBC"><ellipse cx="43.5" cy="48" rx="2.6" ry="2"/><ellipse cx="51.5" cy="48" rx="2.6" ry="2"/></g><g transform="matrix(0.34 0 0 0.34 21.12 -0.56)"><path d="M32 60C32 60 13.5 41.5 13.5 28C13.5 17.5 21.8 9 32 9C42.2 9 50.5 17.5 50.5 28C50.5 41.5 32 60 32 60Z" fill="#E8775A"/><circle cx="32" cy="28" r="7.5" fill="#FFFAF3"/></g></svg>豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
 (function () { var l = document.getElementById('dg-font'); if (l) l.media = 'all'; })();
-window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-11-02.bb959583","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2798,17 +2812,18 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
   // =====================================================================================================
   var PRIVACY_NOTE = {
     title: '隱私說明',
-    lead: '豆米特現在是試辦版，給朋友一起測試用。',
+    lead: '豆米特現在是試辦版，給朋友一起測試用。（2026-11-02 版）',
     sections: [
-      { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到；打開驅蟲徽章時，名片上會有驅蟲的到期日）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
-      { title: '誰看得到', body: '用豆米特的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊，管理員看得到（範例狗狗由管理員扮演），是測試用的。' },
-      { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位。位置只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。' },
-      { title: '我出門遛狗', body: '按「我出門遛狗」才會用一次手機定位，不會一直追蹤。在公園裡就打卡在那座公園；在外面，別人只看到你大約在哪個 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。不存精確位置，也不送給任何人。家的位置只有你知道，存在你自己的資料裡。' },
+      { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、散步紀錄（路線、距離、時間）、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到；打開驅蟲徽章時，名片上會有驅蟲的到期日）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
+      { title: '誰看得到', body: '用豆米特的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗狗名片是公開的：拿到你的名片連結或 QR 碼的人，不用加入也看得到照片、名字、品種、個性和主人暱稱；填了狂犬病疫苗到期日的話，這個日期也跟名片放在一起（名片上只顯示「疫苗」徽章）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。散步紀錄（路線、幾點出門、誰遛的）只有家人看得到；狗友只看得到每天一共走了幾公里、幾分鐘。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊，管理員看得到（範例狗狗由管理員扮演），是測試用的。' },
+      { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」時會用手機定位，只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。按「我出門遛狗」以後，散步中會一直用定位記路線，走完只存在家人的散步紀錄裡（見下面「我出門遛狗」）。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。' },
+      { title: '我出門遛狗', body: '按「我出門遛狗」以後，會記錄這次散步的路線和距離，只有家人看得到，可以隨時刪掉。地圖上給別人看的，還是只有大概的範圍：在公園裡就打卡在那座公園；在外面是大約 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。狗友看得到每天一共走了幾公里、幾分鐘（隱私設定可以關），看不到路線，也看不到幾點出門。家的位置只有你和家人知道。沒在散步的時候，不會記錄位置。' },
       { title: '還是測試', body: '試辦版的保護還不完整：狗聚、聊天和協尋這些共用的資料，懂技術的人可能改得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
       { title: '通知（選用）', body: '在「我的」打開通知，手機會給豆米特一個推播地址，由 Google、Apple、Mozilla 或 Microsoft 的推播服務轉送。有人在你的狗聚聊天室說話、私訊你或邀請你時，手機會跳出狗聚名稱或狗狗名字，不會有訊息內容。關掉通知或刪除我的資料，這個地址就刪掉。' },
+      { title: '相機（掃 QR 碼）', body: '按「掃 QR 碼」時才會打開相機，畫面只在你的手機上找 QR 碼，不會存起來，也不會傳出去。關掉掃描或離開這一頁，相機就關了。' },
       { title: '沒有帳號', body: '不用註冊。你的身分記在這支手機的瀏覽器裡，清除瀏覽器資料、換手機、或從主畫面打開（iPhone），都會變成新的人。要變回同一隻狗，用「我的」→「家人」裡的找回碼。' },
       { title: '綁定 LINE（選用）', body: '有開放時，「我的」→「家人」可以綁定 LINE，換手機或換瀏覽器時用 LINE 登入就能找回同一隻狗。綁定時，登入系統會存 LINE 給的帳號編號、名字和大頭貼，只用來登入，不給別人看；不拿 email，也不會傳 LINE 訊息給你。刪除我的資料時會一起刪掉。' },
-      { title: '回報問題', body: '按「回報問題」送出時，會一起附上你是哪隻狗、畫面名稱、App 版本、手機和瀏覽器的種類、時間，方便找出問題。私訊頁的「檢舉」也會用回報問題送給開這個 App 的人。只有你和開這個 App 的人看得到。' },
+      { title: '回報問題', body: '按「回報問題」送出時，會一起附上你是哪隻狗、現在的畫面（例如正在看哪隻狗的名片、跟誰的私訊）、App 版本、手機和瀏覽器的種類、時間，方便找出問題。私訊頁的「檢舉」也會用回報問題送給開這個 App 的人。只有你和開這個 App 的人看得到。' },
       { title: '一個家、好幾隻狗', body: '家人看得到家裡全部的狗和私訊，也能幫任何一隻打卡、報名、回訊息。名片上會顯示同一家的狗和家人暱稱。刪除有三種：刪除這隻狗、這支手機離開這個家、刪除整個家。' },
       { title: '怎麼刪掉', body: '「我的」→「隱私說明」→「刪除我的資料」。刪掉後，下次打開會變成新的人。' }
     ]
@@ -2841,7 +2856,7 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
   // =====================================================================================================
   var TERMS = {
     title: '使用條款',
-    lead: '豆米特 DogMeet 是 Willie 做的試辦服務，免費讓飼主約狗狗一起散步、玩。用豆米特就表示同意下面這些事。（2026-10-29 版）',
+    lead: '豆米特 DogMeet 是 Willie 做的試辦服務，免費讓飼主約狗狗一起散步、玩。用豆米特就表示同意下面這些事。（2026-11-02 版）',
     agree: '建立名片就表示同意',
     sections: [
       { title: '這是試辦版', body: '功能和規則可能會改，也可能暫停或結束，重要的改變會在 App 裡說。資料可能因為技術問題遺失，重要的東西請自己另外留一份。' },
@@ -2857,7 +2872,7 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
 
   // Google 地圖版（branch google-map）：Google 規定隱私說明和使用條款要寫地圖由 Google 提供，並連到 Google 的政策和條款。
   // 沒有 Google 地圖的 key 時，上面原本的字一字不改。
-  var MAP_PRIVACY_GOOGLE = '地圖由 Google 提供：看地圖時，手機會跟 Google 要地圖，Google 會知道你在看哪一帶的地圖，也適用 Google 的隱私權政策。點地圖上的公園時，先在手機裡的公園清單查（公園資料來自 OpenStreetMap）；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位。位置只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。';
+  var MAP_PRIVACY_GOOGLE = '地圖由 Google 提供：看地圖時，手機會跟 Google 要地圖，Google 會知道你在看哪一帶的地圖，也適用 Google 的隱私權政策。點地圖上的公園時，先在手機裡的公園清單查（公園資料來自 OpenStreetMap）；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」時會用手機定位，只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。按「我出門遛狗」以後，散步中會一直用定位記路線，走完只存在家人的散步紀錄裡（見下面「我出門遛狗」）。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。';
   var MAP_PRIVACY_LINKS = [{ label: 'Google 隱私權政策', url: 'https://policies.google.com/privacy' }];
   var MAP_TERMS = { title: '地圖', body: '豆米特的地圖由 Google 提供。使用地圖，也要遵守 Google 地圖/Google 地球附加服務條款。',
     links: [{ label: 'Google 地圖/Google 地球附加服務條款', url: 'https://maps.google.com/help/terms_maps/' }] };
@@ -2989,6 +3004,8 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     wrong: '找回碼不對，請再確認一次',
     limit: '試太多次了，請一小時後再試',
     format: '找回碼是 12 個英文字母和數字',
+    // next to every 找回碼 box (資安 2026-11-02): the code is the key to the whole family's dogs and messages
+    safety: '只在換手機或加入家人時輸入。豆米特不會用連結或 QR 碼跟你要找回碼，看到這樣的要求不要輸入。',
     welcome: '歡迎回來，已經換成原本的狗狗',
     persona: '範例分身沒有找回碼，請換回你自己',
     unsupported: '這個版本不能用找回碼',
@@ -3007,7 +3024,7 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     entry: '回報問題',
     title: '回報問題',
     placeholder: '哪裡怪怪的？做了什麼、看到什麼',
-    attach: '會一起附上：你是哪隻狗、現在的畫面、App 版本、手機和瀏覽器種類、時間。',
+    attach: '會一起附上：你是哪隻狗、現在的畫面（例如正在看哪隻狗、跟誰的私訊）、App 版本、手機和瀏覽器種類、時間。',
     reportTag: '檢舉',           // 私訊頁「檢舉」送到管理頁時的標籤
     sent: '收到了，謝謝你',
     empty: '先寫一點發生什麼事',
@@ -3057,7 +3074,9 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     join: '加入豆米特',
     joinNote: '30 秒建立你家狗狗的名片，就能約附近的狗一起散步、玩。不用下載、不用註冊。',
     // iPhone：從主畫面打開的豆米特和 Safari 是分開的，相機掃 QR 碼會開 Safari（審查 2026-11-02）
-    haveApp: '已經在用豆米特？從主畫面打開的話，這裡認不出你。不用再建一隻：到「我的」→「家人」拿找回碼，按上面的按鈕後輸入。',
+    // (資安 2026-11-02) never send someone who scanned to type a 找回碼 on the page a QR opened: a look-alike page could
+    // take it. The scanner inside 豆米特 opens the card where they already are.
+    haveApp: '已經在用豆米特？從主畫面打開的話，這裡認不出你。不用再建一隻：回到主畫面的豆米特，在「訊息」→「看我的狗友」按「掃 QR 碼」再掃一次，就會打開這張名片。豆米特不會用連結或 QR 碼跟你要找回碼。',
     notFound: '找不到這張名片',
     notFoundNote: '這張名片可能已經刪掉了。'
   };
@@ -3426,11 +3445,114 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
       .concat(SHOPS.map(function (s) { return { id: s.id, kind: 'shop', parkId: null, name: s.name, example: true, sub: s.kindLabel }; }));
   }
   // =====================================================================================================
+  // 遛狗紀錄（docs/superpowers/specs/2026-11-02-walk-log-design.md）：散步中、走完了、散步紀錄、狗友動態的一行
+  // =====================================================================================================
+  var WALKLOG = {
+    doneTitle: '走完了',
+    viewTitle: '這次散步',
+    notFound: '找不到這次散步',
+    notFoundBody: '可能已經刪掉了。',
+    noRoute: '這次沒有定位，只記了時間',
+    approx: '大約',
+    km: '公里',
+    routeAria: '這次散步的路線',
+    pee: '有尿尿',
+    poop: '有便便',
+    chipsNote: '不按也可以',
+    done: '完成',
+    del: '刪除這次散步',
+    delTitle: '刪除這次散步？',
+    delBody: '路線和時間都會刪掉，不能復原。',
+    delOk: '刪除',
+    deleted: '刪掉了',
+    by: '{who}帶{dogs}',
+    you: '你',
+    family: '家人',
+    // 第一次按「我出門遛狗」（Willie 2026-11-02：「可以 但要說明為什麼要輸入家的位置」）— 文字照設計文件
+    homeTitle: '先設定家的位置',
+    homeWhy: '為什麼要設定？散步常常從家門口出發。沒設定的話，別人每天都會在地圖上看到你從同一個地方出門，就猜得出你住在哪裡。',
+    homeAfter: '設定以後，在家附近按「我出門遛狗」，地圖上只會顯示區名（例如「大安區」），不會顯示你家在哪條街。',
+    homeWho: '家的位置只有你和家人知道，狗友和陌生人都看不到。',
+    homeHere: '用我現在的位置',
+    homeMap: '在地圖上點',
+    homeLater: '先不要',
+    homeSaved: '家的位置設好了',
+    homeNoPos: '沒有拿到位置，可以改用「在地圖上點」',
+    // 散步中
+    nowTitle: '散步中',
+    nowWith: '帶{dogs}',
+    end: '結束散步',
+    seeMap: '看地圖',
+    none: '現在沒有在散步',
+    noneBody: '按地圖上的「我出門遛狗」就會開始記。',
+    backToMap: '回地圖',
+    short: '不到 1 分鐘，這次不記錄',
+    unsaved: '這次散步還沒存好',
+    unsavedBody: '可能是網路不穩。再按一次就會存起來，不會存兩次。',
+    saveAgain: '再存一次',
+    saving: '存檔中…',
+    giveUp: '放棄這次',
+    giveUpTitle: '放棄這次散步？',
+    giveUpBody: '這次散步不會存起來，不能復原。',
+    ended: '結束散步了',
+    // 其他畫面最上面的那一條
+    bar: '散步中 {t}',
+    barUnsaved: '散步還沒存好，點這裡',
+    barAria: '散步中，回到散步畫面',
+    cta: '散步中',
+    // 這次不記錄
+    notRecord: '這次不記錄',
+    notTitle: '這次不記錄？',
+    notBody: '時間和路線都不會存，按了不能改回來。地圖上還是會顯示你在散步，直到按「結束散步」。',
+    notOk: '不記錄',
+    notNote: '這次不記錄。地圖上還是會顯示你在散步，按「結束散步」才會消失。',
+    barDiscarded: '散步中（這次不記錄）',
+    // 放口袋不會亂按：多久沒碰就鎖住、要長按多久（毫秒）
+    lockMs: 15000,
+    unlockMs: 1000,
+    unlock: '長按 1 秒解鎖',
+    wakeHint: '螢幕要開著才記得到路線',
+    noGeoHint: '沒有定位權限，這次只記時間',
+    gapNotice: '剛剛切到別的 App，這段路線是大約的',
+    askTitle: '這次散步結束了嗎？',
+    askLong: '已經走了 {h} 小時。',
+    askAway: '你離開豆米特超過 1 小時。',
+    askYes: '結束了',
+    askNo: '還在走',
+    goHome: '{dog}先回家',
+    // 我的 → 散步紀錄
+    logTitle: '散步紀錄',
+    logRowSub: '走了多遠、連續幾天',
+    logEmpty: '還沒有散步紀錄',
+    logEmptyBody: '按地圖上的「我出門遛狗」，走完就會記在這裡。',
+    streak: '連續 {n} 天',
+    month: '這個月 {km} 公里・{count} 次',
+    weekTitle: '這週',
+    days: ['一', '二', '三', '四', '五', '六', '日'],
+    dayKm: '週{day} {km} 公里',
+    // 狗友動態的一行（只有那天一共走多遠，沒有路線、沒有幾點）
+    feedKm: '{dog}{day}走了 {km} 公里',
+    feedMin: '{dog}{day}散步了 {minutes}',
+    today: '今天',
+    yesterday: '昨天',
+    postKm: '走了 {km} 公里・{minutes}',
+    postMin: '散步了 {minutes}',
+    postDelBody: '留言會一起刪掉，不能復原。散步紀錄還在。',
+    // 我的隱私
+    shareTitle: '狗友看得到我每天走多遠',
+    shareSub: '只有每天一共幾公里、幾分鐘；看不到路線，也看不到幾點出門',
+    shareOn: '狗友看得到每天走多遠',
+    shareOff: '已關掉：狗友看不到散步總結'
+  };
+
+  // =====================================================================================================
   // 找朋友（Willie 2026-11-02）：沒有全部狗狗的名單；熟人用 QR 碼和連結，一起參加過狗聚的狗自動列出來
   // =====================================================================================================
   var FIND_DOG = {
     title: '遇到熟人',
     note: '讓對方用手機相機掃你的 QR 碼，或用 LINE 傳名片給他，他就能追蹤你。你們都追蹤對方，就是狗友。',
+    // 掃 QR 碼 (2026-11-02) where the phone can be asked for its camera
+    noteScan: '按「掃 QR 碼」掃對方的 QR 碼，就會打開牠的名片，可以追蹤牠。也可以讓對方掃你的 QR 碼，或用 LINE 傳名片給他，他就能追蹤你。你們都追蹤對方，就是狗友。',
     qr: '我的 QR 碼',
     qrTitle: '{dog}的 QR 碼',
     qrNote: '讓對方用手機相機掃一下，就會打開{dog}的名片。',
@@ -3441,6 +3563,22 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     noFollow: '還沒有追蹤的狗。遇到熟人，掃對方的 QR 碼就能追蹤。',
     followHint: '遇到熟人，掃 QR 碼就能追蹤',
     noneToBlock: '目前沒有往來的狗狗。遇到奇怪的狗，點牠的照片打開名片，就能封鎖或檢舉。'
+  };
+  // 掃 QR 碼（Willie 2026-11-02：「需要 這樣比較方便 網頁版就先加吧」）: the camera inside 豆米特 (core/qrscan.js)
+  var SCAN = {
+    button: '掃 QR 碼',
+    title: '掃 QR 碼',
+    starting: '打開相機中…',
+    aim: '把朋友的 QR 碼放在框裡，掃到就會打開牠的名片。',
+    notOurs: '這不是豆米特狗狗名片的 QR 碼。',
+    denied: '沒有相機權限。請到手機的設定允許相機，再按一次「掃 QR 碼」。',
+    noCamera: '找不到相機。',
+    busy: '相機正在被別的 App 使用，關掉它再試一次。',
+    noLib: '掃描程式載不到，請確認網路後再試一次。',
+    failed: '相機打不開，請再試一次。',
+    lost: '相機停了（可能有來電，或別的 App 在用相機），再按一次「掃 QR 碼」。',
+    cancel: '不掃了',
+    videoLabel: '相機畫面'
   };
 
   App.content = {
@@ -3455,7 +3593,7 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, tagGroups: TAG_GROUPS, tagRenames: TAG_RENAMES, neuter: NEUTER, ie: IE, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, ruleBreeds: RULE_BREEDS, aggressiveShort: TEXTS.aggressiveShort },
     privacyNote: PRIVACY_NOTE, terms: TERMS, home: HOME, recovery: RECOVERY, shareCard: SHARE_CARD, login: LOGIN, push: PUSH, feedback: FEEDBACK, deleteMine: DELETE_MINE, updateBanner: UPDATE_BANNER, photo: PHOTO, firstRun: FIRST_RUN,
     freePlan: FREE_PLAN, health: HEALTH,
-    map: MAP, parkStatus: PARK_STATUS, findDog: FIND_DOG,
+    map: MAP, parkStatus: PARK_STATUS, walklog: WALKLOG, findDog: FIND_DOG, scan: SCAN,
     /** A park by id: the three legacy parks, then the shared registry (parks/<id>, installed by core/data.js). null = unknown. */
     park: function (id) { return PARKS.filter(function (p) { return p.id === id; })[0] || (registry && registry(id)) || null; },
     /** Legacy parks first, then registry parks by name. */
@@ -4008,7 +4146,7 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
       if (gState !== 'loading') return;
       if (!g.Map) { gFailed(true); return; }
       gState = 'ready';
-      gCreate();
+      gCreate(); gCreateRoute();
     }, function () { gFailed(true); });
   }
   /** retry: a script that did not load is fetched again at an attach after api._gRetryMs; a refused key is final. */
@@ -4018,13 +4156,16 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     if (retry) gRetryAt = Date.now() + api._gRetryMs;
     gShowFail();
   }
+  /** In each Google map's box: the main map's, and 遛狗紀錄's route map when there is one. */
   function gShowFail() {
-    if (!gEl || gEl.querySelector('.dj-gfail')) return;
-    var d = document.createElement('div');
-    d.className = 'dj-gfail'; d.setAttribute('role', 'status'); d.textContent = C.map.googleFailed;
-    gEl.appendChild(d);
+    [gEl, grEl].forEach(function (box) {
+      if (!box || box.querySelector('.dj-gfail')) return;
+      var d = document.createElement('div');
+      d.className = 'dj-gfail'; d.setAttribute('role', 'status'); d.textContent = C.map.googleFailed;
+      box.appendChild(d);
+    });
   }
-  function gHideFail() { var d = gEl && gEl.querySelector('.dj-gfail'); if (d) d.parentNode.removeChild(d); }
+  function gHideFail(box) { var d = box && box.querySelector('.dj-gfail'); if (d) d.parentNode.removeChild(d); }
   function gCreate() {
     if (gMap || gState !== 'ready' || !gEl) return;
     var g = window.google.maps, v = startView || { lat: C.map.center[0], lng: C.map.center[1], zoom: C.map.zoom };
@@ -4036,7 +4177,7 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     if (gMapId()) o.mapId = gMapId();
     clearTimeout(gWait);
     try { gMap = new g.Map(gEl, o); } catch (e) { console.warn('[map] google', e && e.message); gFailed(false); return; }
-    gHideFail();
+    gHideFail(gEl);
     var credit = document.createElement('div');
     credit.className = 'dj-gcredit'; credit.textContent = C.map.parkCredit; // our park names come from OpenStreetMap
     gMap.controls[g.ControlPosition.LEFT_BOTTOM].push(credit);
@@ -4059,7 +4200,8 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     }
     if (gEl.parentNode !== slot) slot.appendChild(gEl);
     if (!gState && Date.now() >= gRetryAt) gLoad();
-    if (!gMap) return;
+    // Google's script may already be here (a walk's route map asked for it first): make the map now (審查 2026-11-02)
+    if (!gMap) { gCreate(); if (!gMap) return; }
     // same size as last time (the usual re-render): leave the map alone, so a drag or pinch in progress goes on
     var w = slot.clientWidth, h = slot.clientHeight;
     if (w === lastW && h === lastH) return;
@@ -4140,11 +4282,141 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     gDotPin.setMap(gMap);
   }
 
+  // ------------------------------------------------------------------ 遛狗紀錄: a second, separate map for one walk's route
+  // (Walk_View). The main map keeps its own view, labels and walk circles; this one only shows a route.
+  var rEl = null, rMap = null, rLayers = [], rKey = '', rCount = { lines: 0, dashed: 0, dots: 0 };
+  var ROUTE_TEAL = '#2F8592', ROUTE_CORAL = '#E8775A';
+  function createRoute() {
+    var L = window.L;
+    rEl = document.createElement('div');
+    rEl.className = 'dj-map dj-route';
+    rEl.style.position = 'absolute'; rEl.style.left = rEl.style.top = rEl.style.right = rEl.style.bottom = '0';
+    rMap = L.map(rEl, { center: C.map.center, zoom: 15, zoomControl: true, attributionControl: true, minZoom: 7, maxZoom: maxZoomFor() });
+    rMap.attributionControl.setPrefix(false);
+    if (C.map.tiles && !window.DOGJU_NO_TILES) L.tileLayer(C.map.tiles, tileOptions()).addTo(rMap);
+    else rMap.attributionControl.addAttribution(C.map.attribution);
+  }
+  /** Put the route map into `slot` (each render of Walk_View). */
+  function attachRoute(slot) {
+    if (!slot) return;
+    if (useG()) return gAttachRoute(slot);
+    if (!rMap) createRoute();
+    if (rEl.parentNode !== slot) { slot.appendChild(rEl); rMap.invalidateSize({ pan: false }); }
+  }
+  /** Draw a route: points [[lat, lng], …]; gaps: indexes i where the segment i-1 → i is a straight line (dashed). A teal
+      start dot and a coral end dot; the map zooms to the whole route. The same route again changes nothing. */
+  function setRoute(points, gaps) {
+    var pts = (points || []).filter(function (p) { return Array.isArray(p) && isFinite(p[0]) && isFinite(p[1]); }).map(function (p) { return [p[0], p[1]]; });
+    if (useG()) return gSetRoute(pts, gaps || []);
+    if (!rMap) createRoute();
+    var L = window.L;
+    var key = JSON.stringify([pts, gaps || []]);
+    if (key === rKey && rLayers.length) return;
+    rKey = key;
+    rLayers.forEach(function (l) { rMap.removeLayer(l); });
+    rLayers = []; rCount = { lines: 0, dashed: 0, dots: 0 };
+    if (!pts.length) return;
+    var gap = {};
+    (gaps || []).forEach(function (g) { gap[g] = true; });
+    function line(list, dashed) {
+      rLayers.push(L.polyline(list, { color: ROUTE_TEAL, weight: 5, opacity: 0.9, dashArray: dashed ? '6 9' : null, interactive: false }).addTo(rMap));
+      rCount.lines++; if (dashed) rCount.dashed++;
+    }
+    function dot(p, color) {
+      rLayers.push(L.circleMarker(p, { radius: 7, color: '#FFFFFF', weight: 2, fillColor: color, fillOpacity: 1, interactive: false }).addTo(rMap));
+      rCount.dots++;
+    }
+    var run = [pts[0]];
+    for (var i = 1; i < pts.length; i++) {
+      if (gap[i]) { if (run.length > 1) line(run, false); line([pts[i - 1], pts[i]], true); run = [pts[i]]; }
+      else run.push(pts[i]);
+    }
+    if (run.length > 1) line(run, false);
+    dot(pts[0], ROUTE_TEAL);
+    if (pts.length > 1) dot(pts[pts.length - 1], ROUTE_CORAL);
+    if (pts.length === 1) rMap.setView(pts[0], 16, { animate: false });
+    else rMap.fitBounds(L.latLngBounds(pts), { padding: [28, 28], maxZoom: 17, animate: false });
+  }
+
+  // On Google's map (a build with a key) the route map is a second Google map, made once in a page's life and moved into
+  // each render's slot like the main one: one more map load, only when a walk is opened. Google draws no dashed line: a
+  // straight-line part is a row of short strokes (a symbol repeated along an invisible line). The start and end dots are
+  // HTML on the map (Pin), the same size at every zoom as on Leaflet. Google's fitBounds has no maxZoom: the first 'idle'
+  // after it brings a short route back to 17.
+  var grEl = null, grMap = null, grItems = [], grKey = '', grWant = null, grCount = { lines: 0, dashed: 0, dots: 0 };
+  function gAttachRoute(slot) {
+    if (!grEl) {
+      grEl = document.createElement('div');
+      grEl.className = 'dj-map dj-gmap dj-route';
+      grEl.style.position = 'absolute'; grEl.style.left = grEl.style.top = grEl.style.right = grEl.style.bottom = '0';
+    }
+    if (grEl.parentNode !== slot) slot.appendChild(grEl);
+    // a refused key, or a load that failed or is slow (the main map's box already says so): this box says it too
+    if (gState === 'failed' || (gState !== 'ready' && gEl && gEl.querySelector('.dj-gfail'))) gShowFail();
+    if (!gState && Date.now() >= gRetryAt) gLoad();
+    gCreateRoute();
+  }
+  function gCreateRoute() {
+    if (grMap || gState !== 'ready' || !grEl) return;
+    var g = window.google.maps;
+    var o = { center: { lat: C.map.center[0], lng: C.map.center[1] }, zoom: 15, minZoom: 7, maxZoom: 20, gestureHandling: 'greedy', clickableIcons: false,
+      mapTypeControl: false, streetViewControl: false, fullscreenControl: false, zoomControl: true, cameraControl: false, rotateControl: false,
+      zoomControlOptions: { position: g.ControlPosition.LEFT_TOP } };
+    if (gMapId()) o.mapId = gMapId();
+    try { grMap = new g.Map(grEl, o); } catch (e) { console.warn('[map] google route', e && e.message); gShowFail(); return; }
+    gHideFail(grEl);
+    // only on the page: a script that arrives after the walk was left must not fit the route into a 0 × 0 box
+    if (grWant && grEl.isConnected) gDrawRoute(grWant.pts, grWant.gaps);
+  }
+  function gSetRoute(pts, gaps) {
+    grWant = { pts: pts, gaps: gaps };
+    if (grMap) gDrawRoute(pts, gaps);
+  }
+  function gDrawRoute(pts, gaps) {
+    var key = JSON.stringify([pts, gaps]);
+    if (key === grKey && grItems.length) return;
+    grKey = key;
+    grItems.forEach(function (x) { x.setMap(null); });
+    grItems = []; grCount = { lines: 0, dashed: 0, dots: 0 };
+    if (!pts.length) return;
+    var g = window.google.maps, P = pinClass(), gap = {};
+    gaps.forEach(function (i) { gap[i] = true; });
+    function line(list, dashed) {
+      var o = { map: grMap, path: list.map(function (p) { return { lat: p[0], lng: p[1] }; }), clickable: false,
+        strokeColor: ROUTE_TEAL, strokeWeight: 5, strokeOpacity: dashed ? 0 : 0.9 };
+      if (dashed) o.icons = [{ icon: { path: 'M 0,-1 0,1', strokeColor: ROUTE_TEAL, strokeOpacity: 0.9, strokeWeight: 5, scale: 2 }, offset: '0', repeat: '14px' }];
+      grItems.push(new g.Polyline(o));
+      grCount.lines++; if (dashed) grCount.dashed++;
+    }
+    function dot(p, color) {
+      var node = document.createElement('div');
+      node.className = 'dj-rdot'; node.style.background = color;
+      var pin = new P(p[0], p[1], node, 'overlayLayer');
+      pin.setMap(grMap); grItems.push(pin); grCount.dots++;
+    }
+    var run = [pts[0]];
+    for (var i = 1; i < pts.length; i++) {
+      if (gap[i]) { if (run.length > 1) line(run, false); line([pts[i - 1], pts[i]], true); run = [pts[i]]; }
+      else run.push(pts[i]);
+    }
+    if (run.length > 1) line(run, false);
+    dot(pts[0], ROUTE_TEAL);
+    if (pts.length > 1) dot(pts[pts.length - 1], ROUTE_CORAL);
+    if (pts.length === 1) { grMap.setCenter({ lat: pts[0][0], lng: pts[0][1] }); grMap.setZoom(16); return; }
+    var b = new g.LatLngBounds();
+    pts.forEach(function (p) { b.extend({ lat: p[0], lng: p[1] }); });
+    g.event.addListenerOnce(grMap, 'idle', function () { if (grMap.getZoom() > 17) grMap.setZoom(17); });
+    grMap.fitBounds(b, 28);
+  }
+
   // _geo / _ua stand in for the phone's in tests; _helped = the 「打開位置權限」 sheet was shown this visit (tests reset it)
-  var api = App.map = { attach: attach, setLabels: setLabels, setWalks: setWalks, locate: locate, position: position, locationHelp: locationHelp, noPosition: noPosition, inView: inView, zoom: zoom, setView: setView, center: center, dot: dot, navUrl: navUrl, provider: provider,
+  var api = App.map = { attach: attach, setLabels: setLabels, setWalks: setWalks, attachRoute: attachRoute, setRoute: setRoute, locate: locate, position: position, locationHelp: locationHelp, noPosition: noPosition, inView: inView, zoom: zoom, setView: setView, center: center, dot: dot, navUrl: navUrl, provider: provider,
     failed: function () { return gState === 'failed'; }, _gmUrl: gmUrl, _gWaitMs: 15000, _gRetryMs: 10000, _geo: null, _ua: null, _helped: false, lastPos: null, _tileOptions: tileOptions, _maxZoom: maxZoomFor };
   Object.defineProperty(api, '_leaflet', { get: function () { return map; } });
   Object.defineProperty(api, '_google', { get: function () { return gMap; } });
+  Object.defineProperty(api, '_routeLeaflet', { get: function () { return rMap; } });
+  Object.defineProperty(api, '_routeGoogle', { get: function () { return grMap; } });
+  api._routeLayers = function () { return Object.assign({}, useG() ? grCount : rCount); };
   api._walkCircles = function () { var w = useG() ? gWalks : walks; return Object.keys(w).map(function (id) { return { id: id, r: w[id].r }; }); };
 })(window.App = window.App || {});
 
@@ -4300,7 +4572,30 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     </div>`;
   }
 
-  App.parkPick = { rows: rows, open: open, ordered: ordered, groups: groups, resolve: resolve, ensureList: ensureList, searchBox: searchBox, noneNote: noneNote, away: away, statusChips: statusChips };
+  // ------------------------------------------------------------------ 家的位置 (private: the home's own data, the family only)
+  /** Save the home point (and turn 家附近只顯示「在附近」 on), then say `msg`. */
+  function saveHomeAt(p, msg) {
+    return App.data.setPrivacy({ homeAt: { lat: p.lat, lng: p.lng }, hideNearHome: true }).then(function () { if (msg) ui.toast(msg); });
+  }
+  /** Tap the home on the map (the one map moves into this sheet; the screen under it takes it back on its next render).
+      After saving: the sheet closes and onSaved() runs. */
+  function homeMapSheet(onSaved, msg) {
+    var sh = ui.sheet({
+      title: '在地圖上點家的位置',
+      render: function () {
+        return html`<p class="sub">拖地圖、放大，點一下家大概的位置。只存在你家的資料裡，只有你和家人看得到。</p>
+          <div class="pv-mapslot mt-12" style="position:relative;height:min(52vh,360px);border-radius:16px;overflow:hidden;isolation:isolate"></div>`;
+      }
+    });
+    var slot = sh && sh.el && sh.el.querySelector('.pv-mapslot');
+    var home = App.data.myHomeAt();
+    App.map.attach(slot, { onTap: function (latlng) { saveHomeAt(latlng, msg).then(function () { sh.close(); if (onSaved) onSaved(latlng); }); } });
+    if (home) App.map.setView(home.lat, home.lng, 16);
+    return sh;
+  }
+
+  App.parkPick = { rows: rows, open: open, ordered: ordered, groups: groups, resolve: resolve, ensureList: ensureList, searchBox: searchBox, noneNote: noneNote, away: away, statusChips: statusChips,
+    saveHomeAt: saveHomeAt, homeMapSheet: homeMapSheet };
 })(window.App = window.App || {});
 
 ;
@@ -4872,6 +5167,169 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
   // may take before the card uses the drawn face
   var api = App.shareCard = { make: make, layout: layout, text: text, link: link, open: open, openQr: openQr, _photoRect: photoRect, _frameOk: false, _photoMs: 8000 };
 })(window.App);
+
+;
+/* ---- core/qrscan.js ---- */
+/* App.qrScan — 掃 QR 碼 inside 豆米特 (Willie 2026-11-02: 「需要 這樣比較方便 網頁版就先加吧」). A friend's 我的 QR 碼
+   opens their dog card right here: with the phone's own camera app, an iPhone that opened 豆米特 from the home screen
+   lands in Safari, where 豆米特 does not know it. The camera runs only while the sheet is open (it stops when the sheet
+   closes or the page is hidden); frames are read in this phone's memory and never kept or sent. The decoder is jsQR
+   1.4.0 (core/vendor/jsQR.js, Apache-2.0, from jsDelivr, sha256 vEDIoVGWI2sjFNsIVvcsoLSZgM1UE7jIUqc0n1/uCFk=), loaded
+   the first time a scan starts. Only this site's own dog-card links open (the test and the live site share the
+   address); any other code gets a line and the camera keeps looking. */
+(function (App) {
+  'use strict';
+  var ui = App.ui, html = ui.html, C = App.content;
+  var libP = null;
+  var LIB_SRI = 'sha256-vEDIoVGWI2sjFNsIVvcsoLSZgM1UE7jIUqc0n1/uCFk=';   // the browser refuses any other file
+
+  /** The phone can be asked for its camera here: a secure page with mediaDevices, not inside another page's frame (a
+      preview there has no decoder file and no camera permission; the tests set _frameOk). */
+  function available() {
+    try {
+      if (window.top !== window.self && !api._frameOk) return false;
+      return window.isSecureContext !== false && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    } catch (e) { return false; }
+  }
+  /** jsQR, loaded once and checked against its fingerprint (a failed or slow load is tried again next time; another
+      address is a new load, like osm.js's list). */
+  function loadLib() {
+    if (typeof window.jsQR === 'function') return Promise.resolve(window.jsQR);
+    if (!libP || libP.url !== api._libUrl) {
+      var url = api._libUrl, p;
+      p = libP = new Promise(function (resolve, reject) {
+        var s = document.createElement('script'), timer;
+        function fail() {
+          clearTimeout(timer);
+          if (libP === p) libP = null;
+          s.remove();
+          var e = new Error('the decoder did not load'); e.name = 'LibError'; reject(e);
+        }
+        timer = setTimeout(fail, api._libWaitMs);
+        s.src = url;
+        s.integrity = LIB_SRI;
+        s.onload = function () { clearTimeout(timer); if (typeof window.jsQR === 'function') resolve(window.jsQR); else fail(); };
+        s.onerror = fail;
+        document.head.appendChild(s);
+      });
+      p.url = url;
+    }
+    return libP;
+  }
+  /** The dog id when `text` is a dog-card link of this site (App.shareUrl('Dog_Card', {id})), else null. */
+  function dogIdOf(text) {
+    var u, id;
+    try { u = new URL(String(text == null ? '' : text)); } catch (e) { return null; }
+    if (!/^https?:$/.test(u.protocol) || u.origin !== location.origin) return null;
+    var h = u.hash.replace(/^#\/?/, ''), i = h.indexOf('?');
+    if ((i < 0 ? h : h.slice(0, i)) !== 'Dog_Card') return null;
+    try { id = new URLSearchParams(i < 0 ? '' : h.slice(i + 1)).get('id'); } catch (e) { return null; }
+    return id && App.store.validSegment(id) ? id : null;
+  }
+  /** The line for a camera or decoder that could not start. */
+  function errText(e) {
+    var S = C.scan, n = e && e.name;
+    if (n === 'LibError') return S.noLib;
+    if (n === 'NotAllowedError' || n === 'SecurityError' || n === 'PermissionDeniedError') return S.denied;
+    if (n === 'NotFoundError' || n === 'OverconstrainedError' || n === 'DevicesNotFoundError') return S.noCamera;
+    if (n === 'NotReadableError' || n === 'TrackStartError') return S.busy;
+    return S.failed;
+  }
+  function stopStream(st) { if (st) st.getTracks().forEach(function (t) { try { t.stop(); } catch (e) { /* ignore */ } }); }
+
+  /** The scan sheet: the camera in a square, a line under it, 不掃了. A dog-card code closes it and opens Dog_Card. The
+      decoder comes first, then the camera: offline the camera is never asked for, and the light never shows over an
+      empty square. */
+  function open() {
+    var S = C.scan, stream = null, timer = null, video = null, done = false, last = '';
+    var canvas = api._canvas = document.createElement('canvas');
+    var s = ui.sheet({
+      title: S.title,
+      autofocus: false,
+      // drawn once: drawing again would replace the video (the line under it is changed in place, say())
+      render: function () {
+        return html`<div class="qrscan mt-8"><video class="qrscan-video" playsinline muted autoplay${ui.attrs({ 'aria-label': S.videoLabel })}></video><span class="qrscan-frame" aria-hidden="true"></span></div>
+          <p class="note mt-12 qrscan-msg" role="status">${S.starting}</p>
+          <div class="mt-12">${ui.secondaryBtn(S.cancel, { act: 'cancel' })}</div>`;
+      },
+      actions: { cancel: function (sh) { sh.close(); } },
+      onClose: stop
+    });
+    function say(t) { var el = s.el && s.el.querySelector('.qrscan-msg'); if (el) el.textContent = t; }
+    // behind another app: the camera goes. Not while 「允許相機？」 is still being asked (a phone's question may cover
+    // the page); a camera that comes while the page is behind is turned off at once (below)
+    function onHide() { if (document.hidden && stream) s.close(); }
+    function onEnded() { if (!done) { say(S.lost); stop(); } }   // a call or another app took the camera
+    function stop() {
+      done = true;
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onHide);
+      stopStream(stream); stream = null;
+      if (video) { try { video.srcObject = null; } catch (e) { /* ignore */ } }
+      canvas.width = 0; canvas.height = 0;   // the last picture is not kept
+    }
+    function read(jsQR) {
+      var w = video.videoWidth, h = video.videoHeight;
+      if (!w || !h) return null;
+      var k = Math.min(1, api._maxSide / Math.max(w, h)), cw = Math.max(1, Math.round(w * k)), ch = Math.max(1, Math.round(h * k));
+      if (canvas.width !== cw) canvas.width = cw;
+      if (canvas.height !== ch) canvas.height = ch;
+      var g = canvas.getContext('2d', { willReadFrequently: true });
+      g.drawImage(video, 0, 0, cw, ch);
+      var code = jsQR(g.getImageData(0, 0, cw, ch).data, cw, ch, { inversionAttempts: 'dontInvert' });
+      return code && typeof code.data === 'string' ? code.data : null;
+    }
+    function found(text) {
+      var id = dogIdOf(text);
+      if (id) { stop(); s.close(); App.go('Dog_Card', { id: id }); return; }
+      if (text !== last) { last = text; say(S.notOurs); }
+    }
+    function look(jsQR) {
+      timer = setTimeout(function () {
+        if (done) return;
+        var text = null;
+        try { text = read(jsQR); } catch (e) { console.warn('[qrscan] read', e); }
+        if (text != null) found(text);
+        if (!done) look(jsQR);
+      }, api._everyMs);
+    }
+    document.addEventListener('visibilitychange', onHide);
+    loadLib().then(function (jsQR) {
+      if (done) return null;
+      return api._getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }).then(function (st) {
+        if (done) { stopStream(st); return; }   // closed, or another page, while 「允許相機？」 was asked
+        stream = st;
+        if (document.hidden) { s.close(); return; }
+        st.getTracks().forEach(function (t) { t.addEventListener('ended', onEnded); });
+        video = s.el.querySelector('video');
+        video.srcObject = st;
+        var p = video.play();
+        if (p && p.catch) p.catch(function () { if (!done) { say(S.failed); stop(); } });   // no picture: say so, camera off
+        say(S.aim);
+        look(jsQR);
+      });
+    }).catch(function (e) {
+      if (done) return;
+      say(errText(e));
+      stop();   // nothing to look with: the sheet stays with the line, and a camera that comes later is turned off at once
+    });
+    return s;
+  }
+
+  var api = {
+    available: available,
+    open: open,
+    dogIdOf: dogIdOf,
+    _libUrl: 'core/vendor/jsQR.js',   // the built site has it at the same place (tools/build_web.py)
+    _getUserMedia: function (c) { return navigator.mediaDevices.getUserMedia(c); },
+    _everyMs: 150,   // one look at the picture this often
+    _libWaitMs: 15000,   // a decoder that has not come by then: 「掃描程式載不到」
+    _frameOk: false,     // tests: the phones are frames of the test page
+    _canvas: null,       // tests: the last scan's picture (wiped when the camera stops)
+    _maxSide: 720    // the picture is made this small first (fast enough on an old phone, still reads a card's code)
+  };
+  App.qrScan = api;
+})(window.App = window.App || {});
 
 ;
 /* ---- core/store.js ---- */
@@ -7420,6 +7878,7 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
         quiet(S().doc('data/users/' + old + '/members').delete())
       ];
       if (Object.keys(nicks).length) jobs.push(quiet(upsert(S().doc('data/users/' + target + '/members'), nicks, {})));
+      jobs.push(quiet(moveWalks(old, target)));   // 遛狗紀錄: the old home's walks join the new home's log
       if (moved.indexOf(old) !== -1) jobs.push(quiet(S().doc('data/users/' + old + '/private').update({ homePark: null, homeParkInfo: null, homeAt: null, recoveryCode: null, pstat: null })));
       return Promise.all(jobs).then(function () {
         // follows and blocks: every dog of the home gets everyone's (追蹤、封鎖全家一起)
@@ -9148,8 +9607,9 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
   }
   /** A post as screens see it (null when unusable or hidden from the viewer). */
   function normDiary(d, viewer) {
-    // a kind this version does not know (遛狗紀錄's daily 狗友 summary, kind 'walk') is not a diary post here
-    if (d && d.kind != null && d.kind !== 'diary') return null;
+    // kind 'walk' = 遛狗紀錄's daily 狗友 summary (one dog, one day: km and minutes only); a kind this version does not
+    // know is not shown at all
+    if (d && d.kind != null && d.kind !== 'diary' && d.kind !== 'walk') return null;
     if (!d || d.deleted || typeof d.by !== 'string' || !ok(d.by) || isHiddenId(d.by)) return null;
     viewer = viewer || actor();
     var own = viewer === actor() ? isMine(d.by) : d.by === viewer;   // 一個家: my family's dogs' posts are mine to see
@@ -9157,10 +9617,15 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     var audience = d.audience === 'public' ? 'public' : 'friends';
     if (!(own || audience === 'public' || isFriend(d.by, viewer))) return null;
     var likes = isMap(d.likes) ? truthyKeys(d.likes) : [];
+    if (d.kind === 'walk') {
+      return { kind: 'walk', id: d.id, by: d.by, day: DATE_KEY_RE.test(String(d.day)) ? d.day : fmt().dateKey(num(d.at) || 0), km: num(d.km) != null && d.km >= 0 ? d.km : null,
+        minutes: Math.max(0, Math.round(num(d.minutes) || 0)), count: Math.max(0, Math.round(num(d.count) || 0)), audience: audience, at: num(d.at) || 0,
+        woofs: likes.length, woofedByMe: likes.indexOf(viewer) !== -1, comments: Math.max(0, num(d.commentCount) || 0), text: '', photos: [] };
+    }
     var photos = (Array.isArray(d.photos) ? d.photos : []).slice(0, DIARY_MAX_PHOTOS).map(function (ph) {
       var r = photoRef(ph); return r ? { url: r.url, thumb: S().photoUrlOk(ph.thumb) ? ph.thumb : r.url, w: r.w, h: r.h } : null;
     }).filter(Boolean);
-    return { id: d.id, by: d.by, text: typeof d.text === 'string' ? d.text.slice(0, DIARY_MAX_TEXT) : '', photos: photos, audience: audience,
+    return { kind: 'diary', id: d.id, by: d.by, text: typeof d.text === 'string' ? d.text.slice(0, DIARY_MAX_TEXT) : '', photos: photos, audience: audience,
       at: num(d.at) || 0, woofs: likes.length, woofedByMe: likes.indexOf(viewer) !== -1, comments: Math.max(0, num(d.commentCount) || 0) };
   }
   function canSeeDiary(d, viewer) { return !!normDiary(d, viewer); }
@@ -9184,7 +9649,7 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
   function watchDiary(dogId, cb) {
     if (!ok(dogId)) return badWatch(cb, []);
     var last = [];
-    function deliver() { cb(last.map(function (d) { return normDiary(d); }).filter(Boolean).sort(function (a, b) { return b.at - a.at; })); }
+    function deliver() { cb(last.map(function (d) { return normDiary(d); }).filter(function (p) { return p && p.kind !== 'walk'; }).sort(function (a, b) { return b.at - a.at; })); }
     var unsub = S().collection('diary').where('by', '==', dogId).onSnapshot(function (qs) { last = listOf(qs); deliver(); }, function () { cb([]); });
     var off = onChange(function (k) { if (k === 'follows' || k === 'people') deliver(); });
     return function () { unsub(); off(); };
@@ -9272,6 +9737,268 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
         var paths = [];
         (Array.isArray(d.photos) ? d.photos : []).forEach(function (ph) { if (ph) paths.push(ph.path, ph.thumbPath); });
         return dropPhotoFiles(paths);
+      });
+    });
+  }
+
+  // ===================================================================== 遛狗紀錄 (walk log)
+  // data/users/<homeId>/walks-<YYYY-MM> = {v: 1, walks: {<id>: {start, end, minutes, km (null: no GPS), approx, dogs[],
+  // by: {key, nick} (which family phone), pee, poop, route (encoded polyline), gaps}}}: the home's walks of one month
+  // (the month the walk started, Taiwan time). Only the family reads or writes it (web/supabase.sql: data/users/<x> →
+  // my_actor_ids()). Two family phones write different ids into one map, merged on the server (upsertShared); a
+  // deleted walk is a null entry. A viewer without private storage (a persona) keeps its walks in this tab only.
+  var WALK_SOFT = 200 * 1024, WALK_MONTH_RE = /^\d{4}-\d{2}$/, WALK_DOC_RE = /^walks-\d{4}-\d{2}$/, memWalks = {};
+  function walkRef(home, m) { return S().doc('data/users/' + home + '/walks-' + m); }
+  function walkMem(home) { return memWalks[home] || (memWalks[home] = {}); }
+  /** 'YYYY-MM' → the month before. */
+  function monthBefore(m) { var p = String(m).split('-').map(Number); return p[1] === 1 ? (p[0] - 1) + '-12' : p[0] + '-' + (p[1] < 11 ? '0' : '') + (p[1] - 1); }
+  /** A stored walk as screens see it (null when unusable). by.me: this phone walked it. */
+  function normWalk(id, w, m) {
+    if (!isMap(w) || !ok(id) || num(w.start) == null) return null;
+    var dogs = (Array.isArray(w.dogs) ? w.dogs : []).filter(function (d, i, a) { return typeof d === 'string' && ok(d) && a.indexOf(d) === i; });
+    if (!dogs.length) return null;
+    var by = isMap(w.by) ? w.by : {}, key = typeof by.key === 'string' ? by.key : '', start = w.start, end = num(w.end) != null && w.end >= start ? w.end : start;
+    return { id: id, m: m, start: start, end: end, minutes: num(w.minutes) != null ? Math.max(0, Math.round(w.minutes)) : Math.round((end - start) / 60000),
+      km: num(w.km) != null && w.km >= 0 ? w.km : null, approx: !!w.approx, dogs: dogs,
+      by: { key: key, nick: typeof by.nick === 'string' ? str(by.nick, 12) : '', me: !!key && key === memberKey() },
+      pee: !!w.pee, poop: !!w.poop, route: typeof w.route === 'string' ? w.route : '',
+      gaps: (Array.isArray(w.gaps) ? w.gaps : []).filter(function (g) { return typeof g === 'number' && g === Math.floor(g) && g > 0; }) };
+  }
+  function walkList(map, m) { return Object.keys(isMap(map) ? map : {}).map(function (id) { return normWalk(id, map[id], m); }).filter(Boolean); }
+  /** The entry to store: what the recorder handed over, with this phone as `by`. */
+  function walkRecord(e) {
+    var start = e.start, end = num(e.end) != null && e.end >= start ? e.end : start;
+    return { start: start, end: end, minutes: num(e.minutes) != null ? Math.max(0, Math.round(e.minutes)) : Math.round((end - start) / 60000),
+      km: num(e.km) != null && e.km >= 0 ? Math.round(e.km * 100) / 100 : null, approx: !!e.approx,
+      dogs: (Array.isArray(e.dogs) ? e.dogs : []).filter(function (d, i, a) { return typeof d === 'string' && ok(d) && a.indexOf(d) === i; }),
+      by: { key: memberKey(), nick: myNick() || '' }, pee: !!e.pee, poop: !!e.poop, route: typeof e.route === 'string' ? e.route : '',
+      gaps: (Array.isArray(e.gaps) ? e.gaps : []).filter(function (g) { return typeof g === 'number' && g === Math.floor(g) && g > 0; }) };
+  }
+  /** A full month (a document is at most 256 KiB): past 200 KiB the new walk keeps a simpler route (100 points), and
+      past that no route — the walk itself is always kept. */
+  function fitWalk(doc, id, rec) {
+    var base = doc ? JSON.stringify(doc).length : 0;
+    function size(r) { return base + JSON.stringify(r).length + id.length + 8; }
+    if (size(rec) <= WALK_SOFT || !rec.route) return rec;
+    var r = App.walklog.routeOf(App.walklog.decode(rec.route), rec.gaps, 100), smaller = Object.assign({}, rec, { route: r.route, gaps: r.gaps });
+    return size(smaller) <= WALK_SOFT ? smaller : Object.assign({}, rec, { route: '', gaps: [] });
+  }
+  /** Keep a finished walk (App.walkrec.finish()) in the family log → {id, m}. */
+  function saveWalk(entry) {
+    var home = homeWho(), e = isMap(entry) ? entry : {};
+    need(home && ok(home), '還沒登入，等一下再試');
+    need(typeof e.id === 'string' && ok(e.id) && num(e.start) != null, '這次散步的資料不完整');
+    var rec = walkRecord(e), id = e.id, m = App.walklog.monthKey(rec.start);
+    need(rec.dogs.length, '這次散步沒有帶狗');
+    if (!privOk(home)) {
+      var mm = walkMem(home);
+      (mm[m] = mm[m] || {})[id] = rec;
+      emit('walks');
+      return Promise.resolve({ id: id, m: m });
+    }
+    var ref = walkRef(home, m);
+    return ref.get().then(function (s) {
+      var fitted = fitWalk(s.exists ? s.data() : null, id, rec);
+      // (the re-check of a just-created month: a key that is there, even null — deleted meanwhile — was not lost)
+      return upsertShared(ref, { walks: obj(id, fitted) }, { v: 1, walks: {} }, function (d) { return isMap(d.walks) && Object.prototype.hasOwnProperty.call(d.walks, id); });
+    }).then(function () { emit('walks'); return syncWalkPosts(rec.start, rec.dogs); }).then(function () { return { id: id, m: m }; });
+  }
+  function walkAt(home, id, m) {
+    needId(id, '找不到這次散步');
+    need(WALK_MONTH_RE.test(String(m)), '找不到這次散步');
+    if (!privOk(home)) return Promise.resolve((walkMem(home)[m] || {})[id] || null);
+    return walkRef(home, m).get().then(function (s) { var d = s.exists ? s.data() : null; return d && isMap(d.walks) && isMap(d.walks[id]) ? d.walks[id] : null; });
+  }
+  /** 有尿尿 / 有便便 on a walk: patch {pee, poop} (booleans). */
+  function updateWalk(id, m, patch) {
+    var home = homeWho(), p = {};
+    ['pee', 'poop'].forEach(function (k) { if (patch && typeof patch[k] === 'boolean') p[k] = patch[k]; });
+    return walkAt(home, id, m).then(function (w) {
+      need(w, '找不到這次散步');
+      if (!Object.keys(p).length) return null;
+      if (!privOk(home)) { Object.assign(w, p); return null; }
+      return walkRef(home, m).update({ walks: obj(id, p) });
+    }).then(function () { emit('walks'); });
+  }
+  /** Delete one walk of the family log. Resolves the walk that was deleted (null: it was not there). */
+  function deleteWalk(id, m) {
+    var home = homeWho();
+    return walkAt(home, id, m).then(function (w) {
+      if (!w) return null;
+      if (!privOk(home)) { delete walkMem(home)[m][id]; return w; }
+      return walkRef(home, m).update({ walks: obj(id, null) }).then(function () { return w; });
+    }).then(function (w) {
+      emit('walks');
+      return w ? syncWalkPosts(w.start, Array.isArray(w.dogs) ? w.dogs : []).then(function () { return w; }) : w;
+    });
+  }
+  /** cb({walks (newest first), from}): this month and last month of the family log, live; older months are read once
+      while the streak reaches back to `from` (up to 24 months) — 散步紀錄 counts a long streak right. */
+  function watchWalks(cb) {
+    var home = homeWho();
+    if (!home || !ok(home)) return badWatch(cb, { walks: [], from: now() });
+    if (!privOk(home)) {
+      var memDeliver = function () {
+        var mm = walkMem(home), list = [];
+        Object.keys(mm).forEach(function (m) { list = list.concat(walkList(mm[m], m)); });
+        cb({ walks: list.sort(function (a, b) { return b.start - a.start; }), from: 0 });
+      };
+      later(memDeliver);
+      return onChange(function (k) { if (k === 'walks') memDeliver(); });
+    }
+    var m0 = App.walklog.monthKey(now()), m1 = monthBefore(m0), live = {}, older = [], from = fmt().parseKey(m1 + '-01');
+    var nextM = monthBefore(m1), back = 2, loading = false, alive = true;
+    function deliver() {
+      if (!alive) return;
+      var list = [];
+      Object.keys(live).forEach(function (m) { list = list.concat(live[m]); });
+      list = list.concat(older).sort(function (a, b) { return b.start - a.start; });
+      cb({ walks: list, from: from });
+      if (!loading && back < 24 && App.walklog.stats(list, { from: from }).streakToStart) loadOlder();
+    }
+    function loadOlder() {
+      loading = true;
+      var m = nextM;
+      walkRef(home, m).get().then(function (s) {
+        loading = false;
+        if (!alive) return;
+        older = older.concat(s.exists ? walkList(s.data().walks, m) : []);
+        from = fmt().parseKey(m + '-01'); nextM = monthBefore(m); back++;
+        deliver();
+      }, function (e) { loading = false; console.warn('[data] older walks', e); });
+    }
+    var unsubs = [m0, m1].map(function (m) {
+      live[m] = [];
+      return walkRef(home, m).onSnapshot(function (s) { live[m] = s.exists ? walkList(s.data().walks, m) : []; deliver(); }, function () { live[m] = []; deliver(); });
+    });
+    return function () { alive = false; unsubs.forEach(function (u) { u(); }); };
+  }
+  /** cb(one walk | null), live. */
+  function watchWalk(id, m, cb) {
+    var home = homeWho();
+    if (!ok(id) || !WALK_MONTH_RE.test(String(m)) || !home || !ok(home)) return badWatch(cb, null);
+    if (!privOk(home)) {
+      var memDeliver = function () { var w = (walkMem(home)[m] || {})[id]; cb(w ? normWalk(id, w, m) : null); };
+      later(memDeliver);
+      return onChange(function (k) { if (k === 'walks') memDeliver(); });
+    }
+    return walkRef(home, m).onSnapshot(function (s) { var d = s.exists ? s.data() : null; cb(d && isMap(d.walks) ? normWalk(id, d.walks[id], m) : null); }, function () { cb(null); });
+  }
+  // ---- the 狗友 daily summary: diary/walk_<dog>_<YYYYMMDD> = {by: the dog, kind: 'walk', day, km, minutes, count,
+  // audience: 'friends', at: that day's midnight} — the day's totals of the family log for one dog, rewritten after every
+  // save or delete (so two phones never add twice). Never a route, a time of day or who walked. The diary rules of
+  // 10-28 cover it (狗友 read it; others only their own 汪). Off in 我的隱私 (walkShare: false in the home's private doc):
+  // none is written and every one goes. A family phone deletes the ones older than 7 days (狗友動態 shows 7 days).
+  var shareCache = {}, shareLoading = {};
+  function walkPostId(dog, dayKey) { return 'walk_' + dog + '_' + String(dayKey).replace(/-/g, ''); }
+  /** Do 狗友 see how far we walk each day? (default yes; loads lazily like the home park) */
+  function walkShareOn() {
+    var who = homeWho();
+    if (!Object.prototype.hasOwnProperty.call(shareCache, who)) {
+      if (!shareLoading[who]) {
+        shareLoading[who] = true;
+        getPrivate(who).then(function (p) { shareCache[who] = !(p && p.walkShare === false); emit('people'); }, function () { shareLoading[who] = false; });
+      }
+      return true;
+    }
+    return shareCache[who];
+  }
+  function setWalkShare(on) {
+    var who = homeWho();
+    on = !!on;
+    return setPrivate({ walkShare: on }, who).then(function () {
+      shareCache[who] = on; emit('people');
+      return on ? null : dropWalkPosts(App.me.isPersona ? [actor()] : myDogs(), function () { return true; });
+    });
+  }
+  /** A post and its comments (my dog's post: the server lets the author remove every comment on it). */
+  function removePost(id) {
+    return diaryComments(id).get().then(function (qs) { return paced(qs.docs, function (c) { return S().doc('diary/' + id + '/comments/' + c.id).delete(); }); })
+      .then(function () { return diaryRef(id).delete(); });
+  }
+  /** Remove the walk summaries of `dogs` that `which(post data)` picks. */
+  function dropWalkPosts(dogs, which) {
+    return paced(dogs.filter(ok), function (dog) {
+      return S().collection('diary').where('by', '==', dog).get().then(function (qs) {
+        return paced(qs.docs.filter(function (x) { var d = x.data(); return d && d.kind === 'walk' && which(d); }), function (x) { return removePost(x.id); });
+      });
+    });
+  }
+  /** After a walk was saved or deleted: that day's line for each of its dogs (best effort — the walk itself is kept). */
+  function syncWalkPosts(start, dogs) {
+    var home = homeWho();
+    if (App.me.isPersona || !privOk(home)) return Promise.resolve();
+    var day = fmt().dateKey(start), m = App.walklog.monthKey(start), cutoff = fmt().startOfDay(now()) - 7 * 24 * HOUR;
+    var mine = (dogs || []).filter(function (d, i, a) { return ok(d) && isMine(d) && a.indexOf(d) === i; });
+    return Promise.all([getPrivate(home), walkRef(home, m).get()]).then(function (r) {
+      var shareOn = !(r[0] && r[0].walkShare === false), walks = r[1].exists ? walkList(r[1].data().walks, m) : [];
+      shareCache[home] = shareOn;
+      return paced(mine, function (dog) {
+        var sum = App.walklog.daySummary(walks, day, dog), id = walkPostId(dog, day), ref = diaryRef(id);
+        // (no delayed re-check here: it would bring back a line deleted meanwhile, or old numbers. The next save or delete
+        // of that day counts again from the log)
+        var job = shareOn && sum.count
+          ? upsert(ref, { by: dog, kind: 'walk', day: day, km: sum.km, minutes: sum.minutes, count: sum.count, audience: 'friends', at: fmt().parseKey(day) },
+            { likes: {}, commentCount: 0, lastCommentAt: null })
+          : ref.get().then(function (s) { return s.exists ? removePost(id) : null; });
+        return job.then(function () { return dropWalkPosts([dog], function (d) { return !(fmt().parseKey(d.day) >= cutoff); }); });
+      });
+    }).catch(function (e) { console.warn('[data] walk summary', e); });
+  }
+  /** 「先設定家的位置」 before the first walk: no home point, no home park, never 先不要, not a persona (a fresh read). */
+  function walkHomeNeeded() {
+    if (App.me.isPersona) return Promise.resolve(false);
+    return getPrivate(homeWho()).then(function (p) { return !homeAtOf(p) && !(p && typeof p.homePark === 'string' && p.homePark) && !(p && p.homeAsked); });
+  }
+  /** 「先不要」: the home is never asked again (every family phone). */
+  function markHomeAsked() { return setPrivate({ homeAsked: true }, homeWho()); }
+  /** The ids of the home's walk-log documents ('walks-YYYY-MM'). */
+  function walkDocsOf(home) {
+    return S().collection('data/users/' + home).get().then(function (qs) { return qs.docs.map(function (d) { return d.id; }).filter(function (x) { return WALK_DOC_RE.test(x); }); });
+  }
+  /** 刪除這隻狗: it leaves every walk of the log; a walk only it took goes. */
+  function forgetWalkDog(home, dog) {
+    if (!privOk(home)) {
+      var mm = walkMem(home);
+      Object.keys(mm).forEach(function (m) {
+        Object.keys(mm[m]).forEach(function (id) {
+          var w = mm[m][id];
+          if (!w || !Array.isArray(w.dogs) || w.dogs.indexOf(dog) === -1) return;
+          var rest = w.dogs.filter(function (d) { return d !== dog; });
+          if (rest.length) w.dogs = rest; else delete mm[m][id];
+        });
+      });
+      emit('walks');
+      return Promise.resolve();
+    }
+    return walkDocsOf(home).then(function (ids) {
+      return paced(ids, function (x) {
+        var ref = S().doc('data/users/' + home + '/' + x);
+        return ref.get().then(function (s) {
+          var map = s.exists && isMap(s.data().walks) ? s.data().walks : {}, patch = {};
+          Object.keys(map).forEach(function (id) {
+            var w = map[id];
+            if (!isMap(w) || !Array.isArray(w.dogs) || w.dogs.indexOf(dog) === -1) return;
+            var rest = w.dogs.filter(function (d) { return d !== dog; });
+            patch[id] = rest.length ? { dogs: rest } : null;
+          });
+          return Object.keys(patch).length ? ref.update({ walks: patch }) : null;
+        });
+      });
+    }).then(function () { emit('walks'); });
+  }
+  /** 合併家: the old home's walk log moves into the new home's months, then the old copy goes. */
+  function moveWalks(from, to) {
+    if (!from || !to || from === to) return Promise.resolve();
+    return walkDocsOf(from).then(function (ids) {
+      return paced(ids, function (x) {
+        var src = S().doc('data/users/' + from + '/' + x);
+        return src.get().then(function (s) {
+          var map = s.exists && isMap(s.data().walks) ? s.data().walks : {}, keep = {};
+          Object.keys(map).forEach(function (id) { if (isMap(map[id])) keep[id] = map[id]; });
+          var job = Object.keys(keep).length ? upsertShared(S().doc('data/users/' + to + '/' + x), { walks: keep }, { v: 1, walks: {} }) : Promise.resolve();
+          return job.then(function () { return src.delete(); });
+        });
       });
     });
   }
@@ -9558,7 +10285,7 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     (checkins || []).forEach(function (c) {
       if (c.kind === 'walk' && f.indexOf(c.id) !== -1 && c.visible) out.push({ kind: 'walk', id: c.id, at: c.at, area: c.r > 100 ? (c.area || '') : '' });
     });
-    (posts || []).forEach(function (p) { out.push({ kind: 'diary', id: p.by, at: p.at, post: p }); });
+    (posts || []).forEach(function (p) { out.push({ kind: p.kind === 'walk' ? 'walkday' : 'diary', id: p.by, at: p.at, post: p }); });
     return out.sort(function (a, b) { return b.at - a.at; });
   }
 
@@ -9572,6 +10299,9 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     var jobs = paths.map(function (p) { return S().doc(p).delete(); });
     if (privOk(id)) jobs.push(privRef().delete());
     else delete memPrivate[id];
+    var wh = homeWho();   // 遛狗紀錄
+    if (privOk(wh)) jobs.push(walkDocsOf(wh).then(function (ids) { return Promise.all(ids.map(function (x) { return S().doc('data/users/' + wh + '/' + x).delete(); })); }));
+    else delete memWalks[wh];
     delete homeCache[id]; delete homeLoading[id]; recP = {};
     return Promise.all(jobs).then(function () { emit('people'); });
   }
@@ -9849,8 +10579,8 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
   function feedbackContext() {
     var cur = App.router && App.router.current ? App.router.current() : null;
     var params = '';
-    // a vet / clinic link's token (t) is a key to someone's health card: never into a report (other visitors can read
-    // reports, and the admin page shows them)
+    // a vet / clinic link's token (t) is a key to someone's health card: never into a report (the admin page shows
+    // reports; only their writer and the admins can read them)
     var p0 = {};
     if (cur && cur.params) Object.keys(cur.params).forEach(function (k) { p0[k] = /^(t|token|code)$/.test(k) ? '(不附上)' : cur.params[k]; });
     try { params = cur ? JSON.stringify(p0) : ''; } catch (e) { params = ''; }
@@ -10847,6 +11577,8 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
         return paced(open, function (x) { return S().rpc('health_link_revoke', { p_hash: x.hash }); });
       }).catch(function (e) { if (e && e.code !== 'not_configured') throw e; });
     }).then(function () { return wipeReads([dog]); }).then(function (r) { return wipeDog(dog, r, step, false); }).then(function () {
+      return step(forgetWalkDog(home, dog));   // 遛狗紀錄: its walks (a walk it took with another dog stays, without it)
+    }).then(function () {
       if (failed) throw userError('有些資料沒有刪完，請再按一次「' + C.home.deleteDog + '」');
       return S().backend === 'claude' ? null : S().rpc('home_remove_dog', { p_dog: dog }).catch(function (e) {
         if (/home_last_dog/.test(String((e && e.message) || ''))) throw userError(C.home.lastDog);
@@ -10898,6 +11630,9 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
           });
         })
       ]).then(function () { return paced(dogs, function (d) { return wipeDog(d, r[0], step, true); }); });
+    }).then(function () {
+      // 遛狗紀錄: every month of the family walk log (a failed listing counts: pressing again finishes it)
+      return step(walkDocsOf(home).then(function (ids) { return paced(ids, function (x) { return step(S().doc('data/users/' + home + '/' + x).delete()); }); }));
     }).then(function () {
       // the home's own documents last
       return paced(['data/users/' + home + '/private', 'data/users/' + home + '/reads', 'data/users/' + home + '/members', 'homes/' + home],
@@ -11171,6 +11906,8 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
   sendHealthUpload = safe(sendHealthUpload);
   reportParkStatus = safe(reportParkStatus); setCare = safe(setCare); careDone = safe(careDone); createDiary = safe(createDiary); toggleWoof = safe(toggleWoof); addDiaryComment = safe(addDiaryComment);
   deleteDiaryComment = safe(deleteDiaryComment); deleteDiary = safe(deleteDiary);
+  saveWalk = safe(saveWalk); updateWalk = safe(updateWalk); deleteWalk = safe(deleteWalk); walkHomeNeeded = safe(walkHomeNeeded); markHomeAsked = safe(markHomeAsked);
+  setWalkShare = safe(setWalkShare);
 
   App.data = {
     init: init, onChange: onChange, now: now,
@@ -11199,6 +11936,9 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     watchParkStatus: watchParkStatus, reportParkStatus: reportParkStatus,
     createDiary: createDiary, watchFollowDiary: watchFollowDiary, feedItems: feedItems, watchDiary: watchDiary, watchDiaryPost: watchDiaryPost, watchDiaryComments: watchDiaryComments,
     toggleWoof: toggleWoof, addDiaryComment: addDiaryComment, deleteDiaryComment: deleteDiaryComment, deleteDiary: deleteDiary,
+    // 遛狗紀錄
+    saveWalk: saveWalk, updateWalk: updateWalk, deleteWalk: deleteWalk, watchWalks: watchWalks, watchWalk: watchWalk, walkHomeNeeded: walkHomeNeeded, markHomeAsked: markHomeAsked,
+    walkPostId: walkPostId, walkShareOn: walkShareOn, setWalkShare: setWalkShare,
     metDogs: metDogs,
     ensurePark: ensurePark, cleanParkName: cleanParkName, cellOf: cellOf, distM: distM, walkCheckIn: walkCheckIn, notePark: notePark, parkShared: parkShared, myHomeParkInfo: myHomeParkInfo, myHomeAt: myHomeAt,
     checkIn: checkIn, checkInDogs: checkInDogs, walkDogs: walkDogs, checkOut: checkOut, reapplyCheckinPrivacy: reapplyCheckinPrivacy, watchCheckins: watchCheckins, presence: presence, canSeeCheckin: canSeeCheckin,
@@ -11263,6 +12003,475 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
     /** boot only: make sure a just-read profile is in the people cache before the first route */
     _prime: function (p) { if (p && p.id && !people.has(p.id)) { people.set(p.id, withTags(p)); emit('people'); } }
   };
+})(window.App = window.App || {});
+
+;
+/* ---- core/walklog.js ---- */
+/* App.walklog — 遛狗紀錄的計算 (docs/superpowers/specs/2026-11-02-walk-log-design.md). Pure functions: no DOM, no store.
+   - track(): the GPS points of one walk, with the noise taken out (accuracy worse than 35 m, steps under 5 m, jumps
+     faster than 6 m/s) and straight lines where the phone could not follow (gap(): the page was hidden; or 3 jump
+     fixes in a row that agree with each other — a car or a bus). Any straight line makes the walk 「大約」.
+   - routeOf(): the route kept small for the family log — Douglas–Peucker at 5 m, at most 400 points (the tolerance
+     doubles until it fits), both ends of every straight line kept — as an encoded polyline (precision 1e5).
+   - stats() / daySummary(): the numbers of 散步紀錄 and of the 狗友 daily line. A walk belongs to the Taiwan day (and
+     month) it started in. */
+(function (App) {
+  'use strict';
+  var ACC_MAX = 35, MIN_STEP = 5, MAX_SPEED = 6, JUMP_CONFIRM = 3, ROUTE_MAX = 400, ROUTE_TOL = 5;
+  function fmt() { return App.ui.fmt; }
+  function ll(p) { return Array.isArray(p) ? { lat: Number(p[0]), lng: Number(p[1]) } : { lat: Number(p && p.lat), lng: Number(p && p.lng) }; }
+  /** Metres between two points ({lat, lng} or [lat, lng]); equirectangular, like App.data.distM. */
+  function distM(a, b) {
+    a = ll(a); b = ll(b);
+    var k = Math.PI / 180, x = (b.lng - a.lng) * k * Math.cos(((a.lat + b.lat) / 2) * k), y = (b.lat - a.lat) * k;
+    return Math.sqrt(x * x + y * y) * 6371000;
+  }
+  function r2(n) { return Math.round(n * 100) / 100; }
+  function fin(v) { return typeof v === 'number' && isFinite(v); }
+  function okPt(p) { return Array.isArray(p) && fin(p[0]) && fin(p[1]) && Math.abs(p[0]) <= 90 && Math.abs(p[1]) <= 180; }
+
+  // ------------------------------------------------------------------ one walk's points
+  /** A walk's track; `saved` is a track's toJSON() (localStorage, after a reload). */
+  function track(saved) {
+    var s = saved && typeof saved === 'object' ? saved : {};
+    var points = (Array.isArray(s.points) ? s.points : []).filter(okPt).map(function (p) { return [p[0], p[1], fin(p[2]) ? p[2] : 0]; });
+    var gaps = (Array.isArray(s.gaps) ? s.gaps : []).filter(function (i) { return i === Math.floor(i) && i > 0 && i < points.length; });
+    var gapNext = !!s.gapNext;
+    var jumps = (Array.isArray(s.jumps) ? s.jumps : []).filter(okPt).slice(0, JUMP_CONFIRM - 1);
+    var meters = 0;
+    for (var i = 1; i < points.length; i++) meters += distM(points[i - 1], points[i]);
+    var tr = { points: points, gaps: gaps, approx: gaps.length > 0 };
+    function push(p, isGap) {
+      var last = points[points.length - 1];
+      if (last) meters += distM(last, p);
+      if (isGap && points.length) { gaps.push(points.length); tr.approx = true; }
+      points.push(p);
+    }
+    /** One fix {lat, lng, acc, t} → 'ok' (kept) | 'inaccurate' | 'still' (under 5 m from the last point) | 'jump'. */
+    tr.add = function (fix) {
+      var lat = Number(fix && fix.lat), lng = Number(fix && fix.lng), acc = fix && fix.acc, t = Number(fix && fix.t) || Date.now();
+      if (!okPt([lat, lng])) return 'inaccurate';
+      if (acc != null && !(Number(acc) <= ACC_MAX)) return 'inaccurate';
+      var p = [lat, lng, t], last = points[points.length - 1];
+      if (!last) { points.push(p); gapNext = false; jumps = []; return 'ok'; }
+      var d = distM(last, p);
+      // (still: an iPhone's cached last position after a return lands here — the straight line stays pending)
+      if (d < MIN_STEP) { jumps = []; return 'still'; }
+      var dt = (t - last[2]) / 1000;
+      if (!(dt > 0) || d / dt > MAX_SPEED) {
+        // a jump: one wild fix is dropped; JUMP_CONFIRM in a row that agree with each other are a real move
+        var prev = jumps[jumps.length - 1], pdt = prev ? (t - prev[2]) / 1000 : 0;
+        if (prev && pdt > 0 && distM(prev, p) / pdt <= MAX_SPEED) jumps.push(p); else jumps = [p];
+        if (jumps.length < JUMP_CONFIRM) return 'jump';
+        var list = jumps;
+        jumps = []; gapNext = false;
+        list.forEach(function (q, k) { if (k === 0 || distM(points[points.length - 1], q) >= MIN_STEP) push(q, k === 0); });
+        return 'ok';
+      }
+      push(p, gapNext);
+      gapNext = false; jumps = [];
+      return 'ok';
+    };
+    /** The page was hidden: the next kept point is joined with a straight line (「大約」). */
+    tr.gap = function () { if (points.length) gapNext = true; jumps = []; };
+    tr.km = function () { return r2(meters / 1000); };
+    tr.last = function () { return points.length ? points[points.length - 1] : null; };
+    tr.toJSON = function () { return { points: points, gaps: gaps, gapNext: gapNext, jumps: jumps }; };
+    return tr;
+  }
+
+  // ------------------------------------------------------------------ the stored route
+  /** Metres from p to the segment a–b (local flat coordinates around p). */
+  function segDist(p, a, b) {
+    var k = Math.PI / 180, c = Math.cos(p[0] * k);
+    function xy(q) { return [(q[1] - p[1]) * k * c * 6371000, (q[0] - p[0]) * k * 6371000]; }
+    var A = xy(a), B = xy(b), dx = B[0] - A[0], dy = B[1] - A[1], L2 = dx * dx + dy * dy;
+    var u = L2 ? Math.max(0, Math.min(1, -(A[0] * dx + A[1] * dy) / L2)) : 0;
+    var x = A[0] + u * dx, y = A[1] + u * dy;
+    return Math.sqrt(x * x + y * y);
+  }
+  /** Douglas–Peucker on points[from..to] (both kept): marks the kept indexes in `keep`. */
+  function dp(points, from, to, tol, keep) {
+    var stack = [[from, to]];
+    while (stack.length) {
+      var r = stack.pop(), a = r[0], b = r[1], worst = -1, at = -1;
+      for (var i = a + 1; i < b; i++) {
+        var d = segDist(points[i], points[a], points[b]);
+        if (d > worst) { worst = d; at = i; }
+      }
+      if (at !== -1 && worst > tol) { keep[at] = true; stack.push([a, at], [at, b]); }
+    }
+  }
+  /** {route (encoded), gaps (indexes into the route), n, tol}: at most maxN (default 400) points; the start, the end
+      and both ends of every straight line are always kept. */
+  function routeOf(points, gaps, maxN) {
+    var pts = (Array.isArray(points) ? points : []).filter(okPt), max = Math.max(2, Number(maxN) || ROUTE_MAX);
+    var gs = (Array.isArray(gaps) ? gaps : []).filter(function (g) { return g === Math.floor(g) && g > 0 && g < pts.length; });
+    if (pts.length < 3) return { route: encode(pts), gaps: gs.slice(), n: pts.length, tol: ROUTE_TOL };
+    var forced = [0, pts.length - 1];
+    gs.forEach(function (g) { forced.push(g - 1, g); });
+    forced = forced.filter(function (v, i, a) { return a.indexOf(v) === i; }).sort(function (a, b) { return a - b; });
+    var tol = ROUTE_TOL, keep;
+    for (;;) {
+      keep = {};
+      forced.forEach(function (i) { keep[i] = true; });
+      for (var k = 1; k < forced.length; k++) dp(pts, forced[k - 1], forced[k], tol, keep);
+      if (Object.keys(keep).length <= max || tol > 1e6) break;
+      tol *= 2;
+    }
+    var idx = Object.keys(keep).map(Number).sort(function (a, b) { return a - b; });
+    var out = idx.map(function (i) { return pts[i]; });
+    return { route: encode(out), gaps: gs.map(function (g) { return idx.indexOf(g); }).filter(function (i) { return i > 0; }), n: out.length, tol: tol };
+  }
+  // encoded polyline (the format maps use): precision 1e5
+  function encNum(v) {
+    v = v < 0 ? ~(v << 1) : v << 1;
+    var s = '';
+    while (v >= 0x20) { s += String.fromCharCode((0x20 | (v & 0x1f)) + 63); v >>= 5; }
+    return s + String.fromCharCode(v + 63);
+  }
+  /** [[lat, lng], …] → string. */
+  function encode(points) {
+    var plat = 0, plng = 0, out = '';
+    (points || []).forEach(function (p) {
+      var q = ll(p), la = Math.round(q.lat * 1e5), ln = Math.round(q.lng * 1e5);
+      out += encNum(la - plat) + encNum(ln - plng);
+      plat = la; plng = ln;
+    });
+    return out;
+  }
+  /** string → [[lat, lng], …] (anything broken is cut off, never an endless loop). */
+  function decode(str) {
+    var s = typeof str === 'string' ? str : '', i = 0, lat = 0, lng = 0, out = [];
+    function read() {
+      var res = 0, shift = 0, b;
+      do {
+        if (i >= s.length) return null;
+        b = s.charCodeAt(i++) - 63;
+        res |= (b & 0x1f) << shift; shift += 5;
+      } while (b >= 0x20 && shift < 35);
+      return (res & 1) ? ~(res >> 1) : (res >> 1);
+    }
+    while (i < s.length) {
+      var a = read(), b = read();
+      if (a === null || b === null) break;
+      lat += a; lng += b;
+      out.push([lat / 1e5, lng / 1e5]);
+    }
+    return out;
+  }
+
+  // ------------------------------------------------------------------ the numbers
+  function dayOf(w) { return fmt().dateKey(w.start); }
+  function mineFor(walks, dog) {
+    return (Array.isArray(walks) ? walks : []).filter(function (w) {
+      return w && fin(w.start) && (!dog || (Array.isArray(w.dogs) && w.dogs.indexOf(dog) !== -1));
+    });
+  }
+  function kmOf(w) { return fin(w.km) ? w.km : 0; }
+  function minOf(w) { return fin(w.minutes) ? w.minutes : 0; }
+  /** 'YYYY-MM' (Taiwan) of a time. */
+  function monthKey(t) { return fmt().dateKey(t).slice(0, 7); }
+  /** {streak, streakToStart, week: [{key, km, minutes, today}] Monday→Sunday, month: {km, minutes, count}}.
+      o: {t (now), dog (only this dog's walks), from (the first loaded moment: streakToStart says the streak may go on
+      before it)}. The streak counts back from today, or from yesterday when today has no walk yet (no guilt: nothing
+      is lost until a whole day passes). */
+  function stats(walks, o) {
+    o = o || {};
+    var F = fmt(), t = o.t == null ? Date.now() : o.t, list = mineFor(walks, o.dog), days = {};
+    list.forEach(function (w) { days[dayOf(w)] = true; });
+    var today = F.dateKey(t), anchor = days[today] ? today : days[F.addDays(today, -1)] ? F.addDays(today, -1) : null;
+    var streak = 0, earliest = null;
+    for (var d = anchor; d && days[d]; d = F.addDays(d, -1)) { streak++; earliest = d; if (streak > 3660) break; }
+    var mon = F.dateKey(F.startOfWeek(t)), week = [];
+    for (var i = 0; i < 7; i++) {
+      var key = F.addDays(mon, i), ws = list.filter(function (w) { return dayOf(w) === key; });
+      week.push({ key: key, km: r2(ws.reduce(function (s, w) { return s + kmOf(w); }, 0)), minutes: ws.reduce(function (s, w) { return s + minOf(w); }, 0), today: key === today });
+    }
+    var mk = monthKey(t), inMonth = list.filter(function (w) { return dayOf(w).slice(0, 7) === mk; });
+    return {
+      streak: streak,
+      streakToStart: !!(earliest && o.from != null && F.parseKey(earliest) <= o.from),
+      week: week,
+      month: { km: r2(inMonth.reduce(function (s, w) { return s + kmOf(w); }, 0)), minutes: inMonth.reduce(function (s, w) { return s + minOf(w); }, 0), count: inMonth.length }
+    };
+  }
+  /** One dog's day for the 狗友 line: {km, minutes, count}. */
+  function daySummary(walks, dayKey, dog) {
+    var ws = mineFor(walks, dog).filter(function (w) { return dayOf(w) === dayKey; });
+    return { km: r2(ws.reduce(function (s, w) { return s + kmOf(w); }, 0)), minutes: ws.reduce(function (s, w) { return s + minOf(w); }, 0), count: ws.length };
+  }
+
+  // ------------------------------------------------------------------ how a walk is written on screen
+  /** '1.23' / '2.3' (at most 2 decimals, no trailing zeros). */
+  function kmText(km) { return String(Math.round((Number(km) || 0) * 100) / 100); }
+  /** 「你帶阿走、小的」: which family phone (你 / its nickname / 家人) and the dogs. w: a walk from App.data. */
+  function whoLine(w) {
+    var W = App.content.walklog, who = w.by && w.by.me ? W.you : ((w.by && w.by.nick) || W.family);
+    return App.ui.tpl(W.by, { who: who, dogs: (w.dogs || []).map(function (d) { return App.data.dogName(d); }).join('、') });
+  }
+
+  App.walklog = { distM: distM, track: track, routeOf: routeOf, encode: encode, decode: decode, monthKey: monthKey, stats: stats, daySummary: daySummary, kmText: kmText, whoLine: whoLine,
+    LIMITS: { accuracy: ACC_MAX, step: MIN_STEP, speed: MAX_SPEED, jumps: JUMP_CONFIRM, points: ROUTE_MAX, tolerance: ROUTE_TOL } };
+})(window.App = window.App || {});
+
+;
+/* ---- core/walkrec.js ---- */
+/* App.walkrec — 散步中的記錄 (docs/superpowers/specs/2026-11-02-walk-log-design.md). One walk at a time per home.
+   - GPS: watchPosition (high accuracy, no old positions) only while a walk records; every fix goes through
+     App.walklog.track (noise out, straight lines where the phone could not follow).
+   - 螢幕保持亮著 (Wake Lock): asked at the start and every time the page comes back (the phone lets go when hidden).
+   - The page hidden ≥ 20 s: the next point is joined with a straight line (「大約」) and a notice waits
+     (takeGapNotice). Away ≥ 60 min, or walking past the home's check-in hours (2 or 3): askEnd() says why to ask
+     「這次散步結束了嗎？」; snooze() asks again an hour later.
+   - Kept on this phone (localStorage, every 10 s and whenever the page hides): a reload or a crash goes on with the
+     same walk. A finished walk stays here until it is saved (clear()), so a save that failed is saved once, later.
+   No position is read outside a walk, and nothing leaves the phone until the family log saves the walk. */
+(function (App) {
+  'use strict';
+  var GAP_MS = 20000, AWAY_MS = 60 * 60000, SNOOZE_MS = 60 * 60000, KEY = 'dogapp.walklog.';
+  var S = null, tr = null, watchId = null, watchGeo = null, wakeS = null, wakeState = 'off', saveTimer = null, listening = false;
+  var listeners = [];
+  var api;
+
+  function now() { return api._now ? api._now() : Date.now(); }
+  function geo() { return api._geo || (App.map && App.map._geo) || (navigator && navigator.geolocation) || null; }
+  function wakeApi() { return api._wake !== undefined ? api._wake : (navigator && navigator.wakeLock) || null; }
+  function key() { return KEY + ((App.me && App.me.homeId) || 'local'); }
+  function ls() { try { return window.localStorage; } catch (e) { return null; } }
+  function emit() { listeners.slice().forEach(function (cb) { try { cb(); } catch (e) { console.error(e); } }); }
+  function fail(msg) { return App.data && App.data.userError ? App.data.userError(msg) : new Error(msg); }
+  function clone(v) { return v == null ? v : JSON.parse(JSON.stringify(v)); }
+  function live() { return !!S && !S.ended && !S.discarded; }
+  /** The home's check-in hours (2 or 3): the map shows the walk that long, so that is when to ask. */
+  function hours() { var p = App.data && App.data.me && App.data.me(), pv = (p && p.privacy) || {}; return pv.checkinHours === 2 ? 2 : 3; }
+
+  function save() {
+    if (!S) return;
+    S.track = tr ? tr.toJSON() : S.track;
+    if (live() && !S.hiddenAt) S.seenAt = now();
+    var s = ls();
+    try { if (s) s.setItem(key(), JSON.stringify(S)); } catch (e) { /* storage blocked or full: the walk lives in memory */ }
+  }
+
+  // ------------------------------------------------------------------ GPS and 螢幕保持亮著
+  function watch() {
+    unwatch();
+    if (!live() || S.noGeo) return;
+    var g = geo();
+    if (!g || !g.watchPosition) { S.noGeo = true; return; }
+    try {
+      watchGeo = g;
+      watchId = g.watchPosition(onFix, onErr, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+    } catch (e) { watchGeo = null; S.noGeo = true; }
+  }
+  function unwatch() {
+    if (watchId != null && watchGeo && watchGeo.clearWatch) { try { watchGeo.clearWatch(watchId); } catch (e) { /* gone */ } }
+    watchId = null; watchGeo = null;
+  }
+  function onFix(pos) {
+    if (!live() || S.noGeo || !tr) return;
+    var c = pos && pos.coords;
+    if (!c) return;
+    if (tr.add({ lat: c.latitude, lng: c.longitude, acc: c.accuracy, t: now() }) === 'ok') emit();
+  }
+  /** Only 「不允許」 (code 1) stops the GPS: a slow fix (timeout) keeps watching. */
+  function onErr(e) {
+    if (!live() || !e || e.code !== 1) return;
+    S.noGeo = true;
+    unwatch(); wakeOff(); save(); emit();
+  }
+  function wakeOn() {
+    if (!live() || S.noGeo || wakeS) return;
+    var w = wakeApi();
+    if (!w || !w.request) { wakeState = 'none'; emit(); return; }
+    var p;
+    wakeState = 'asking';   // (no 「螢幕要開著」 hint while the phone is still answering)
+    try { p = w.request('screen'); } catch (e) { wakeState = 'off'; emit(); return; }
+    Promise.resolve(p).then(function (s) {
+      if (!s) return;
+      if (!live() || S.noGeo || wakeS) { try { s.release(); } catch (e) { /* ignore */ } return; }
+      wakeS = s; wakeState = 'on';
+      try { s.addEventListener('release', function () { if (wakeS === s) { wakeS = null; wakeState = 'off'; emit(); } }); } catch (e) { /* ignore */ }
+      emit();
+    }, function () { wakeState = 'off'; emit(); });
+  }
+  function wakeOff() {
+    var s = wakeS;
+    wakeS = null;
+    if (s) { try { s.release(); } catch (e) { /* ignore */ } }
+    if (wakeState === 'on' || wakeState === 'asking') wakeState = 'off';
+  }
+  function arm() {
+    watch();
+    wakeOn();
+    if (!saveTimer) saveTimer = setInterval(save, api._saveMs || 10000);
+    listen();
+  }
+  function disarm() {
+    unwatch(); wakeOff();
+    if (saveTimer) { clearInterval(saveTimer); saveTimer = null; }
+  }
+  function listen() {
+    if (listening) return;
+    listening = true;
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('pagehide', function () { save(); });
+  }
+  function onVisible() {
+    if (!S) return;
+    if (document.visibilityState === 'hidden') {
+      if (!S.hiddenAt) S.hiddenAt = now();
+      wakeOff(); save();
+      return;
+    }
+    var hidAt = S.hiddenAt, away = hidAt ? now() - hidAt : 0;
+    S.hiddenAt = null;
+    if (live()) {
+      if (away >= GAP_MS && !S.noGeo && tr && tr.points.length) { tr.gap(); S.gapNotice = true; }
+      if (away >= AWAY_MS) { S.askAway = true; S.awayAt = hidAt; }
+      watch();   // a fresh watch: iOS can leave the old one dead after the page was away
+      wakeOn();
+    }
+    save(); emit(); syncBar();
+    toWalkIfAsked();
+  }
+  /** Back from away with the question to ask: 散步中 asks it. */
+  function toWalkIfAsked() {
+    var cur = App.router && App.router.current ? App.router.current() : null;
+    if (cur && cur.name !== 'Walk_Now' && askEnd()) App.go('Walk_Now');
+  }
+
+  // ------------------------------------------------------------------ the walk
+  // ------------------------------------------------------------------ the 「散步中 mm:ss」 bar on every other screen
+  var barEl = null, barTimer = null;
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function clockText(ms) { var sec = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60); return (h ? h + ':' + pad(m) : pad(m)) + ':' + pad(sec % 60); }
+  /** Show the bar (first in #app, before the screen) while a walk is kept and the screen is not 散步中 itself. */
+  function syncBar() {
+    // 這次不記錄 and no 結束散步: once the map stopped showing the walk nothing is left of it, so it goes by itself
+    if (S && S.discarded && now() - S.start >= hours() * 3600e3) { clear(); return; }
+    var root = document.getElementById('app'), screen = document.getElementById('screen');
+    var cur = App.router && App.router.current ? App.router.current() : null;
+    var show = !!S && !!root && !!screen && screen.parentNode === root && !!cur && cur.name !== 'Walk_Now' && !(App.router.isPublicHash && App.router.isPublicHash());
+    if (!show) { if (barEl && barEl.parentNode) barEl.parentNode.removeChild(barEl); return; }
+    var W = App.content.walklog;
+    if (S.gapNotice) { S.gapNotice = false; App.ui.toast(W.gapNotice); }
+    if (!barEl) {
+      barEl = document.createElement('button');
+      barEl.type = 'button';
+      barEl.className = 'walk-bar';
+      barEl.addEventListener('click', function () { App.go('Walk_Now'); });
+    }
+    var text = S.ended ? W.barUnsaved : S.discarded ? (W.barDiscarded || W.cta) : W.bar.replace('{t}', clockText(now() - S.start));
+    if (barEl.textContent !== text) barEl.textContent = text;
+    barEl.setAttribute('aria-label', W.barAria);
+    if (barEl.parentNode !== root || barEl.nextSibling !== screen) root.insertBefore(barEl, screen);
+  }
+  function barOn() { if (!barTimer) barTimer = setInterval(syncBar, 1000); syncBar(); }
+  function barOff() { if (barTimer) { clearInterval(barTimer); barTimer = null; } syncBar(); }
+
+  /** Start recording. o: {dogs: [ids], noGeo (the start point was tapped on the map: time only)} → Promise<current()>. */
+  function start(o) {
+    return new Promise(function (resolve) {
+      o = o || {};
+      if (S) throw fail('已經在散步了');
+      var dogs = (Array.isArray(o.dogs) ? o.dogs : []).filter(function (d) { return typeof d === 'string' && d; });
+      if (!dogs.length) throw fail('先選一隻狗');
+      var t = now();
+      S = { v: 1, id: App.data && App.data.newId ? App.data.newId('wk') : 'wk' + t.toString(36), start: t, dogs: dogs, noGeo: !!o.noGeo, discarded: false, ended: false,
+        endAt: null, entry: null, hiddenAt: null, awayAt: null, seenAt: t, snoozeUntil: 0, askAway: false, gapNotice: false, track: null };
+      tr = App.walklog.track();
+      arm();
+      save(); emit(); barOn();
+      resolve(current());
+    });
+  }
+  /** null, or {id, start, dogs, km (null without GPS), approx, noGeo, discarded, elapsed (ms), wake: 'on'|'off'|'none', ended}. */
+  function current() {
+    if (!S) return null;
+    return { id: S.id, start: S.start, dogs: S.dogs.slice(), km: S.noGeo ? null : (tr ? tr.km() : 0), approx: !!(tr && tr.approx), noGeo: !!S.noGeo,
+      discarded: !!S.discarded, elapsed: Math.max(0, (S.ended ? S.endAt : now()) - S.start), wake: wakeState, ended: !!S.ended };
+  }
+  /** End the walk: the entry for the family log {id, start, end, minutes, km, approx, dogs, route, gaps, pee, poop}, or
+      null when it was 這次不記錄. Once ended it returns the same entry (a second press after a failed save). */
+  function finish(endAt) {
+    if (!S || S.discarded) return null;
+    if (S.ended) return clone(S.entry);
+    var t = Number(endAt) || now();
+    if (t < S.start) t = S.start;
+    unwatch(); wakeOff();
+    var geoOk = !S.noGeo && tr, r = geoOk ? App.walklog.routeOf(tr.points, tr.gaps) : { route: '', gaps: [] };
+    S.entry = { id: S.id, start: S.start, end: t, minutes: Math.round((t - S.start) / 60000), km: geoOk ? tr.km() : null, approx: !!(geoOk && tr.approx),
+      dogs: S.dogs.slice(), route: r.route, gaps: r.gaps, pee: false, poop: false };
+    S.ended = true; S.endAt = t;
+    save(); emit();
+    return clone(S.entry);
+  }
+  /** 這次不記錄: the GPS stops and nothing of this walk is kept (the map still shows the walk until 結束散步). */
+  function discard() {
+    if (!live()) return;
+    S.discarded = true;
+    unwatch(); wakeOff();
+    tr = App.walklog.track();
+    save(); emit();
+  }
+  /** Forget the walk (saved, or never to be saved). */
+  function clear() {
+    disarm();
+    S = null; tr = null; wakeState = 'off';
+    var s = ls();
+    try { if (s) s.removeItem(key()); } catch (e) { /* ignore */ }
+    barOff(); emit();
+  }
+  /** At start-up: the walk kept on this phone goes on. Away an hour or more → askEnd() says 'away'. */
+  function resume() {
+    if (S) return current();
+    var s = ls(), raw = null, v = null;
+    try { raw = s && s.getItem(key()); } catch (e) { raw = null; }
+    if (!raw) return null;
+    try { v = JSON.parse(raw); } catch (e) { v = null; }
+    if (!v || v.v !== 1 || typeof v.id !== 'string' || typeof v.start !== 'number' || !isFinite(v.start) || !Array.isArray(v.dogs) ||
+        !v.dogs.filter(function (d) { return typeof d === 'string' && d; }).length) {
+      try { s.removeItem(key()); } catch (e) { /* ignore */ }
+      return null;
+    }
+    S = v;
+    S.dogs = v.dogs.filter(function (d) { return typeof d === 'string' && d; });
+    tr = App.walklog.track(v.track);
+    var t = now(), last = v.hiddenAt || v.seenAt || v.start;
+    S.hiddenAt = null;
+    if (live()) {
+      if (t - last >= GAP_MS && !S.noGeo && tr.points.length) tr.gap();
+      if (t - last >= AWAY_MS) { S.askAway = true; S.awayAt = last; }
+      arm();
+    } else listen();
+    save(); emit(); barOn();
+    toWalkIfAsked();
+    return current();
+  }
+  /** Why to ask 「這次散步結束了嗎？」: 'away' (gone an hour or more), 'long' (past the check-in hours), or null. */
+  function askEnd() {
+    if (!live()) return null;
+    if (S.askAway) return 'away';
+    var t = now();
+    return t - S.start >= hours() * 3600e3 && t >= (S.snoozeUntil || 0) ? 'long' : null;
+  }
+  /** 「還在走」: ask again in an hour. */
+  function snooze() { if (!live()) return; S.askAway = false; S.awayAt = null; S.snoozeUntil = now() + SNOOZE_MS; save(); emit(); }
+  /** When the walk really ended if it ends now from the question: the last point, else when the phone was put away. */
+  function lastAt() { if (!S) return null; var l = tr && tr.last(); return l ? l[2] : (S.hiddenAt || S.awayAt || now()); }
+  /** True once after a straight line was drawn for the time the page was away (the screen says so). */
+  function takeGapNotice() { if (!S || !S.gapNotice) return false; S.gapNotice = false; save(); return true; }
+  function onChange(cb) { listeners.push(cb); return function () { listeners = listeners.filter(function (x) { return x !== cb; }); }; }
+
+  api = App.walkrec = { start: start, current: current, finish: finish, discard: discard, clear: clear, resume: resume, askEnd: askEnd, snooze: snooze,
+    lastAt: lastAt, takeGapNotice: takeGapNotice, onChange: onChange, hours: hours,
+    // tests: the phone's location, 螢幕保持亮著 and clock; how often the walk is kept on the phone; _forget = a page that
+    // starts again (memory gone, the copy on the phone kept)
+    _geo: null, _now: null, _saveMs: 10000, _saveNow: function () { save(); },
+    _forget: function () { disarm(); S = null; tr = null; wakeState = 'off'; barOff(); },
+    _syncBar: function () { syncBar(); } };
 })(window.App = window.App || {});
 
 ;
@@ -12360,6 +13569,8 @@ window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
         if (!(App.router.isPublicHash && App.router.isPublicHash())) App.data.bootPrivate();
         clearTimeout(slow); clearTimeout(slower);
         App.router.start(root());
+        // 遛狗紀錄: a walk that was recording when the page closed goes on (core/walkrec.js); not on a vet's / clinic's page
+        if (App.walkrec && !(App.router.isPublicHash && App.router.isPublicHash())) { try { App.walkrec.resume(); } catch (e) { console.error('[walk] resume', e); } }
         if (App.store.degraded) App.ui.banner(App.store.degradedText, { reload: true });
         App.me.mountPill(); // only when the admin tools are unlocked on this device
         App.data.onChange(function (k) { if (k === 'people') App._updateTestPill(); });
@@ -13145,7 +14356,7 @@ try {
     render: function (ctx) {
       var ev = ctx.state.event;
       if (ev === undefined) return html`${ui.topBar({})}${ui.loading()}`;
-      if (!ev) return html`${ui.topBar({})}<div class="px mt-16">${ui.emptyState({ title: '找不到這場狗聚', body: '連結可能打錯了，或狗聚已經刪掉。', action: ui.secondaryBtn('回地圖', { go: 'Main', block: false }) })}</div>`;
+      if (!ev) return html`${ui.topBar({})}<div class="px mt-16">${ui.emptyState({ title: '找不到這場狗聚', body: '連結可能打錯了，或狗聚已經刪掉。', action: ui.secondaryBtn(C.walklog.backToMap, { go: 'Main', block: false }) })}</div>`;
       var t = D.now(), st = D.eventStatus(ev, t);
       var back = ui.secondaryBtn('回狗聚頁', { go: 'Event', params: { id: ev.id }, block: false });
 
@@ -13169,7 +14380,7 @@ try {
         ${st === 'live' ? html`<div class="px mt-12">${ui.infoPanel({ icon: 'eventInfo', body: '狗聚還在進行中，現在送也可以。' })}</div>` : ''}
         ${stickersPart}
         ${reportSection(ctx, ev)}
-        ${others.length ? html`<div class="af-bottom">${ui.primaryBtn('送出', { act: 'send' })}</div>` : html`<div class="af-bottom">${ui.primaryBtn('回地圖', { act: 'home' })}</div>`}`;
+        ${others.length ? html`<div class="af-bottom">${ui.primaryBtn('送出', { act: 'send' })}</div>` : html`<div class="af-bottom">${ui.primaryBtn(C.walklog.backToMap, { act: 'home' })}</div>`}`;
     },
     actions: {
       dog: function (ctx, d) { App.me.setDog(d.id); },   // 一個家: switch to that dog (the screen opens as it)
@@ -14320,6 +15531,7 @@ try {
     var following = D.following().filter(function (id) { return id !== me && D.person(id) && !D.isBlocked(id); });
     // 找朋友 (Willie 2026-11-02): no list of every dog — friends come by QR code or link, or from meetups they really went to
     var met = D.metDogs(ctx.state.allEvents || []).filter(function (m) { return m.id !== me && following.indexOf(m.id) === -1; });
+    var scan = !!(App.qrScan && App.qrScan.available());   // 掃 QR 碼 (2026-11-02): the camera inside 豆米特
     return html`${ui.topBar({})}
       <h1 class="h1 px">私訊邀請與追蹤</h1>
       ${consentNote()}
@@ -14335,8 +15547,8 @@ try {
       </section>
       <section class="px mt-24" aria-labelledby="dm-find">
         ${ui.sectionHead(F.title, null, { id: 'dm-find' })}
-        <p class="note mt-4">${F.note}</p>
-        <div class="row-flex mt-8" style="flex-wrap:wrap">${ui.quietBtn(F.qr, { act: 'myQr', icon: 'qr', iconSize: 20, block: false })}${ui.quietBtn(F.share, { act: 'myCard', icon: 'share', iconSize: 20, block: false })}</div>
+        <p class="note mt-4">${scan ? F.noteScan : F.note}</p>
+        <div class="row-flex mt-8" style="flex-wrap:wrap">${scan ? ui.quietBtn(C.scan.button, { act: 'scanQr', icon: 'camera', iconSize: 20, block: false }) : ''}${ui.quietBtn(F.qr, { act: 'myQr', icon: 'qr', iconSize: 20, block: false })}${ui.quietBtn(F.share, { act: 'myCard', icon: 'share', iconSize: 20, block: false })}</div>
       </section>
       <section class="px mt-24" aria-labelledby="dm-met">
         ${ui.sectionHead(F.metTitle, null, { id: 'dm-met' })}
@@ -14610,6 +15822,7 @@ try {
     },
 
     actions: {
+      scanQr: function () { App.qrScan.open(); },
       myQr: function () { var p = D.me(); if (p) App.shareCard.openQr(p, App.me.actorId); },
       myCard: function () { var p = D.me(); if (p) App.shareCard.open(p, App.me.actorId); },
       invite: function (ctx, d) {
@@ -14794,7 +16007,7 @@ try {
    delete my post, 檢舉 someone else's post. Missing / not allowed → 「找不到這篇日記」. */
 (function (App) {
   'use strict';
-  var ui = App.ui, html = ui.html, D = App.data, fmt = ui.fmt;
+  var ui = App.ui, html = ui.html, D = App.data, C = App.content, fmt = ui.fmt;
 
   (function () {
     if (document.getElementById('css-Diary_Post')) return;
@@ -14824,15 +16037,19 @@ try {
       if (p === undefined) return html`${ui.topBar({ backLabel: '返回' })}${ui.loading()}`;
       if (!p) return html`${ui.topBar({ backLabel: '返回' })}<div class="px">${ui.emptyState({ title: '找不到這篇日記', body: '可能被刪掉了，或是只給狗友看。' })}</div>`;
       var mine = p.by === me, comments = ctx.state.comments || [];
+      // 遛狗紀錄's daily summary: how far and how long on that day (never a time of day, never a route)
+      var W = C.walklog, walk = p.kind === 'walk';
+      var walkLine = !walk ? '' : p.km > 0 ? ui.tpl(W.postKm, { km: App.walklog.kmText(p.km), minutes: fmt.minutes(p.minutes) }) : ui.tpl(W.postMin, { minutes: fmt.minutes(p.minutes) });
       return html`
         ${ui.topBar({ backLabel: '返回' })}
         <section class="px">
           <button type="button" class="dy-open row-flex" style="gap:10px"${ui.go('DM_Invite', { id: p.by })}>
             ${ui.dogAvatar(D.person(p.by), { size: 40, label: false })}
-            <span><span class="h3">${D.dogName(p.by)}</span><br><span class="note">${fmt.relative(p.at)}・${p.audience === 'public' ? '公開' : '只給狗友'}</span></span>
+            <span><span class="h3">${D.dogName(p.by)}</span><br><span class="note">${walk ? fmt.date(fmt.parseKey(p.day)) : fmt.relative(p.at)}・${p.audience === 'public' ? '公開' : '只給狗友'}</span></span>
           </button>
           ${p.photos.map(function (ph) { return html`<img class="dp-pic" src="${ph.url}" alt="日記照片">`; })}
           ${p.text ? html`<div class="dy-text">${p.text}</div>` : ''}
+          ${walk ? html`<div class="dy-text">${walkLine}</div>` : ''}
           <div class="dy-bar">
             <button type="button" class="dy-woof"${ui.act('woof')}${ui.attrs({ 'aria-pressed': String(p.woofedByMe), 'aria-label': '汪，' + p.woofs + ' 個' })}>🐾 汪 ${p.woofs}</button>
             ${mine ? ui.textBtn('刪除這篇', { act: 'del', muted: true }) : ui.textBtn('檢舉', { act: 'report', muted: true })}
@@ -14863,7 +16080,8 @@ try {
       },
       delC: function (ctx, d) { return D.deleteDiaryComment(String(ctx.params.id), d.cid).then(function () { ui.toast('留言刪掉了'); }); },
       del: function (ctx) {
-        return ui.confirm({ title: '刪除這篇日記？', body: '照片和留言會一起刪掉，不能復原。', ok: '刪除', danger: true }).then(function (yes) {
+        var post = ctx.state.post;
+        return ui.confirm({ title: '刪除這篇日記？', body: post && post.kind === 'walk' ? C.walklog.postDelBody : '照片和留言會一起刪掉，不能復原。', ok: '刪除', danger: true }).then(function (yes) {
           if (!yes) return null;
           return D.deleteDiary(String(ctx.params.id)).then(function () { ui.toast('刪掉了'); ctx.back(); });
         });
@@ -15921,6 +17139,7 @@ try {
           <form class="field mt-12" novalidate>
             <label class="label" for="fm-merge-code">${R.label}</label>
             <input class="input fm-input" id="fm-merge-code" type="text" data-model="code"${ui.attrs({ value: st.code, placeholder: R.placeholder, maxlength: 20, autocomplete: 'off', autocapitalize: 'characters', autocorrect: 'off', spellcheck: 'false', enterkeyhint: 'go', 'aria-describedby': 'fm-merge-msg' })}>
+            <p class="note mt-4">${R.safety}</p>
             <p class="fm-msg" id="fm-merge-msg" role="alert">${st.msg}</p>
             <div class="sheet-actions">${ui.quietBtn('取消', { act: 'cancel' })}${ui.primaryBtn(H.mergeNext, { type: 'submit', act: 'next' })}</div>
           </form>`;
@@ -18249,6 +19468,7 @@ try {
           <form class="mt-12" novalidate autocomplete="off">
             <label class="label" for="jl-code">${R.label}</label>
             <input class="input jl-code mt-8"${ui.attrs({ id: 'jl-code', type: 'text', 'data-model': 'code', value: st.code, placeholder: R.placeholder, maxlength: 20, autocomplete: 'off', autocapitalize: 'characters', autocorrect: 'off', spellcheck: 'false', enterkeyhint: 'go', 'aria-describedby': 'jl-code-msg', disabled: st.ok })}>
+            <p class="note mt-4">${R.safety}</p>
             <p class="jl-claim-msg" id="jl-code-msg"${ui.attrs({ role: st.ok ? 'status' : 'alert' })}>${st.msg}</p>
             <div class="sheet-actions">${ui.quietBtn('取消', { act: 'close' })}${ui.secondaryBtn(R.submit, { type: 'submit', act: 'claim', disabled: st.ok })}</div>
           </form>`;
@@ -19163,14 +20383,16 @@ try {
     var pres = D.presence(ctx.state.checkins || []);
     var mine = pres.mine;
     var minePark = mine && mine.parkId ? C.park(mine.parkId) : null;
-    var walking = mine && mine.kind === 'walk';
-    var cta = mine ? (walking ? '散步中・' + (mine.r > 100 ? (mine.area || '附近') : '這一帶') : minePark ? '我在' + shortPark(minePark.name) : '我在附近') : '🐾 我出門遛狗';
+    var walking = mine && mine.kind === 'walk', rec = App.walkrec.current();
+    var where = walking ? '・' + (mine.r > 100 ? (mine.area || '附近') : '這一帶') : '';
+    // 遛狗紀錄: a walk recording on this phone → the button goes back to 散步中
+    var cta = rec ? C.walklog.cta + where : mine ? (walking ? C.walklog.nowTitle + where : minePark ? '我在' + shortPark(minePark.name) : '我在附近') : '🐾 我出門遛狗';
     return html`
       <div class="px mt-8"><button type="button" class="map-search" data-act="findPark">🔍 ${C.parkSearch.label}</button></div>
       <section class="map map-real px mt-8" aria-label="地圖：點公園可以打卡、揪團，標籤是現在有狗的公園">
         <div class="map-slot"></div>
         <button type="button" class="map-locate" data-act="locate">📍 回到我這裡</button>
-        <div class="map-cta">${ui.primaryBtn(cta, { act: mine ? 'status' : 'walk', block: false, ariaLabel: mine ? '散步或打卡中：' + cta : '我出門遛狗：用手機的位置打卡一次' })}</div>
+        <div class="map-cta">${ui.primaryBtn(cta, { act: rec ? 'walking' : mine ? 'status' : 'walk', block: false, ariaLabel: rec ? C.walklog.barAria : mine ? '散步或打卡中：' + cta : '我出門遛狗：用手機的位置打卡一次' })}</div>
       </section>
       <div class="px mt-4" style="text-align:right">${ui.textBtn('從公園清單打卡', { act: 'checkin', icon: 'chevronRight', iconAfter: true, iconSize: 16 })}</div>
       ${pres.near.length ? html`<p class="note px mt-8">另有 ${pres.near.length} 隻在附近（家附近不顯示公園）</p>` : ''}`;
@@ -19181,7 +20403,7 @@ try {
   var pickWalk = false; // 我出門遛狗 without location: the next tap on the map is where I am
   var pickWalkDogs = null; // 一個家: the dogs that go on that walk
   function tapMap(ctx, latlng, zoom) {
-    if (pickWalk) { pickWalk = false; var dogs = pickWalkDogs; pickWalkDogs = null; return startWalk(ctx, latlng, dogs); }
+    if (pickWalk) { pickWalk = false; var dogs = pickWalkDogs; pickWalkDogs = null; return startWalk(ctx, latlng, dogs, true); }
     if (zoom < C.map.tapZoom) { ui.toast('放大一點再點公園'); return; }
     if (looking) { ui.toast('查詢中，請稍等'); return; }
     looking = true;
@@ -19198,11 +20420,37 @@ try {
     }, function (e) { looking = false; throw e; });
   }
 
-  /** 我出門遛狗 at a point: the park I am in, else a blurred walk circle (一個家: `dogs`, each its own). */
-  function startWalk(ctx, point, dogs) {
+  /** 我出門遛狗 at a point: the park I am in, else a blurred walk circle (一個家: `dogs`, each its own) — written once, never
+      moved during the walk. Then 遛狗紀錄 records and 散步中 opens. noGeo: the point was tapped on the map (time only). */
+  function startWalk(ctx, point, dogs, noGeo) {
     return (dogs ? D.walkDogs(point, dogs).then(function (l) { return l[0]; }) : D.walkCheckIn(point)).then(function (r) {
       if (r.kind === 'park') ui.toast(r.near ? '已打卡，顯示為「在附近」' : '已打卡：' + r.park.name);
       else ui.toast(r.near ? '已開始散步（家附近，只顯示' + (r.area || '在附近') + '）' : '已開始散步，別人看到的是這一帶');
+      if (App.walkrec.current()) return null;
+      return App.walkrec.start({ dogs: dogs || [App.me.actorId], noGeo: !!noGeo }).then(function () { App.go('Walk_Now'); });
+    });
+  }
+  /** 第一次按「我出門遛狗」 (Willie 2026-11-02: 「可以 但要說明為什麼要輸入家的位置」): why the home point matters, then set it
+      (where I am now / on the map) or 先不要 (never asked again). Before anything is on the map; closing starts nothing. */
+  function openHomeAsk(ctx, cont) {
+    var W = C.walklog;
+    ui.sheet({
+      title: W.homeTitle,
+      render: function () {
+        return html`<p class="sub mt-4">${W.homeWhy}</p><p class="mt-8">${W.homeAfter}</p><p class="note mt-8">${W.homeWho}</p>
+          <div class="mt-16" style="display:flex;flex-direction:column;gap:8px">${ui.primaryBtn(W.homeHere, { act: 'here' })}${ui.quietBtn(W.homeMap, { act: 'map' })}</div>
+          <div class="mt-8" style="text-align:center">${ui.textBtn(W.homeLater, { act: 'later', muted: true })}</div>`;
+      },
+      actions: {
+        here: function (s) {
+          return App.map.position().then(function (p) {
+            if (!p) { App.map.noPosition(W.homeNoPos); return null; }
+            return App.parkPick.saveHomeAt(p, W.homeSaved).then(function () { s.close(); return cont(p); });
+          });
+        },
+        map: function (s) { s.close(); App.parkPick.homeMapSheet(function () { cont(); }, W.homeSaved); },
+        later: function (s) { return D.markHomeAsked().then(function () { s.close(); return cont(); }); }
+      }
     });
   }
   /** 一個家: 帶誰去？ before the walk. */
@@ -19227,10 +20475,24 @@ try {
       }
     });
   }
-  /** The button: ask for the position once; no position → let them tap the map. */
+  /** The button: 散步中 already → back to it; 帶誰去 (2+ dogs); 「先設定家的位置」 the first time; then the position once
+      (no position → tap the map). */
   function walkNow(ctx, dogs) {
+    if (App.walkrec.current()) { App.go('Walk_Now'); return null; }
     if (!dogs && many()) return openWalkPick(ctx);
-    if (looking) return;
+    if (looking) return null;
+    looking = true;
+    return D.walkHomeNeeded().catch(function () { return false; }).then(function (ask) {
+      looking = false;
+      if (ctx.dead) return null;
+      if (ask) return openHomeAsk(ctx, function (p) { return locateAndStart(ctx, dogs, p); });
+      return locateAndStart(ctx, dogs);
+    });
+  }
+  /** Start at `at` (the position the home sheet just read), else ask for the position once. */
+  function locateAndStart(ctx, dogs, at) {
+    if (at) return startWalk(ctx, at, dogs);
+    if (looking) return null;
     looking = true;
     ui.toast('找位置中…');
     return App.map.locate().then(function (p) {
@@ -19247,15 +20509,15 @@ try {
     if (many() && pres.mineAll.length > 1) return openGoHome(ctx, pres.mineAll);
     var walking = mine.kind === 'walk', park = !walking && mine.parkId ? C.park(mine.parkId) : null;
     ui.sheet({
-      title: walking ? '散步中' : park ? '我在' + park.name : '我在附近',
+      title: walking ? C.walklog.nowTitle : park ? '我在' + park.name : '我在附近',
       render: function () {
         var where = walking ? (mine.r > 100 ? '別人看到的是「' + (mine.area || '') + '附近」（家附近）' : '別人看到的是你在「這一帶」（約 100 公尺）') : '';
         // 一個家: say which dog is out (it may not be 現在這隻狗)
         return html`<p class="sub">${many() ? D.dogName(mine.id) + '・' : ''}${where ? where + '・' : ''}${ui.fmt.time(mine.until)} 自動消失</p>
-          <div class="sheet-actions">${ui.quietBtn('改在公園打卡', { act: 'park' })}${ui.primaryBtn(walking ? '結束散步' : '離開公園', { act: 'end' })}</div>`;
+          <div class="sheet-actions">${ui.quietBtn('改在公園打卡', { act: 'park' })}${ui.primaryBtn(walking ? C.walklog.end : '離開公園', { act: 'end' })}</div>`;
       },
       actions: {
-        end: function (s) { return D.checkOut(mine.id).then(function () { s.close(); ui.toast(walking ? '結束散步了' : '已離開公園'); }); },
+        end: function (s) { return D.checkOut(mine.id).then(function () { s.close(); ui.toast(walking ? C.walklog.ended : '已離開公園'); }); },
         park: function (s) { s.close(); openCheckin(ctx); }
       }
     });
@@ -19271,7 +20533,7 @@ try {
         var left = list.filter(function (c) { return s.state.gone.indexOf(c.id) === -1; });
         return html`<ul class="list">${left.map(function (c) {
           var park = c.kind !== 'walk' && c.parkId ? C.park(c.parkId) : null;
-          var where = c.kind === 'walk' ? '散步中' : park ? '在' + park.name : '在附近';
+          var where = c.kind === 'walk' ? C.walklog.nowTitle : park ? '在' + park.name : '在附近';
           return ui.listRow({ lead: ui.dogAvatar(D.person(c.id) || { dog: {} }, { size: 36, label: false }), title: D.dogName(c.id), sub: where + '・' + ui.fmt.time(c.until) + ' 自動消失',
             right: ui.textBtn(H.goHome.split('{dog}').join(D.dogName(c.id)), { act: 'goHome', data: { id: c.id } }) });
         })}</ul>
@@ -19295,6 +20557,16 @@ try {
     });
   }
 
+  /** 遛狗紀錄: one dog's day — how far and how long, never a time of day. The line opens its comments; 汪 is its own button. */
+  function walkDayRow(it, lead) {
+    var W = C.walklog, F = ui.fmt, p = it.post, n = F.daysUntil(F.parseKey(p.day));
+    var day = n === 0 ? W.today : n === -1 ? W.yesterday : ' ' + F.md(F.parseKey(p.day)) + ' ';
+    var title = p.km > 0 ? ui.tpl(W.feedKm, { dog: D.dogName(it.id), day: day, km: App.walklog.kmText(p.km) }) : ui.tpl(W.feedMin, { dog: D.dogName(it.id), day: day, minutes: F.minutes(p.minutes) });
+    return html`<li class="fd-walk">
+      <button type="button" class="row fd-walk-main"${ui.go('Diary_Post', { id: p.id })}>${lead}<span class="row-main"><span class="row-title">${title}</span>${p.km > 0 ? html`<span class="row-sub">${F.minutes(p.minutes)}</span>` : ''}</span></button>
+      <button type="button" class="dy-woof"${ui.act('woofWalk', { id: p.id })}${ui.attrs({ 'aria-pressed': String(p.woofedByMe), 'aria-label': '汪，' + p.woofs + ' 個' })}>🐾 汪 ${p.woofs}</button>
+    </li>`;
+  }
   /** 狗友動態: what the dogs I follow did lately (no positions — a walk only says 出門散步了 / the district). */
   function feedSection(ctx) {
     var items = D.feedItems(ctx.state.checkins || [], ctx.state.events || [], ctx.state.feedPosts || []);
@@ -19304,6 +20576,7 @@ try {
     var rows = shown.map(function (it) {
       var name = D.dogName(it.id), lead = html`<span aria-hidden="true">${ui.dogAvatar(D.person(it.id), { size: 40, label: false })}</span>`;
       var when = ui.fmt.relative(it.at);
+      if (it.kind === 'walkday') return walkDayRow(it, lead);
       if (it.kind === 'diary') {
         var p = it.post, ph = p.photos[0];
         return ui.listRow({ lead: lead, title: name + '寫了日記', sub: (p.text ? p.text.slice(0, 40) + (p.text.length > 40 ? '…' : '') + '・' : '') + when,
@@ -19488,6 +20761,8 @@ try {
         } });
       },
       walk: function (ctx) { return walkNow(ctx); },
+      walking: function () { App.go('Walk_Now'); },
+      woofWalk: function (ctx, d) { return D.toggleWoof(d.id); },
       feedMore: function (ctx) { ctx.set({ feedAll: true }); },
       status: function (ctx) { openStatus(ctx); },
       rsvp: function (ctx) {
@@ -19846,23 +21121,10 @@ try {
     return diffs.length ? diffs : null;
   }
 
-  function saveHomeAt(p) {
-    return D.setPrivacy({ homeAt: { lat: p.lat, lng: p.lng }, hideNearHome: true }).then(function () { ui.toast('家的位置設好了，只有你知道'); });
-  }
-  /** Tap your home on the map (the one map moves into this sheet; the home screen takes it back on its next render). */
-  function openHomeMapSheet() {
-    var sh = ui.sheet({
-      title: '在地圖上點家的位置',
-      render: function () {
-        return html`<p class="sub">拖地圖、放大，點一下家大概的位置。只存在你自己的資料裡，別人看不到。</p>
-          <div class="pv-mapslot mt-12" style="position:relative;height:min(52vh,360px);border-radius:16px;overflow:hidden;isolation:isolate"></div>`;
-      }
-    });
-    var slot = sh && sh.el && sh.el.querySelector('.pv-mapslot');
-    var home = D.myHomeAt();
-    App.map.attach(slot, { onTap: function (latlng) { saveHomeAt(latlng).then(function () { sh.close(); }); } });
-    if (home) App.map.setView(home.lat, home.lng, 16);
-  }
+  // 一個家: the home point is the whole family's (遛狗紀錄 2026-11-02: 「只有你和家人知道」)
+  var HOME_SAVED = '家的位置設好了，只有你和家人知道';
+  function saveHomeAt(p) { return App.parkPick.saveHomeAt(p, HOME_SAVED); }
+  function openHomeMapSheet() { App.parkPick.homeMapSheet(null, HOME_SAVED); }
   /** Parks to choose from; my current home park first when only my private copy knows it (not on this phone's list). */
   function homeChoices() {
     var list = App.parkPick.ordered(), info = D.myHomeParkInfo();
@@ -20110,13 +21372,23 @@ try {
               ${ui.switchCtl({ checked: !!v.hideNearHome, act: 'nearHome', labelledby: 'pv-home', describedby: 'pv-home-sub' })}
             </div>
             <span class="note">${homePark ? '家的範圍：' + homePark.name + (v.hideNearHome ? '' : '（開關關著，還沒生效）') : (v.hideNearHome ? '還沒設定家的範圍，這個保護還沒生效。' : '還沒設定家的範圍。')}</span>
-            <span class="note">${homeAt ? '家的位置：已設定（只有你知道）' + (v.hideNearHome ? '・家附近 600 公尺內的散步只顯示區名' : '（開關關著，還沒生效）') : '家的位置：還沒設定。設了以後，在家附近按「我出門遛狗」只會顯示區名。'}</span>
+            <span class="note">${homeAt ? '家的位置：已設定（只有你和家人知道）' + (v.hideNearHome ? '・家附近 600 公尺內的散步只顯示區名' : '（開關關著，還沒生效）') : '家的位置：還沒設定。設了以後，在家附近按「我出門遛狗」只會顯示區名。'}</span>
             <div class="row-flex" style="flex-wrap:wrap;gap:8px">
-              ${ui.quietBtn('用我現在的位置', { act: 'homeHere', block: false })}
-              ${ui.quietBtn('在地圖上點', { act: 'homeMap', block: false })}
+              ${ui.quietBtn(C.walklog.homeHere, { act: 'homeHere', block: false })}
+              ${ui.quietBtn(C.walklog.homeMap, { act: 'homeMap', block: false })}
               ${homeAt ? ui.textBtn('清除家的位置', { act: 'homeClear', muted: true }) : ''}
             </div>
             ${ui.primaryBtn('設定家的範圍', { act: 'home', icon: 'home', block: false, cls: 'pv-home-btn' })}
+          </div>
+
+          <div class="pv-block">
+            <div style="min-height:44px;display:flex;align-items:center;gap:12px">
+              <div class="grow" style="min-width:0;display:flex;flex-direction:column;gap:2px">
+                <span class="h3" id="pv-walk">${C.walklog.shareTitle}</span>
+                <span class="note" id="pv-walk-sub">${C.walklog.shareSub}</span>
+              </div>
+              ${ui.switchCtl({ checked: D.walkShareOn(), act: 'walkShare', labelledby: 'pv-walk', describedby: 'pv-walk-sub' })}
+            </div>
           </div>
         </div>
 
@@ -20211,10 +21483,14 @@ try {
           else ui.toast(on ? '家附近只顯示「在附近」' : '已關掉：家附近也會顯示公園');
         });
       },
+      walkShare: function () {
+        var on = !D.walkShareOn();
+        return D.setWalkShare(on).then(function () { ui.toast(on ? C.walklog.shareOn : C.walklog.shareOff); });
+      },
       home: function (ctx) { openHomeSheet(ctx); },
       homeHere: function () {
         return App.map.position().then(function (p) {
-          if (!p) { App.map.noPosition('沒有拿到位置，可以改用「在地圖上點」'); return; }
+          if (!p) { App.map.noPosition(C.walklog.homeNoPos); return; }
           return saveHomeAt(p);
         });
       },
@@ -20445,6 +21721,7 @@ try {
             right: spaceOn ? html`<span class="pf-on">開著</span>` : ''
           })}
           ${ui.listRow({ icon: 'photo', iconSize: 20, title: '狗狗日記', sub: '照片和小故事', go: 'Diary' })}
+          ${ui.listRow({ icon: 'navMap', iconSize: 20, title: C.walklog.logTitle, sub: C.walklog.logRowSub, go: 'Walk_Log' })}
           ${ui.listRow({ icon: 'privacy', iconSize: 20, title: many ? C.home.settings : '我的隱私', sub: '打卡給誰看、家附近', go: 'Privacy' })}
           ${ui.listRow({ icon: 'infoSmall', iconSize: 20, title: C.privacyNote.title, sub: C.terms.title + '、' + C.deleteMine.title, go: 'Privacy', params: { section: 'note' } })}
         </ul>
@@ -20591,6 +21868,7 @@ try {
           <form class="field mt-12" novalidate>
             <label class="label" for="pc-code">${R.label}</label>
             <input class="input pc-code" id="pc-code" type="text" data-model="code"${ui.attrs({ value: st.code, placeholder: R.placeholder, maxlength: 20, autocomplete: 'off', autocapitalize: 'characters', autocorrect: 'off', spellcheck: 'false', enterkeyhint: 'go', 'aria-describedby': 'pc-code-msg', disabled: st.ok })}>
+            <p class="note mt-4">${R.safety}</p>
             <p class="pc-claim-msg" id="pc-code-msg" role="${st.ok ? 'status' : 'alert'}">${st.msg}</p>
             <div class="sheet-actions">${ui.quietBtn('取消', { act: 'cancel' })}${ui.primaryBtn(R.submit, { type: 'submit', act: 'claim', disabled: st.ok })}</div>
           </form>`;
@@ -21596,7 +22874,7 @@ try {
           ${ui.secondaryBtn('繞完一圈', { act: 'lap', icon: 'loop' })}
           ${ui.whiteBtn('少算一圈', { act: 'unlap', disabled: !w.laps })}
         </div>
-        <div class="mt-12">${ui.primaryBtn('結束散步', { act: 'finish' })}</div>
+        <div class="mt-12">${ui.primaryBtn(C.walklog.end, { act: 'finish' })}</div>
         <div style="text-align:center">${ui.textBtn('不記錄，取消這次', { act: 'cancelWalk', muted: true })}</div>
       </section>`;
   }
@@ -21991,6 +23269,404 @@ try {
 })(window.App);
 
 } catch (e) { console.error("[build] screens/Theme_Day.js failed to load", e); }
+;
+/* ---- screens/Walk_Log.js ---- */
+try {
+/* Walk_Log — 我的 → 散步紀錄 (docs/superpowers/specs/2026-11-02-walk-log-design.md): the family's walks. How many days in a
+   row (only when there is a streak: a broken one is never mentioned), this week's bars (today coral), this month's total,
+   and every walk; a walk opens Walk_View (route, delete). Two or more dogs: a switch for which dog (local to this screen,
+   the app's current dog stays). Only the family can see any of this. */
+(function (App) {
+  'use strict';
+  var ui = App.ui, html = ui.html, D = App.data, C = App.content, fmt = ui.fmt;
+
+  (function () {
+    if (document.getElementById('css-Walk_Log')) return;
+    var s = document.createElement('style'); s.id = 'css-Walk_Log';
+    s.textContent = [
+      '.wl-stats{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px}',
+      '.wl-streak{font-family:var(--font-head);font-size:24px;line-height:32px;color:var(--ink)}',
+      '.wl-week{display:flex;align-items:flex-end;gap:6px;height:112px}',
+      '.wl-col{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}',
+      '.wl-km{font-size:11px;line-height:14px;color:var(--muted);white-space:nowrap}',
+      '.wl-fill{width:100%;max-width:32px;border-radius:6px 6px 2px 2px;background:var(--teal)}',
+      '.wl-col.today .wl-fill{background:var(--coral)}',
+      '.wl-day{font-size:12px;line-height:16px;color:var(--muted)}',
+      '.wl-col.today .wl-day{color:var(--ink);font-weight:700}'
+    ].join('');
+    document.head.appendChild(s);
+  })();
+
+  /** This week's bars, Monday to Sunday: height by km (a walk without GPS still shows a small bar). */
+  function weekBars(week) {
+    var W = C.walklog, max = Math.max.apply(null, week.map(function (d) { return d.km; }).concat([0]));
+    return html`<div class="wl-week" role="img" aria-label="${W.weekTitle + '：' + week.map(function (d, i) { return ui.tpl(W.dayKm, { day: W.days[i], km: App.walklog.kmText(d.km) }); }).join('、')}">${week.map(function (d, i) {
+      var walked = d.km > 0 || d.minutes > 0, h = !walked ? 0 : Math.max(6, max > 0 ? Math.round(d.km / max * 72) : 6);
+      return html`<div class="wl-col ${d.today ? 'today' : ''}">
+        ${d.km > 0 ? html`<span class="wl-km">${App.walklog.kmText(d.km)}</span>` : ''}
+        ${walked ? html`<div class="wl-fill" style="height:${h}px"></div>` : ''}
+        <span class="wl-day">${W.days[i]}</span>
+      </div>`;
+    })}</div>`;
+  }
+  function walkRow(w) {
+    var W = C.walklog, far = w.km != null ? '・' + (w.approx ? W.approx + ' ' : '') + App.walklog.kmText(w.km) + ' ' + W.km : '';
+    return ui.listRow({ title: fmt.dateTime(w.start) + far, sub: fmt.minutes(w.minutes) + '・' + App.walklog.whoLine(w), go: 'Walk_View', params: { id: w.id, m: w.m } });
+  }
+
+  App.register('Walk_Log', {
+    title: C.walklog.logTitle,
+    tab: null,
+    mount: function (ctx) {
+      ctx.state.dog = App.me.actorId;
+      ctx.live('log', D.watchWalks);
+    },
+    render: function (ctx) {
+      var W = C.walklog, log = ctx.state.log, dogs = App.me.isPersona ? [] : D.myDogs();
+      var top = ui.topBar({ title: W.logTitle });
+      if (log === undefined) return html`${top}${ui.loading()}`;
+      var dog = dogs.indexOf(ctx.state.dog) !== -1 ? ctx.state.dog : (dogs[0] || App.me.actorId);
+      var switcher = ui.dogSwitch({ dogs: dogs, current: dog, act: 'dog' });
+      var list = (log.walks || []).filter(function (w) { return w.dogs.indexOf(dog) !== -1; });
+      if (!list.length) {
+        return html`${top}<div class="px">${switcher}${ui.emptyState({ title: W.logEmpty, body: W.logEmptyBody })}</div>`;
+      }
+      var st = App.walklog.stats(list, { dog: dog, from: log.from });
+      return html`
+        ${top}
+        <div class="px">${switcher}</div>
+        <section class="px mt-8" aria-label="${W.logTitle}">
+          <div class="wl-stats">
+            ${st.streak > 0 ? html`<span class="wl-streak">${ui.tpl(W.streak, { n: st.streak })}</span>` : ''}
+            <span class="sub">${ui.tpl(W.month, { km: App.walklog.kmText(st.month.km), count: st.month.count })}</span>
+          </div>
+        </section>
+        <section class="px mt-16" aria-label="${W.weekTitle}">${weekBars(st.week)}</section>
+        <ul class="list wl-list px mt-16">${list.map(walkRow)}</ul>`;
+    },
+    actions: {
+      dog: function (ctx, d) { ctx.set({ dog: d.id }); }
+    }
+  });
+})(window.App);
+
+} catch (e) { console.error("[build] screens/Walk_Log.js failed to load", e); }
+;
+/* ---- screens/Walk_Now.js ---- */
+try {
+/* Walk_Now — 散步中 (docs/superpowers/specs/2026-11-02-walk-log-design.md): the dark screen while a walk records
+   (App.walkrec). The time, how far (大約 when part of it is a straight line), the dogs, a big 結束散步 and 看地圖 (the walk
+   goes on; every other screen shows 「散步中 mm:ss」 at the top).
+   - 結束散步: under a minute nothing is kept; otherwise the walk goes into the family log, the map stops showing it, and
+     走完了 opens. A save that fails keeps the walk on this phone (「再存一次」 saves it once).
+   - 這次不記錄 (asks once, no way back): the GPS stops and nothing is kept; the map shows the walk until 結束散步.
+   - In a pocket: no touch for 15 s → locked, a long press of 1 s unlocks (C.walklog.lockMs / unlockMs).
+   - 「這次散步結束了嗎？」 after an hour away or past the check-in hours; 結束了 ends it at the last point.
+   - Two or more dogs: 「某某先回家」 ends that dog on the map; the walk still counts it.
+   With no walk: 「現在沒有在散步」 — never a redirect. */
+(function (App) {
+  'use strict';
+  var ui = App.ui, html = ui.html, D = App.data, C = App.content;
+
+  (function () {
+    if (document.getElementById('css-Walk_Now')) return;
+    var s = document.createElement('style'); s.id = 'css-Walk_Now';
+    s.textContent = [
+      '.screen.scr-Walk_Now{background:#1F2A2C;color:#F4F1EC}',
+      '.scr-Walk_Now .fb-link{color:#B9D9DD}',
+      '.scr-Walk_Now .btn-text{color:#B9D9DD}',
+      '.wn-top{min-height:60px;display:flex;align-items:center;gap:10px;padding:8px var(--gutter)}',
+      '.wn-logo{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;background:var(--cream)}',
+      '.wn-title{font-family:var(--font-head);font-size:20px;line-height:26px}',
+      '.wn-time{display:block;margin-top:24px;text-align:center;font-family:var(--font-head);font-size:64px;line-height:72px;font-variant-numeric:tabular-nums}',
+      '.wn-msg{margin:32px var(--gutter) 0;text-align:center;font-family:var(--font-head);font-size:24px;line-height:32px}',
+      '.wn-km{display:block;margin-top:4px;text-align:center;font-size:20px;line-height:28px;font-variant-numeric:tabular-nums}',
+      '.wn-dogs{margin:20px var(--gutter) 0;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 16px}',
+      '.wn-dog{display:inline-flex;align-items:center;gap:8px;font-size:16px;line-height:22px;min-width:0;overflow-wrap:anywhere}',
+      '.wn-actions{margin:32px var(--gutter) 0;display:flex;flex-direction:column;gap:12px}',
+      '.wn-actions .btn{min-height:56px;font-size:18px}',
+      '.wn-actions .wn-end{min-height:68px;font-size:22px}',
+      '.wn-note{margin:16px var(--gutter) 0;text-align:center;font-size:14px;line-height:20px;color:#B9D9DD}',
+      '.wn-links{margin:16px var(--gutter) 0;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px}',
+      /* locked: the whole screen is one long-press button, nothing else to press in a pocket */
+      '.wn-lock{position:fixed;left:0;right:0;top:0;bottom:0;z-index:20;margin:0;padding:24px var(--gutter);border:none;background:#1F2A2C;color:#F4F1EC;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:inherit;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;cursor:pointer}',
+      '.wn-lock .wn-time{margin-top:0}',
+      '.wn-unlock{display:block;margin-top:32px;font-size:16px;line-height:24px;color:#B9D9DD}',
+      '.wn-bar{display:block;width:180px;max-width:100%;height:4px;margin:0 auto 8px;border-radius:2px;background:#3A4A4D;overflow:hidden}',
+      '.wn-bar > span{display:block;width:0;height:100%;background:var(--coral)}',
+      '.wn-lock.holding .wn-bar > span{width:100%;transition:width 1s linear}'
+    ].join('');
+    document.head.appendChild(s);
+  })();
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  /** '05:12' / '1:05:12' */
+  function clock(ms) { var sec = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60); return (h ? h + ':' + pad(m) : pad(m)) + ':' + pad(sec % 60); }
+  function kmLine(cur) { return (cur.approx ? C.walklog.approx + ' ' : '') + (cur.km || 0).toFixed(2) + ' ' + C.walklog.km; }
+  /** What changes the screen's layout (anything else only changes the numbers). */
+  function shape(cur) { return cur ? [cur.id, cur.ended, cur.discarded, cur.noGeo, cur.wake].join('|') : 'none'; }
+  /** The numbers, without a re-render (a re-render every second is not needed for two numbers). */
+  function paint(el) {
+    var cur = App.walkrec.current(), t = el && el.querySelector('.wn-time'), k = el && el.querySelector('.wn-km');
+    if (!cur) return;
+    if (t) { var v = clock(cur.elapsed); if (t.textContent !== v) t.textContent = v; }
+    if (k) { var w = kmLine(cur); if (k.textContent !== w) k.textContent = w; }
+  }
+  /** The map stops showing the walk for each dog of it (one that is not mine any more is skipped). */
+  function outAll(dogs) {
+    return dogs.reduce(function (p, d) {
+      return p.then(function () { return Promise.resolve().then(function () { return D.checkOut(d); }).catch(function (e) { console.warn('[walk] check out', d, e); }); });
+    }, Promise.resolve());
+  }
+  /** End the walk now (or at endAt: the question 「這次散步結束了嗎？」 ends it at the last point). */
+  function finishWalk(ctx, endAt) {
+    var W = C.walklog, cur = App.walkrec.current();
+    if (!cur) return null;
+    var dogs = cur.dogs.slice();
+    if (cur.discarded) return outAll(dogs).then(function () { App.walkrec.clear(); ui.toast(W.ended); App.go('Main', {}, { root: true }); });
+    ctx.state.saving = true;   // (finish() re-renders at once: 存檔中…, not 還沒存好)
+    var e = App.walkrec.finish(endAt);
+    if (!e) return null;
+    if (e.end - e.start < 60000) return outAll(dogs).then(function () { App.walkrec.clear(); ui.toast(W.short); App.go('Main', {}, { root: true }); });
+    return D.saveWalk(e).then(function (r) {
+      return outAll(dogs).then(function () { App.walkrec.clear(); App.go('Walk_View', { id: r.id, m: r.m, done: 1 }, { replace: true }); });
+    }, function (err) {
+      // the walk stays on this phone (ended): 「再存一次」 saves the same walk once
+      ctx.set({ saving: false });
+      ui.reportError(err, W.unsaved);
+    });
+  }
+  /** 「這次散步結束了嗎？」 — once; not over a locked screen (nothing is answered in a pocket). Closing it = 還在走. */
+  function maybeAsk(ctx) {
+    var W = C.walklog, why = App.walkrec.askEnd();
+    if (!why || ctx.state.asking || ctx.state.locked) return;
+    ctx.state.asking = true;
+    var answered = false;
+    ui.sheet({
+      title: W.askTitle,
+      render: function () {
+        return html`<p class="sub mt-4">${why === 'long' ? ui.tpl(W.askLong, { h: App.walkrec.hours() }) : W.askAway}</p>
+          <div class="sheet-actions">${ui.quietBtn(W.askNo, { act: 'no' })}${ui.primaryBtn(W.askYes, { act: 'yes' })}</div>`;
+      },
+      actions: {
+        no: function (s) { answered = true; App.walkrec.snooze(); s.close(); },
+        yes: function (s) { answered = true; s.close(); return finishWalk(ctx, App.walkrec.lastAt()); }
+      },
+      onClose: function () { ctx.state.asking = false; if (!answered && App.walkrec.current()) App.walkrec.snooze(); }
+    });
+  }
+  /** Two or more dogs: 「某某先回家」 for each one the map still shows. */
+  function goHomeLinks(ctx, cur) {
+    if (cur.dogs.length < 2) return '';
+    var active = D.presence(ctx.state.checkins || []).mineAll.map(function (c) { return c.id; });
+    var out = cur.dogs.filter(function (d) { return active.indexOf(d) !== -1; });
+    return out.map(function (d) { return ui.textBtn(ui.tpl(C.walklog.goHome, { dog: D.dogName(d) }), { act: 'goHome', data: { id: d } }); });
+  }
+
+  // ---- the long press (kept outside the screen's markup: a re-render during the press does not cut it short)
+  var holdTimer = null;
+  function cancelHold() {
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+    var b = document.querySelector('.wn-lock.holding');
+    if (b) b.classList.remove('holding');
+  }
+  function startHold(ctx) {
+    if (holdTimer) return;
+    var b = document.querySelector('.wn-lock');
+    if (b) b.classList.add('holding');
+    holdTimer = setTimeout(function () {
+      holdTimer = null;
+      if (ctx.dead) return;
+      ctx.state.touch();
+      ctx.set({ locked: false });
+    }, C.walklog.unlockMs);
+  }
+
+  App.register('Walk_Now', {
+    title: C.walklog.nowTitle,
+    tab: null,
+    mount: function (ctx) {
+      var last = Date.now();
+      function touched() { last = Date.now(); }
+      ctx.state.touch = touched;
+      ctx.state.locked = false;
+      ctx.state.shape = shape(App.walkrec.current());
+      document.addEventListener('pointerdown', touched, true);
+      document.addEventListener('keydown', touched, true);
+      document.addEventListener('pointerup', cancelHold);
+      document.addEventListener('pointercancel', cancelHold);
+      ctx.onCleanup(function () {
+        document.removeEventListener('pointerdown', touched, true);
+        document.removeEventListener('keydown', touched, true);
+        document.removeEventListener('pointerup', cancelHold);
+        document.removeEventListener('pointercancel', cancelHold);
+        cancelHold();
+      });
+      function notice() { if (App.walkrec.takeGapNotice()) ui.toast(C.walklog.gapNotice); }
+      ctx.onCleanup(App.walkrec.onChange(function () {
+        var k = shape(App.walkrec.current());
+        if (k !== ctx.state.shape) { ctx.state.shape = k; ctx.update(); } else paint(ctx.el);
+        notice();
+      }));
+      ctx.live('checkins', D.watchCheckins);
+      ctx.every(1000, function () { paint(ctx.el); });
+      // the lock and the question (a short tick: the lock must not wait a whole second in a pocket)
+      ctx.every(200, function () {
+        var cur = App.walkrec.current();
+        if (cur && !cur.ended && !cur.discarded && !ctx.state.locked && !document.querySelector('.overlay') && Date.now() - last >= C.walklog.lockMs) ctx.set({ locked: true });
+        if (cur && !cur.ended && !cur.discarded) maybeAsk(ctx);
+      });
+      notice();
+      App.walkrec._syncBar();   // no 「散步中」 bar on this screen
+    },
+    render: function (ctx) {
+      var W = C.walklog, cur = App.walkrec.current();
+      var top = html`<div class="wn-top"><span class="wn-logo">${ui.brandMark({ size: 32 })}</span><span class="wn-title">${W.nowTitle}</span></div>`;
+      if (!cur) {
+        return html`${top}<p class="wn-msg">${W.none}</p><p class="wn-note">${W.noneBody}</p>
+          <div class="wn-actions">${ui.primaryBtn(W.backToMap, { act: 'map' })}</div>`;
+      }
+      if (cur.ended && ctx.state.saving) return html`${top}<p class="wn-msg" role="status">${W.saving}</p>`;
+      if (cur.ended) {
+        return html`${top}<p class="wn-msg">${W.unsaved}</p><p class="wn-note">${W.unsavedBody}</p>
+          <div class="wn-actions">${ui.primaryBtn(W.saveAgain, { act: 'end', cls: 'wn-end' })}</div>
+          <div class="wn-links">${ui.textBtn(W.giveUp, { act: 'giveUp', muted: true })}</div>`;
+      }
+      if (cur.discarded) {
+        return html`${top}<p class="wn-msg">${W.notRecord}</p><p class="wn-note">${W.notNote}</p>
+          <div class="wn-actions">${ui.primaryBtn(W.end, { act: 'end', cls: 'wn-end' })}${ui.secondaryBtn(W.seeMap, { act: 'map' })}</div>`;
+      }
+      if (ctx.state.locked) {
+        return html`${top}<button type="button" class="wn-lock" aria-label="${W.nowTitle}，${W.unlock}">
+          <span class="wn-time">${clock(cur.elapsed)}</span>${cur.noGeo ? '' : html`<span class="wn-km">${kmLine(cur)}</span>`}
+          <span class="wn-unlock"><span class="wn-bar"><span></span></span>${W.unlock}</span>
+        </button>`;
+      }
+      return html`${top}
+        <div class="wn-time" role="timer" aria-label="${W.nowTitle}">${clock(cur.elapsed)}</div>
+        ${cur.noGeo ? '' : html`<div class="wn-km">${kmLine(cur)}</div>`}
+        <div class="wn-dogs" aria-label="${ui.tpl(W.nowWith, { dogs: cur.dogs.map(function (d) { return D.dogName(d); }).join('、') })}">${cur.dogs.map(function (d) {
+          return html`<span class="wn-dog">${ui.dogAvatar(D.person(d) || { dog: {} }, { size: 36, label: false })}${D.dogName(d)}</span>`;
+        })}</div>
+        ${cur.noGeo ? html`<p class="wn-note">${W.noGeoHint}</p>` : cur.wake === 'none' || cur.wake === 'off' ? html`<p class="wn-note">${W.wakeHint}</p>` : ''}
+        <div class="wn-actions">${ui.primaryBtn(W.end, { act: 'end', cls: 'wn-end' })}${ui.secondaryBtn(W.seeMap, { act: 'map' })}</div>
+        <div class="wn-links">${goHomeLinks(ctx, cur)}${ui.textBtn(W.notRecord, { act: 'notRecord', muted: true })}</div>`;
+    },
+    afterRender: function (ctx, el) {
+      var lock = el.querySelector('.wn-lock');
+      if (!lock) return;
+      lock.addEventListener('pointerdown', function (e) { e.preventDefault(); startHold(ctx); });
+      lock.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); startHold(ctx); } });
+      lock.addEventListener('keyup', cancelHold);
+      lock.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+      if (holdTimer) lock.classList.add('holding');
+    },
+    actions: {
+      map: function () { App.go('Main', {}, { root: true }); },
+      end: function (ctx) { return finishWalk(ctx); },
+      // a save that keeps failing must not leave the phone stuck: no new walk could start
+      giveUp: function () {
+        var W = C.walklog, cur = App.walkrec.current();
+        if (!cur) return null;
+        return ui.confirm({ title: W.giveUpTitle, body: W.giveUpBody, ok: W.giveUp, danger: true }).then(function (yes) {
+          if (!yes) return null;
+          return outAll(cur.dogs).then(function () { App.walkrec.clear(); ui.toast(W.ended); App.go('Main', {}, { root: true }); });
+        });
+      },
+      notRecord: function () {
+        var W = C.walklog;
+        return ui.confirm({ title: W.notTitle, body: W.notBody, ok: W.notOk, danger: true }).then(function (yes) { if (yes) App.walkrec.discard(); });
+      },
+      goHome: function (ctx, d) {
+        return D.checkOut(d.id).then(function () { ui.toast(String(C.home.wentHome).split('{dog}').join(D.dogName(d.id))); });
+      }
+    }
+  });
+})(window.App);
+
+} catch (e) { console.error("[build] screens/Walk_Now.js failed to load", e); }
+;
+/* ---- screens/Walk_View.js ---- */
+try {
+/* Walk_View — 走完了 / 這次散步 (docs/superpowers/specs/2026-11-02-walk-log-design.md): one walk of the family log.
+   params {id, m ('YYYY-MM'), done}: done = just finished (title 走完了, 完成 → the map); otherwise opened from 散步紀錄
+   (title 這次散步, 刪除這次散步). The route on its own map (App.map.attachRoute; straight lines dashed), how far (大約
+   when part of it is a straight line), how long, who walked which dogs, and two optional chips 有尿尿 / 有便便
+   (Willie 2026-11-02: 「這個可以 但要確認畫面不亂」). Only the family can open it: the log is theirs alone. */
+(function (App) {
+  'use strict';
+  var ui = App.ui, html = ui.html, D = App.data, C = App.content, fmt = ui.fmt;
+
+  (function () {
+    if (document.getElementById('css-Walk_View')) return;
+    var s = document.createElement('style'); s.id = 'css-Walk_View';
+    s.textContent = [
+      '.wv-map{position:relative;height:min(42vh,280px);border-radius:24px;overflow:hidden;isolation:isolate;background:var(--cream)}',
+      '.wv-stats{display:flex;align-items:flex-end}',
+      '.wv-stats > div{flex:1;min-width:0}',
+      '.wv-stats > div + div{padding-left:16px;border-left:1px solid var(--hairline)}',
+      '.wv-num{font-family:var(--font-head);font-size:28px;line-height:34px;color:var(--ink);white-space:nowrap}',
+      '.wv-num.time{font-size:24px}',
+      '.wv-unit,.wv-approx{font-family:var(--font-body);font-size:15px}',
+      '.wv-approx{color:var(--muted)}',
+      '.wv-chips{display:flex;flex-wrap:wrap;gap:8px}'
+    ].join('');
+    document.head.appendChild(s);
+  })();
+
+  App.register('Walk_View', {
+    title: '散步',
+    tab: null,
+    mount: function (ctx) {
+      var p = ctx.params || {};
+      ctx.live('walk', D.watchWalk, String(p.id || ''), String(p.m || ''));
+    },
+    render: function (ctx) {
+      var W = C.walklog, w = ctx.state.walk, done = !!ctx.params.done;
+      var top = ui.topBar({ title: done ? W.doneTitle : W.viewTitle });
+      if (w === undefined) return html`${top}${ui.loading()}`;
+      if (!w) return html`${top}<div class="px">${ui.emptyState({ title: W.notFound, body: W.notFoundBody })}</div>`;
+      var hasRoute = App.walklog.decode(w.route).length > 0;
+      return html`
+        ${top}
+        <div class="px mt-8">${hasRoute ? html`<div class="wv-map" role="img" aria-label="${W.routeAria}"></div>` : html`<p class="note">${W.noRoute}</p>`}</div>
+        <section class="px mt-16" aria-label="${W.viewTitle}">
+          <div class="wv-stats">
+            ${w.km != null ? html`<div><div class="wv-num">${w.approx ? html`<span class="wv-approx">${W.approx} </span>` : ''}${App.walklog.kmText(w.km)}<span class="wv-unit"> ${W.km}</span></div></div>` : ''}
+            <div><div class="wv-num time">${fmt.minutes(w.minutes)}</div></div>
+          </div>
+          <p class="sub mt-8">${App.walklog.whoLine(w)}</p>
+          <p class="note mt-4">${fmt.dateTime(w.start)}–${fmt.time(w.end)}</p>
+        </section>
+        <section class="px mt-16" aria-label="${W.pee}、${W.poop}">
+          <div class="wv-chips">${ui.chip(W.pee, { act: 'pee', pressed: w.pee })}${ui.chip(W.poop, { act: 'poop', pressed: w.poop })}</div>
+          <p class="note mt-4">${W.chipsNote}</p>
+        </section>
+        <div class="px mt-24">${done ? ui.primaryBtn(W.done, { act: 'done' }) : ui.textBtn(W.del, { act: 'del', muted: true })}</div>`;
+    },
+    afterRender: function (ctx, el) {
+      var w = ctx.state.walk, slot = el.querySelector('.wv-map');
+      if (!w || !slot) return;
+      App.map.attachRoute(slot);
+      App.map.setRoute(App.walklog.decode(w.route), w.gaps);
+    },
+    actions: {
+      pee: function (ctx) { var w = ctx.state.walk; if (w) return D.updateWalk(w.id, w.m, { pee: !w.pee }); },
+      poop: function (ctx) { var w = ctx.state.walk; if (w) return D.updateWalk(w.id, w.m, { poop: !w.poop }); },
+      done: function () { App.go('Main', {}, { root: true }); },
+      del: function (ctx) {
+        var W = C.walklog, w = ctx.state.walk;
+        if (!w) return;
+        return ui.confirm({ title: W.delTitle, body: W.delBody, ok: W.delOk, danger: true }).then(function (yes) {
+          if (!yes) return null;
+          return D.deleteWalk(w.id, w.m).then(function () { ui.toast(W.deleted); ctx.back(); });
+        });
+      }
+    }
+  });
+})(window.App);
+
+} catch (e) { console.error("[build] screens/Walk_View.js failed to load", e); }
 ;
 /* ---- screens/Yellow_Space.js ---- */
 try {

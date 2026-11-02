@@ -15,7 +15,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-70NiJjUL0pJSEJCaeM3EYZ968Pdw51Z/Ylk/OEaP5ZA=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://bxoaolzovbcdulqacaur.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://bxoaolzovbcdulqacaur.supabase.co wss://bxoaolzovbcdulqacaur.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-dZIeWCSIFHIUhuV73BfSqZJyGjYDHxHHMoJMFvvE7v8=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://bxoaolzovbcdulqacaur.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://bxoaolzovbcdulqacaur.supabase.co wss://bxoaolzovbcdulqacaur.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
 <title>豆米特 DogMeet</title>
 <meta name="description" content="豆米特 DogMeet 試辦版：約附近的狗一起散步、玩。">
 <meta property="og:type" content="website">
@@ -1051,6 +1051,11 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 .dog-pick-b[aria-checked="true"]{border-color:var(--teal);background:var(--teal-tint);color:var(--teal-ink);font-weight:700}
 .dog-pick-b .nm{max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dog-pick-b .tick{position:absolute;top:4px;right:4px}
+/* 掃 QR 碼 (core/qrscan.js, 2026-11-02): the camera in a rounded square, a frame to aim with */
+.qrscan{position:relative;width:100%;max-width:360px;height:300px;margin-left:auto;margin-right:auto;border-radius:20px;overflow:hidden;background:var(--ink)}
+@supports (aspect-ratio:1/1){.qrscan{height:auto;aspect-ratio:1/1}}
+.qrscan-video{display:block;width:100%;height:100%;object-fit:cover}
+.qrscan-frame{position:absolute;inset:16%;border:3px solid #fff;border-radius:16px;box-shadow:0 0 0 999px rgba(0,0,0,.28);pointer-events:none}
 
 /* ---- web build (GitHub Pages) ---- */
 #app { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
@@ -1062,7 +1067,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <div id="app"><div class="boot" role="status"><div class="h1-tab"><svg class="brand-mark" width="48" height="48" viewBox="0 0 64 64" aria-hidden="true"><g transform="matrix(0.5676 0 0 0.5676 -1.6622 25.1081)"><g fill="#E8775A"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><path d="M49 21C48.5 14 47 8.5 44.5 5.5C43.4 4.3 42 4.4 41 5.4C38.5 8 36.5 10.5 35 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#C9603F"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.4 16.2C44.9 12.6 44 9.9 42.9 8.6C42.4 8.1 41.8 8.1 41.3 8.6C40 10.1 38.8 11.6 38 12.8Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.5676 0 0 0.5676 29.3378 25.1081)"><g fill="#4FAFBC"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#2F8592"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.6216 0 0 0.6216 12.1081 20.0946)"><circle cx="32" cy="28" r="18.5" fill="#2F8592"/><g fill="#1F6670"><path d="M18.5 15.5C12.5 16 10 23.5 11.5 30C12.7 34.2 17 33.8 18.2 29.2C19.4 24.7 21 19 18.5 15.5Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><rect x="4" y="47" width="56" height="11" rx="5.5" fill="#1F6670"/><g fill="#E8775A"><ellipse cx="12.5" cy="48" rx="2.6" ry="2"/><ellipse cx="20.5" cy="48" rx="2.6" ry="2"/></g><g fill="#2F8592"><ellipse cx="27.6" cy="48" rx="2.6" ry="2"/><ellipse cx="36.4" cy="48" rx="2.6" ry="2"/></g><g fill="#4FAFBC"><ellipse cx="43.5" cy="48" rx="2.6" ry="2"/><ellipse cx="51.5" cy="48" rx="2.6" ry="2"/></g><g transform="matrix(0.34 0 0 0.34 21.12 -0.56)"><path d="M32 60C32 60 13.5 41.5 13.5 28C13.5 17.5 21.8 9 32 9C42.2 9 50.5 17.5 50.5 28C50.5 41.5 32 60 32 60Z" fill="#E8775A"/><circle cx="32" cy="28" r="7.5" fill="#FFFAF3"/></g></svg>豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
 (function () { var l = document.getElementById('dg-font'); if (l) l.media = 'all'; })();
-window.APP_BUILD = {"version":"2026-11-02.e1e49893","seedUrl":"seed-data.json"};
+window.APP_BUILD = {"version":"2026-11-02.bb959583","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2810,14 +2815,15 @@ window.APP_BUILD = {"version":"2026-11-02.e1e49893","seedUrl":"seed-data.json"};
     lead: '豆米特現在是試辦版，給朋友一起測試用。（2026-11-02 版）',
     sections: [
       { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、散步紀錄（路線、距離、時間）、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到；打開驅蟲徽章時，名片上會有驅蟲的到期日）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
-      { title: '誰看得到', body: '用豆米特的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。散步紀錄（路線、幾點出門、誰遛的）只有家人看得到；狗友只看得到每天一共走了幾公里、幾分鐘。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊，管理員看得到（範例狗狗由管理員扮演），是測試用的。' },
+      { title: '誰看得到', body: '用豆米特的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗狗名片是公開的：拿到你的名片連結或 QR 碼的人，不用加入也看得到照片、名字、品種、個性和主人暱稱；填了狂犬病疫苗到期日的話，這個日期也跟名片放在一起（名片上只顯示「疫苗」徽章）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。散步紀錄（路線、幾點出門、誰遛的）只有家人看得到；狗友只看得到每天一共走了幾公里、幾分鐘。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊，管理員看得到（範例狗狗由管理員扮演），是測試用的。' },
       { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」時會用手機定位，只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。按「我出門遛狗」以後，散步中會一直用定位記路線，走完只存在家人的散步紀錄裡（見下面「我出門遛狗」）。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。' },
       { title: '我出門遛狗', body: '按「我出門遛狗」以後，會記錄這次散步的路線和距離，只有家人看得到，可以隨時刪掉。地圖上給別人看的，還是只有大概的範圍：在公園裡就打卡在那座公園；在外面是大約 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。狗友看得到每天一共走了幾公里、幾分鐘（隱私設定可以關），看不到路線，也看不到幾點出門。家的位置只有你和家人知道。沒在散步的時候，不會記錄位置。' },
       { title: '還是測試', body: '試辦版的保護還不完整：狗聚、聊天和協尋這些共用的資料，懂技術的人可能改得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
       { title: '通知（選用）', body: '在「我的」打開通知，手機會給豆米特一個推播地址，由 Google、Apple、Mozilla 或 Microsoft 的推播服務轉送。有人在你的狗聚聊天室說話、私訊你或邀請你時，手機會跳出狗聚名稱或狗狗名字，不會有訊息內容。關掉通知或刪除我的資料，這個地址就刪掉。' },
+      { title: '相機（掃 QR 碼）', body: '按「掃 QR 碼」時才會打開相機，畫面只在你的手機上找 QR 碼，不會存起來，也不會傳出去。關掉掃描或離開這一頁，相機就關了。' },
       { title: '沒有帳號', body: '不用註冊。你的身分記在這支手機的瀏覽器裡，清除瀏覽器資料、換手機、或從主畫面打開（iPhone），都會變成新的人。要變回同一隻狗，用「我的」→「家人」裡的找回碼。' },
       { title: '綁定 LINE（選用）', body: '有開放時，「我的」→「家人」可以綁定 LINE，換手機或換瀏覽器時用 LINE 登入就能找回同一隻狗。綁定時，登入系統會存 LINE 給的帳號編號、名字和大頭貼，只用來登入，不給別人看；不拿 email，也不會傳 LINE 訊息給你。刪除我的資料時會一起刪掉。' },
-      { title: '回報問題', body: '按「回報問題」送出時，會一起附上你是哪隻狗、畫面名稱、App 版本、手機和瀏覽器的種類、時間，方便找出問題。私訊頁的「檢舉」也會用回報問題送給開這個 App 的人。只有你和開這個 App 的人看得到。' },
+      { title: '回報問題', body: '按「回報問題」送出時，會一起附上你是哪隻狗、現在的畫面（例如正在看哪隻狗的名片、跟誰的私訊）、App 版本、手機和瀏覽器的種類、時間，方便找出問題。私訊頁的「檢舉」也會用回報問題送給開這個 App 的人。只有你和開這個 App 的人看得到。' },
       { title: '一個家、好幾隻狗', body: '家人看得到家裡全部的狗和私訊，也能幫任何一隻打卡、報名、回訊息。名片上會顯示同一家的狗和家人暱稱。刪除有三種：刪除這隻狗、這支手機離開這個家、刪除整個家。' },
       { title: '怎麼刪掉', body: '「我的」→「隱私說明」→「刪除我的資料」。刪掉後，下次打開會變成新的人。' }
     ]
@@ -2998,6 +3004,8 @@ window.APP_BUILD = {"version":"2026-11-02.e1e49893","seedUrl":"seed-data.json"};
     wrong: '找回碼不對，請再確認一次',
     limit: '試太多次了，請一小時後再試',
     format: '找回碼是 12 個英文字母和數字',
+    // next to every 找回碼 box (資安 2026-11-02): the code is the key to the whole family's dogs and messages
+    safety: '只在換手機或加入家人時輸入。豆米特不會用連結或 QR 碼跟你要找回碼，看到這樣的要求不要輸入。',
     welcome: '歡迎回來，已經換成原本的狗狗',
     persona: '範例分身沒有找回碼，請換回你自己',
     unsupported: '這個版本不能用找回碼',
@@ -3016,7 +3024,7 @@ window.APP_BUILD = {"version":"2026-11-02.e1e49893","seedUrl":"seed-data.json"};
     entry: '回報問題',
     title: '回報問題',
     placeholder: '哪裡怪怪的？做了什麼、看到什麼',
-    attach: '會一起附上：你是哪隻狗、現在的畫面、App 版本、手機和瀏覽器種類、時間。',
+    attach: '會一起附上：你是哪隻狗、現在的畫面（例如正在看哪隻狗、跟誰的私訊）、App 版本、手機和瀏覽器種類、時間。',
     reportTag: '檢舉',           // 私訊頁「檢舉」送到管理頁時的標籤
     sent: '收到了，謝謝你',
     empty: '先寫一點發生什麼事',
@@ -3066,7 +3074,9 @@ window.APP_BUILD = {"version":"2026-11-02.e1e49893","seedUrl":"seed-data.json"};
     join: '加入豆米特',
     joinNote: '30 秒建立你家狗狗的名片，就能約附近的狗一起散步、玩。不用下載、不用註冊。',
     // iPhone：從主畫面打開的豆米特和 Safari 是分開的，相機掃 QR 碼會開 Safari（審查 2026-11-02）
-    haveApp: '已經在用豆米特？從主畫面打開的話，這裡認不出你。不用再建一隻：到「我的」→「家人」拿找回碼，按上面的按鈕後輸入。',
+    // (資安 2026-11-02) never send someone who scanned to type a 找回碼 on the page a QR opened: a look-alike page could
+    // take it. The scanner inside 豆米特 opens the card where they already are.
+    haveApp: '已經在用豆米特？從主畫面打開的話，這裡認不出你。不用再建一隻：回到主畫面的豆米特，在「訊息」→「看我的狗友」按「掃 QR 碼」再掃一次，就會打開這張名片。豆米特不會用連結或 QR 碼跟你要找回碼。',
     notFound: '找不到這張名片',
     notFoundNote: '這張名片可能已經刪掉了。'
   };
@@ -3541,6 +3551,8 @@ window.APP_BUILD = {"version":"2026-11-02.e1e49893","seedUrl":"seed-data.json"};
   var FIND_DOG = {
     title: '遇到熟人',
     note: '讓對方用手機相機掃你的 QR 碼，或用 LINE 傳名片給他，他就能追蹤你。你們都追蹤對方，就是狗友。',
+    // 掃 QR 碼 (2026-11-02) where the phone can be asked for its camera
+    noteScan: '按「掃 QR 碼」掃對方的 QR 碼，就會打開牠的名片，可以追蹤牠。也可以讓對方掃你的 QR 碼，或用 LINE 傳名片給他，他就能追蹤你。你們都追蹤對方，就是狗友。',
     qr: '我的 QR 碼',
     qrTitle: '{dog}的 QR 碼',
     qrNote: '讓對方用手機相機掃一下，就會打開{dog}的名片。',
@@ -3551,6 +3563,22 @@ window.APP_BUILD = {"version":"2026-11-02.e1e49893","seedUrl":"seed-data.json"};
     noFollow: '還沒有追蹤的狗。遇到熟人，掃對方的 QR 碼就能追蹤。',
     followHint: '遇到熟人，掃 QR 碼就能追蹤',
     noneToBlock: '目前沒有往來的狗狗。遇到奇怪的狗，點牠的照片打開名片，就能封鎖或檢舉。'
+  };
+  // 掃 QR 碼（Willie 2026-11-02：「需要 這樣比較方便 網頁版就先加吧」）: the camera inside 豆米特 (core/qrscan.js)
+  var SCAN = {
+    button: '掃 QR 碼',
+    title: '掃 QR 碼',
+    starting: '打開相機中…',
+    aim: '把朋友的 QR 碼放在框裡，掃到就會打開牠的名片。',
+    notOurs: '這不是豆米特狗狗名片的 QR 碼。',
+    denied: '沒有相機權限。請到手機的設定允許相機，再按一次「掃 QR 碼」。',
+    noCamera: '找不到相機。',
+    busy: '相機正在被別的 App 使用，關掉它再試一次。',
+    noLib: '掃描程式載不到，請確認網路後再試一次。',
+    failed: '相機打不開，請再試一次。',
+    lost: '相機停了（可能有來電，或別的 App 在用相機），再按一次「掃 QR 碼」。',
+    cancel: '不掃了',
+    videoLabel: '相機畫面'
   };
 
   App.content = {
@@ -3565,7 +3593,7 @@ window.APP_BUILD = {"version":"2026-11-02.e1e49893","seedUrl":"seed-data.json"};
     dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, tagGroups: TAG_GROUPS, tagRenames: TAG_RENAMES, neuter: NEUTER, ie: IE, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, ruleBreeds: RULE_BREEDS, aggressiveShort: TEXTS.aggressiveShort },
     privacyNote: PRIVACY_NOTE, terms: TERMS, home: HOME, recovery: RECOVERY, shareCard: SHARE_CARD, login: LOGIN, push: PUSH, feedback: FEEDBACK, deleteMine: DELETE_MINE, updateBanner: UPDATE_BANNER, photo: PHOTO, firstRun: FIRST_RUN,
     freePlan: FREE_PLAN, health: HEALTH,
-    map: MAP, parkStatus: PARK_STATUS, walklog: WALKLOG, findDog: FIND_DOG,
+    map: MAP, parkStatus: PARK_STATUS, walklog: WALKLOG, findDog: FIND_DOG, scan: SCAN,
     /** A park by id: the three legacy parks, then the shared registry (parks/<id>, installed by core/data.js). null = unknown. */
     park: function (id) { return PARKS.filter(function (p) { return p.id === id; })[0] || (registry && registry(id)) || null; },
     /** Legacy parks first, then registry parks by name. */
@@ -5139,6 +5167,169 @@ window.APP_BUILD = {"version":"2026-11-02.e1e49893","seedUrl":"seed-data.json"};
   // may take before the card uses the drawn face
   var api = App.shareCard = { make: make, layout: layout, text: text, link: link, open: open, openQr: openQr, _photoRect: photoRect, _frameOk: false, _photoMs: 8000 };
 })(window.App);
+
+;
+/* ---- core/qrscan.js ---- */
+/* App.qrScan — 掃 QR 碼 inside 豆米特 (Willie 2026-11-02: 「需要 這樣比較方便 網頁版就先加吧」). A friend's 我的 QR 碼
+   opens their dog card right here: with the phone's own camera app, an iPhone that opened 豆米特 from the home screen
+   lands in Safari, where 豆米特 does not know it. The camera runs only while the sheet is open (it stops when the sheet
+   closes or the page is hidden); frames are read in this phone's memory and never kept or sent. The decoder is jsQR
+   1.4.0 (core/vendor/jsQR.js, Apache-2.0, from jsDelivr, sha256 vEDIoVGWI2sjFNsIVvcsoLSZgM1UE7jIUqc0n1/uCFk=), loaded
+   the first time a scan starts. Only this site's own dog-card links open (the test and the live site share the
+   address); any other code gets a line and the camera keeps looking. */
+(function (App) {
+  'use strict';
+  var ui = App.ui, html = ui.html, C = App.content;
+  var libP = null;
+  var LIB_SRI = 'sha256-vEDIoVGWI2sjFNsIVvcsoLSZgM1UE7jIUqc0n1/uCFk=';   // the browser refuses any other file
+
+  /** The phone can be asked for its camera here: a secure page with mediaDevices, not inside another page's frame (a
+      preview there has no decoder file and no camera permission; the tests set _frameOk). */
+  function available() {
+    try {
+      if (window.top !== window.self && !api._frameOk) return false;
+      return window.isSecureContext !== false && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    } catch (e) { return false; }
+  }
+  /** jsQR, loaded once and checked against its fingerprint (a failed or slow load is tried again next time; another
+      address is a new load, like osm.js's list). */
+  function loadLib() {
+    if (typeof window.jsQR === 'function') return Promise.resolve(window.jsQR);
+    if (!libP || libP.url !== api._libUrl) {
+      var url = api._libUrl, p;
+      p = libP = new Promise(function (resolve, reject) {
+        var s = document.createElement('script'), timer;
+        function fail() {
+          clearTimeout(timer);
+          if (libP === p) libP = null;
+          s.remove();
+          var e = new Error('the decoder did not load'); e.name = 'LibError'; reject(e);
+        }
+        timer = setTimeout(fail, api._libWaitMs);
+        s.src = url;
+        s.integrity = LIB_SRI;
+        s.onload = function () { clearTimeout(timer); if (typeof window.jsQR === 'function') resolve(window.jsQR); else fail(); };
+        s.onerror = fail;
+        document.head.appendChild(s);
+      });
+      p.url = url;
+    }
+    return libP;
+  }
+  /** The dog id when `text` is a dog-card link of this site (App.shareUrl('Dog_Card', {id})), else null. */
+  function dogIdOf(text) {
+    var u, id;
+    try { u = new URL(String(text == null ? '' : text)); } catch (e) { return null; }
+    if (!/^https?:$/.test(u.protocol) || u.origin !== location.origin) return null;
+    var h = u.hash.replace(/^#\/?/, ''), i = h.indexOf('?');
+    if ((i < 0 ? h : h.slice(0, i)) !== 'Dog_Card') return null;
+    try { id = new URLSearchParams(i < 0 ? '' : h.slice(i + 1)).get('id'); } catch (e) { return null; }
+    return id && App.store.validSegment(id) ? id : null;
+  }
+  /** The line for a camera or decoder that could not start. */
+  function errText(e) {
+    var S = C.scan, n = e && e.name;
+    if (n === 'LibError') return S.noLib;
+    if (n === 'NotAllowedError' || n === 'SecurityError' || n === 'PermissionDeniedError') return S.denied;
+    if (n === 'NotFoundError' || n === 'OverconstrainedError' || n === 'DevicesNotFoundError') return S.noCamera;
+    if (n === 'NotReadableError' || n === 'TrackStartError') return S.busy;
+    return S.failed;
+  }
+  function stopStream(st) { if (st) st.getTracks().forEach(function (t) { try { t.stop(); } catch (e) { /* ignore */ } }); }
+
+  /** The scan sheet: the camera in a square, a line under it, 不掃了. A dog-card code closes it and opens Dog_Card. The
+      decoder comes first, then the camera: offline the camera is never asked for, and the light never shows over an
+      empty square. */
+  function open() {
+    var S = C.scan, stream = null, timer = null, video = null, done = false, last = '';
+    var canvas = api._canvas = document.createElement('canvas');
+    var s = ui.sheet({
+      title: S.title,
+      autofocus: false,
+      // drawn once: drawing again would replace the video (the line under it is changed in place, say())
+      render: function () {
+        return html`<div class="qrscan mt-8"><video class="qrscan-video" playsinline muted autoplay${ui.attrs({ 'aria-label': S.videoLabel })}></video><span class="qrscan-frame" aria-hidden="true"></span></div>
+          <p class="note mt-12 qrscan-msg" role="status">${S.starting}</p>
+          <div class="mt-12">${ui.secondaryBtn(S.cancel, { act: 'cancel' })}</div>`;
+      },
+      actions: { cancel: function (sh) { sh.close(); } },
+      onClose: stop
+    });
+    function say(t) { var el = s.el && s.el.querySelector('.qrscan-msg'); if (el) el.textContent = t; }
+    // behind another app: the camera goes. Not while 「允許相機？」 is still being asked (a phone's question may cover
+    // the page); a camera that comes while the page is behind is turned off at once (below)
+    function onHide() { if (document.hidden && stream) s.close(); }
+    function onEnded() { if (!done) { say(S.lost); stop(); } }   // a call or another app took the camera
+    function stop() {
+      done = true;
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onHide);
+      stopStream(stream); stream = null;
+      if (video) { try { video.srcObject = null; } catch (e) { /* ignore */ } }
+      canvas.width = 0; canvas.height = 0;   // the last picture is not kept
+    }
+    function read(jsQR) {
+      var w = video.videoWidth, h = video.videoHeight;
+      if (!w || !h) return null;
+      var k = Math.min(1, api._maxSide / Math.max(w, h)), cw = Math.max(1, Math.round(w * k)), ch = Math.max(1, Math.round(h * k));
+      if (canvas.width !== cw) canvas.width = cw;
+      if (canvas.height !== ch) canvas.height = ch;
+      var g = canvas.getContext('2d', { willReadFrequently: true });
+      g.drawImage(video, 0, 0, cw, ch);
+      var code = jsQR(g.getImageData(0, 0, cw, ch).data, cw, ch, { inversionAttempts: 'dontInvert' });
+      return code && typeof code.data === 'string' ? code.data : null;
+    }
+    function found(text) {
+      var id = dogIdOf(text);
+      if (id) { stop(); s.close(); App.go('Dog_Card', { id: id }); return; }
+      if (text !== last) { last = text; say(S.notOurs); }
+    }
+    function look(jsQR) {
+      timer = setTimeout(function () {
+        if (done) return;
+        var text = null;
+        try { text = read(jsQR); } catch (e) { console.warn('[qrscan] read', e); }
+        if (text != null) found(text);
+        if (!done) look(jsQR);
+      }, api._everyMs);
+    }
+    document.addEventListener('visibilitychange', onHide);
+    loadLib().then(function (jsQR) {
+      if (done) return null;
+      return api._getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }).then(function (st) {
+        if (done) { stopStream(st); return; }   // closed, or another page, while 「允許相機？」 was asked
+        stream = st;
+        if (document.hidden) { s.close(); return; }
+        st.getTracks().forEach(function (t) { t.addEventListener('ended', onEnded); });
+        video = s.el.querySelector('video');
+        video.srcObject = st;
+        var p = video.play();
+        if (p && p.catch) p.catch(function () { if (!done) { say(S.failed); stop(); } });   // no picture: say so, camera off
+        say(S.aim);
+        look(jsQR);
+      });
+    }).catch(function (e) {
+      if (done) return;
+      say(errText(e));
+      stop();   // nothing to look with: the sheet stays with the line, and a camera that comes later is turned off at once
+    });
+    return s;
+  }
+
+  var api = {
+    available: available,
+    open: open,
+    dogIdOf: dogIdOf,
+    _libUrl: 'core/vendor/jsQR.js',   // the built site has it at the same place (tools/build_web.py)
+    _getUserMedia: function (c) { return navigator.mediaDevices.getUserMedia(c); },
+    _everyMs: 150,   // one look at the picture this often
+    _libWaitMs: 15000,   // a decoder that has not come by then: 「掃描程式載不到」
+    _frameOk: false,     // tests: the phones are frames of the test page
+    _canvas: null,       // tests: the last scan's picture (wiped when the camera stops)
+    _maxSide: 720    // the picture is made this small first (fast enough on an old phone, still reads a card's code)
+  };
+  App.qrScan = api;
+})(window.App = window.App || {});
 
 ;
 /* ---- core/store.js ---- */
@@ -10388,8 +10579,8 @@ window.APP_BUILD = {"version":"2026-11-02.e1e49893","seedUrl":"seed-data.json"};
   function feedbackContext() {
     var cur = App.router && App.router.current ? App.router.current() : null;
     var params = '';
-    // a vet / clinic link's token (t) is a key to someone's health card: never into a report (other visitors can read
-    // reports, and the admin page shows them)
+    // a vet / clinic link's token (t) is a key to someone's health card: never into a report (the admin page shows
+    // reports; only their writer and the admins can read them)
     var p0 = {};
     if (cur && cur.params) Object.keys(cur.params).forEach(function (k) { p0[k] = /^(t|token|code)$/.test(k) ? '(不附上)' : cur.params[k]; });
     try { params = cur ? JSON.stringify(p0) : ''; } catch (e) { params = ''; }
@@ -15340,6 +15531,7 @@ try {
     var following = D.following().filter(function (id) { return id !== me && D.person(id) && !D.isBlocked(id); });
     // 找朋友 (Willie 2026-11-02): no list of every dog — friends come by QR code or link, or from meetups they really went to
     var met = D.metDogs(ctx.state.allEvents || []).filter(function (m) { return m.id !== me && following.indexOf(m.id) === -1; });
+    var scan = !!(App.qrScan && App.qrScan.available());   // 掃 QR 碼 (2026-11-02): the camera inside 豆米特
     return html`${ui.topBar({})}
       <h1 class="h1 px">私訊邀請與追蹤</h1>
       ${consentNote()}
@@ -15355,8 +15547,8 @@ try {
       </section>
       <section class="px mt-24" aria-labelledby="dm-find">
         ${ui.sectionHead(F.title, null, { id: 'dm-find' })}
-        <p class="note mt-4">${F.note}</p>
-        <div class="row-flex mt-8" style="flex-wrap:wrap">${ui.quietBtn(F.qr, { act: 'myQr', icon: 'qr', iconSize: 20, block: false })}${ui.quietBtn(F.share, { act: 'myCard', icon: 'share', iconSize: 20, block: false })}</div>
+        <p class="note mt-4">${scan ? F.noteScan : F.note}</p>
+        <div class="row-flex mt-8" style="flex-wrap:wrap">${scan ? ui.quietBtn(C.scan.button, { act: 'scanQr', icon: 'camera', iconSize: 20, block: false }) : ''}${ui.quietBtn(F.qr, { act: 'myQr', icon: 'qr', iconSize: 20, block: false })}${ui.quietBtn(F.share, { act: 'myCard', icon: 'share', iconSize: 20, block: false })}</div>
       </section>
       <section class="px mt-24" aria-labelledby="dm-met">
         ${ui.sectionHead(F.metTitle, null, { id: 'dm-met' })}
@@ -15630,6 +15822,7 @@ try {
     },
 
     actions: {
+      scanQr: function () { App.qrScan.open(); },
       myQr: function () { var p = D.me(); if (p) App.shareCard.openQr(p, App.me.actorId); },
       myCard: function () { var p = D.me(); if (p) App.shareCard.open(p, App.me.actorId); },
       invite: function (ctx, d) {
@@ -16946,6 +17139,7 @@ try {
           <form class="field mt-12" novalidate>
             <label class="label" for="fm-merge-code">${R.label}</label>
             <input class="input fm-input" id="fm-merge-code" type="text" data-model="code"${ui.attrs({ value: st.code, placeholder: R.placeholder, maxlength: 20, autocomplete: 'off', autocapitalize: 'characters', autocorrect: 'off', spellcheck: 'false', enterkeyhint: 'go', 'aria-describedby': 'fm-merge-msg' })}>
+            <p class="note mt-4">${R.safety}</p>
             <p class="fm-msg" id="fm-merge-msg" role="alert">${st.msg}</p>
             <div class="sheet-actions">${ui.quietBtn('取消', { act: 'cancel' })}${ui.primaryBtn(H.mergeNext, { type: 'submit', act: 'next' })}</div>
           </form>`;
@@ -19274,6 +19468,7 @@ try {
           <form class="mt-12" novalidate autocomplete="off">
             <label class="label" for="jl-code">${R.label}</label>
             <input class="input jl-code mt-8"${ui.attrs({ id: 'jl-code', type: 'text', 'data-model': 'code', value: st.code, placeholder: R.placeholder, maxlength: 20, autocomplete: 'off', autocapitalize: 'characters', autocorrect: 'off', spellcheck: 'false', enterkeyhint: 'go', 'aria-describedby': 'jl-code-msg', disabled: st.ok })}>
+            <p class="note mt-4">${R.safety}</p>
             <p class="jl-claim-msg" id="jl-code-msg"${ui.attrs({ role: st.ok ? 'status' : 'alert' })}>${st.msg}</p>
             <div class="sheet-actions">${ui.quietBtn('取消', { act: 'close' })}${ui.secondaryBtn(R.submit, { type: 'submit', act: 'claim', disabled: st.ok })}</div>
           </form>`;
@@ -21673,6 +21868,7 @@ try {
           <form class="field mt-12" novalidate>
             <label class="label" for="pc-code">${R.label}</label>
             <input class="input pc-code" id="pc-code" type="text" data-model="code"${ui.attrs({ value: st.code, placeholder: R.placeholder, maxlength: 20, autocomplete: 'off', autocapitalize: 'characters', autocorrect: 'off', spellcheck: 'false', enterkeyhint: 'go', 'aria-describedby': 'pc-code-msg', disabled: st.ok })}>
+            <p class="note mt-4">${R.safety}</p>
             <p class="pc-claim-msg" id="pc-code-msg" role="${st.ok ? 'status' : 'alert'}">${st.msg}</p>
             <div class="sheet-actions">${ui.quietBtn('取消', { act: 'cancel' })}${ui.primaryBtn(R.submit, { type: 'submit', act: 'claim', disabled: st.ok })}</div>
           </form>`;
