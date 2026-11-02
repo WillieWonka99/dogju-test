@@ -15,6 +15,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-CLKD4oxcjg3SKpaTLST4uoQ9t7ew29uQ0VaPKDn2Ouo=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://bxoaolzovbcdulqacaur.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://bxoaolzovbcdulqacaur.supabase.co wss://bxoaolzovbcdulqacaur.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
 <title>豆米特 DogMeet</title>
 <meta name="description" content="豆米特 DogMeet 試辦版：約附近的狗一起散步、玩。">
 <meta property="og:type" content="website">
@@ -27,7 +28,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" media="print" id="dg-font">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap"></noscript>
 <style>
 /* required styles */
@@ -1051,7 +1052,8 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <body>
 <div id="app"><div class="boot" role="status"><div class="h1-tab"><svg class="brand-mark" width="48" height="48" viewBox="0 0 64 64" aria-hidden="true"><g transform="matrix(0.5676 0 0 0.5676 -1.6622 25.1081)"><g fill="#E8775A"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><path d="M49 21C48.5 14 47 8.5 44.5 5.5C43.4 4.3 42 4.4 41 5.4C38.5 8 36.5 10.5 35 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#C9603F"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.4 16.2C44.9 12.6 44 9.9 42.9 8.6C42.4 8.1 41.8 8.1 41.3 8.6C40 10.1 38.8 11.6 38 12.8Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.5676 0 0 0.5676 29.3378 25.1081)"><g fill="#4FAFBC"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#2F8592"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.6216 0 0 0.6216 12.1081 20.0946)"><circle cx="32" cy="28" r="18.5" fill="#2F8592"/><g fill="#1F6670"><path d="M18.5 15.5C12.5 16 10 23.5 11.5 30C12.7 34.2 17 33.8 18.2 29.2C19.4 24.7 21 19 18.5 15.5Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><rect x="4" y="47" width="56" height="11" rx="5.5" fill="#1F6670"/><g fill="#E8775A"><ellipse cx="12.5" cy="48" rx="2.6" ry="2"/><ellipse cx="20.5" cy="48" rx="2.6" ry="2"/></g><g fill="#2F8592"><ellipse cx="27.6" cy="48" rx="2.6" ry="2"/><ellipse cx="36.4" cy="48" rx="2.6" ry="2"/></g><g fill="#4FAFBC"><ellipse cx="43.5" cy="48" rx="2.6" ry="2"/><ellipse cx="51.5" cy="48" rx="2.6" ry="2"/></g><g transform="matrix(0.34 0 0 0.34 21.12 -0.56)"><path d="M32 60C32 60 13.5 41.5 13.5 28C13.5 17.5 21.8 9 32 9C42.2 9 50.5 17.5 50.5 28C50.5 41.5 32 60 32 60Z" fill="#E8775A"/><circle cx="32" cy="28" r="7.5" fill="#FFFAF3"/></g></svg>豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
-window.APP_BUILD = {"version":"2026-11-02.25ef2898","seedUrl":"seed-data.json"};
+(function () { var l = document.getElementById('dg-font'); if (l) l.media = 'all'; })();
+window.APP_BUILD = {"version":"2026-11-02.d5752ee6","seedUrl":"seed-data.json"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2677,6 +2679,7 @@ window.APP_BUILD = {"version":"2026-11-02.25ef2898","seedUrl":"seed-data.json"};
     lostPublishNote: '發布後，大家打開豆米特就會在首頁看到協尋',
     lostAsk: '送私訊邀請問問看',
     myJoin: '我的報名（改狀態或這次不來了）',
+    quota: '今天發太多了，明天再試。',   // 每天能發的數量到了（資料庫的上限，2026-11-02 資安）
     demoTag: '範例'                                    // 範例狗狗開的狗聚，標籤上多一個「範例」
   };
 
@@ -2798,7 +2801,7 @@ window.APP_BUILD = {"version":"2026-11-02.25ef2898","seedUrl":"seed-data.json"};
     lead: '豆米特現在是試辦版，給朋友一起測試用。',
     sections: [
       { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、照顧提醒、走失暗記、找回碼和狗狗健康卡另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到；打開驅蟲徽章時，名片上會有驅蟲的到期日）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
-      { title: '誰看得到', body: '用豆米特的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊不保密，是測試用的。' },
+      { title: '誰看得到', body: '用豆米特的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊，管理員看得到（範例狗狗由管理員扮演），是測試用的。' },
       { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」才會用到手機定位。位置只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。' },
       { title: '我出門遛狗', body: '按「我出門遛狗」才會用一次手機定位，不會一直追蹤。在公園裡就打卡在那座公園；在外面，別人只看到你大約在哪個 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。不存精確位置，也不送給任何人。家的位置只有你知道，存在你自己的資料裡。' },
       { title: '還是測試', body: '試辦版的保護還不完整：狗聚、聊天和協尋這些共用的資料，懂技術的人可能改得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
@@ -5877,7 +5880,8 @@ window.APP_BUILD = {"version":"2026-11-02.25ef2898","seedUrl":"seed-data.json"};
       if (code === 'P0002' || /doc_missing/.test(msg)) e = dbError('invalid_argument', 'update() on a missing document: ' + path);
       else if (code === '42501' || /row-level security|permission denied/i.test(msg)) {
         e = dbError('permission_denied', 'not allowed: ' + path + ' (' + msg + ')');
-        e.userMessage = '這筆資料不能由你修改，沒有存進去。';
+        // 每天能發的數量到了 (2026-11-02 資安: docs_quota)
+        e.userMessage = /quota:/.test(msg) ? ((App.content && App.content.texts && App.content.texts.quota) || '今天發太多了，明天再試。') : '這筆資料不能由你修改，沒有存進去。';
       } else if (code === '42P01' || code === '42883' || code === 'PGRST202' || code === 'PGRST205' || code === 'PGRST106' || /does not exist|could not find the (table|function)/i.test(msg)) {
         e = dbError('not_configured', msg);
         // a server function newer than the SQL Willie pasted (上線 day, before the paste) is just not there yet: 「還在
@@ -8259,6 +8263,10 @@ window.APP_BUILD = {"version":"2026-11-02.25ef2898","seedUrl":"seed-data.json"};
       .catch(function (e) { console.warn('[data] system message', e); });
   }
   /** Human text for a system message, e.g. '柚子 加入了' (names resolved live, never stored). */
+  /** Notices only the host posts (改時間、取消、結束、中場休息): the chat shows them only when the host wrote them — the
+      database refuses them from anyone else (2026-11-02 資安), and the screen does not trust a line just for its kind. */
+  var HOST_NOTICES = ['changed', 'cancelled', 'ended', 'break'];
+  function hostNotice(sys) { return HOST_NOTICES.indexOf(sys) !== -1; }
   function systemText(m) {
     m = m || {};
     var who = dogName(m.who || m.by);
@@ -11182,7 +11190,7 @@ window.APP_BUILD = {"version":"2026-11-02.25ef2898","seedUrl":"seed-data.json"};
     joinEvent: joinEvent, joinEventDogs: joinEventDogs, joinProblem: joinProblem, leaveEvent: leaveEvent, approveAttendee: approveAttendee, checkInEvent: checkInEvent, arriveOpen: arriveOpen,
     startLive: startLive, callBreak: callBreak, endEvent: endEvent, liveInfo: liveInfo,
     // chat
-    watchMessages: watchMessages, sendMessage: sendMessage, maxMessages: MAX_MSGS, postSystem: postSystem, systemText: systemText, chatState: chatState,
+    watchMessages: watchMessages, sendMessage: sendMessage, maxMessages: MAX_MSGS, postSystem: postSystem, systemText: systemText, hostNotice: hostNotice, chatState: chatState,
     // stickers & reports
     sendStickers: sendStickers, withdrawStickers: withdrawStickers, watchEventStickers: watchEventStickers, watchMyStickers: watchMyStickers,
     sendReport: sendReport, watchReports: watchReports, setPlayAgain: setPlayAgain, getPlayAgain: getPlayAgain,
@@ -12476,13 +12484,14 @@ try {
   // ------------------------------------------------------------------ 回報問題
   /** 回報問題只給你看 (偷看測試 2026-10-27): the SQL line that puts THIS phone's sign-in into public.admins. Until a row is
       there, every signed-in visitor can read 回報問題 (so this page keeps working); after it, only the writer and the
-      phones listed. Supabase only. */
+      phones listed. Since 2026-11-02 (資安) the database also keeps 範例資料 / example-dog personas, the test switch,
+      hidden dogs and deleting someone else's 協尋 for the phones listed. Supabase only. */
   function adminSql() { return "insert into public.admins (uid) values ('" + App.me.viewerId + "') on conflict do nothing;"; }
   function adminIdCard() {
     if (App.store.backend !== 'supabase' || !App.me.viewerId) return '';
     return html`<div class="card cream adm-id">
-      <h2 class="h3">回報問題只給你看</h2>
-      <p class="note mt-4">回報問題和檢舉只有寫的人和管理員看得到。把下面這一行貼到 Supabase 的 SQL Editor 按 Run，這支手機就是管理員，看得到大家的回報（還沒貼之前這裡是空的）。用別支手機管理，就在那支手機也貼一次。</p>
+      <h2 class="h3">這支手機設成管理員</h2>
+      <p class="note mt-4">回報問題和檢舉只有寫的人和管理員看得到。範例資料（寫入、清除、扮演範例狗狗）、測試開關、隱藏狗狗、刪掉別人的協尋，也只有管理員能用。把下面這一行貼到 Supabase 的 SQL Editor 按 Run，這支手機就是管理員（還沒貼之前，這些按了會被擋，回報這裡是空的）。用別支手機管理，就在那支手機也貼一次。</p>
       <p class="adm-sql mt-8">${adminSql()}</p>
       <div class="mt-8">${ui.secondaryBtn('複製這一行', { act: 'copyAdminSql', block: false })}</div>
       <p class="small mt-4">這支手機的管理編號：${App.me.viewerId}</p>
@@ -13311,6 +13320,7 @@ try {
       var day = fmt.dateKey(m.at);
       if (day !== lastDay) { out.push(html`<div class="chat-day">${dayLabel(m.at)}</div>`); lastDay = day; prev = null; }
       if (m.kind === 'system') {
+        if (D.hostNotice(m.sys) && (!ev || m.by !== ev.hostId)) { prev = null; return; }   // 只信主揪發的（資安 2026-11-02）
         var note = D.systemText(m);
         if (note) out.push(html`<div class="chat-sys">${note}<span class="sr-only">・${fmt.time(m.at)}</span></div>`);
         prev = null; return;
