@@ -17,7 +17,7 @@ window.APP_CONFIG = {
   supabaseAnonKey: 'sb_publishable_OG0sdAn6bnYdBNOJ59J8Mw_Z0zpdu4j',
   adminTokenHash: 'b6730da825b7942f538815f52185885e52cb08c5e260dc806bb9be0708f576f9',
   lineLogin: true,
-  googleLogin: false,
+  googleLogin: true,
   vapidPublicKey: '',
   googleMapsKey: 'AIzaSyAxKEws1yiLB2lIDILIFpJSGzgjTbZcUZo',
   googleMapsMapId: ''
