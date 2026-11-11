@@ -15,7 +15,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eepnW+XiJPqzjL3kwSi9sZXgDMNZXDehVvKxpOs5Sog=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://azairfcdrzkgejrlivqg.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://azairfcdrzkgejrlivqg.supabase.co wss://azairfcdrzkgejrlivqg.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-DyN+ttz4hNJjvnL78a9JAei9Op2PBkECEmg3SIpdydQ=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://azairfcdrzkgejrlivqg.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://azairfcdrzkgejrlivqg.supabase.co wss://azairfcdrzkgejrlivqg.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
 <title>豆米特 DogMeet</title>
 <meta name="description" content="豆米特 DogMeet 試辦版：約附近的狗一起散步、玩。">
 <meta property="og:type" content="website">
@@ -950,6 +950,9 @@ button.row, a.row { cursor: pointer; }
 .dj-gpin { position: absolute; }
 .dj-rdot { width: 14px; height: 14px; transform: translate(-50%, -50%); border: 2px solid #FFFFFF; border-radius: 50%; box-sizing: border-box; pointer-events: none; }
 .dj-gdot { width: 20px; height: 20px; transform: translate(-50%, -50%); border: 3px solid #1F6670; border-radius: 50%; background: rgba(232, 119, 90, 0.9); box-sizing: border-box; pointer-events: none; }
+/* 「你在這裡」 (core/map.js): the paw picture, centred on its point; not a button — a tap there is a tap on the map */
+.dj-you { display: block; max-width: none; transform: translate(-50%, -50%); pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+.dj-gpin.dj-gyou { pointer-events: none; } /* Google's top pane takes taps: this one lets them through */
 .dj-gcredit { margin: 0 0 4px 4px; padding: 0 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.8); color: #333; font-size: 10px; line-height: 16px; }
 .dj-gfail { position: absolute; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--cream); color: var(--ink); font-size: 15px; line-height: 22px; text-align: center; }
 /* App 版 (core/nmap.js): the phone draws Google's own map UNDER the page, in the box of <capacitor-google-map>. While it is
@@ -1082,7 +1085,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <div id="app"><div class="boot" role="status"><div class="h1-tab"><svg class="brand-mark" width="48" height="48" viewBox="0 0 64 64" aria-hidden="true"><g transform="matrix(0.5676 0 0 0.5676 -1.6622 25.1081)"><g fill="#E8775A"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><path d="M49 21C48.5 14 47 8.5 44.5 5.5C43.4 4.3 42 4.4 41 5.4C38.5 8 36.5 10.5 35 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#C9603F"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.4 16.2C44.9 12.6 44 9.9 42.9 8.6C42.4 8.1 41.8 8.1 41.3 8.6C40 10.1 38.8 11.6 38 12.8Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.5676 0 0 0.5676 29.3378 25.1081)"><g fill="#4FAFBC"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#2F8592"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.6216 0 0 0.6216 12.1081 20.0946)"><circle cx="32" cy="28" r="18.5" fill="#2F8592"/><g fill="#1F6670"><path d="M18.5 15.5C12.5 16 10 23.5 11.5 30C12.7 34.2 17 33.8 18.2 29.2C19.4 24.7 21 19 18.5 15.5Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><rect x="4" y="47" width="56" height="11" rx="5.5" fill="#1F6670"/><g fill="#E8775A"><ellipse cx="12.5" cy="48" rx="2.6" ry="2"/><ellipse cx="20.5" cy="48" rx="2.6" ry="2"/></g><g fill="#2F8592"><ellipse cx="27.6" cy="48" rx="2.6" ry="2"/><ellipse cx="36.4" cy="48" rx="2.6" ry="2"/></g><g fill="#4FAFBC"><ellipse cx="43.5" cy="48" rx="2.6" ry="2"/><ellipse cx="51.5" cy="48" rx="2.6" ry="2"/></g><g transform="matrix(0.34 0 0 0.34 21.12 -0.56)"><path d="M32 60C32 60 13.5 41.5 13.5 28C13.5 17.5 21.8 9 32 9C42.2 9 50.5 17.5 50.5 28C50.5 41.5 32 60 32 60Z" fill="#E8775A"/><circle cx="32" cy="28" r="7.5" fill="#FFFAF3"/></g></svg>豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
 (function () { var l = document.getElementById('dg-font'); if (l) l.media = 'all'; })();
-window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","storageNs":"test"};
+window.APP_BUILD = {"version":"2026-11-11.f090b575","seedUrl":"seed-data.json","storageNs":"test"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -2841,13 +2844,16 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
   // =====================================================================================================
   // 2026-11-11「顯示家附近」：「誰看得到」和「我出門遛狗」多寫了「除非你自己打開「顯示家附近」」（分享和發到日記都有這個開關；
   // 草稿，Willie 上線前看過才算；版本日期上線那天再改）
+  // 2026-11-11「你在這裡」（Willie：「一直顯示」，再改成「或是狗的腳印？」）：「地圖」那段的定位那一句改寫，下面 Google 的
+  // 版本（MAP_PRIVACY_GOOGLE）也一樣（草稿，Willie 上線前看過才算）。「這個位置豆米特不會存起來」只說看地圖用的這個位置
+  // （審查：原本的說法讀起來像什麼位置都不存，可是下一句散步路線會存）
   var PRIVACY_NOTE = {
     title: '隱私說明',
     lead: '豆米特現在是試辦版，給朋友一起測試用。（2026-11-10 版）',
     sections: [
       { title: '存了什麼', body: '狗狗名片（名字、品種、照片、個性標籤）、你填的暱稱、打卡、集章、散步、狗聚報名和聊天、私訊、走失協尋、狗狗日記（照片、文字、你發的散步路線、汪和留言）、你回報的公園狀況（別人只看到人數）。晶片號、家的範圍、家的位置、散步紀錄（路線、距離、時間）、每週散步目標、照顧提醒、走失暗記、找回碼、狗狗健康卡、健康筆記和初次見面貼紙（一起去過同一場狗聚、或在豆米特裡掃了對方名片的狗）另外存，別的使用者看不到（健康卡你做了連結給醫生時，拿到連結的人看得到；健康筆記要你在那個連結勾了「附上最近 14 天的健康筆記」，醫生才看得到那 14 天；打開驅蟲徽章時，名片上會有驅蟲的到期日）；管理資料庫的人技術上看得到，App 的管理頁不會顯示。' },
       { title: '誰看得到', body: '用豆米特的人都看得到狗狗名片和狗聚（誰報名哪一場）。狗狗名片是公開的：拿到你的名片連結或 QR 碼的人，不用加入也看得到照片、名字、品種、個性和主人暱稱；填了狂犬病疫苗到期日的話，這個日期也跟名片放在一起（名片上只顯示「疫苗」徽章）。狗聚聊天室只有主揪、報名的狗和管理員（為了刪不當的訊息）看得到。你追蹤了誰、封鎖了誰，只有你自己看得到（互相追蹤的狗友知道你們是狗友）；被封鎖的狗不會收到通知。打卡、散步、狗狗日記和常客紀錄照你的設定：只給狗友的，資料庫只讓你和狗友讀，陌生人在地圖和常客榜上只看到「一隻狗」和數量，不知道是誰。散步紀錄（路線、幾點出門、誰遛的）只有家人看得到；狗友只看得到每天一共走了幾公里、幾分鐘。你把散步發到日記或分享出去時，看得到的人會看到畫出來的路線：沒有地圖、沒有座標，家附近那一段藏起來。你自己打開「顯示家附近」時，路線會畫到家門口，熟悉附近的人可能認得出你住哪裡。每週散步目標只有家人看得到。健康筆記只有家人看得到；給醫生看的連結預設不附，你勾了「附上最近 14 天的健康筆記」，拿到那個連結的人才看得到那 14 天的精神、食慾、便便、體重和備註。記的體重也會更新到健康卡上（醫生看健康卡時看得到）。初次見面貼紙只有家人看得到；對方家記的是他們自己那一份，你刪掉名片以後，那邊也不會再顯示你的狗。集章紀錄只有你自己看得到。上傳的照片，拿到網址的人都看得到；上傳前會清掉照片裡的拍攝地點。跟範例狗狗（麻糬、柚子…）的私訊，管理員看得到（範例狗狗由管理員扮演），是測試用的。' },
-      { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」時會用手機定位，只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。按「我出門遛狗」以後，散步中會一直用定位記路線，走完只存在家人的散步紀錄裡（見下面「我出門遛狗」）。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。' },
+      { title: '地圖', body: '地圖由 OpenStreetMap 提供：看地圖時，手機會跟它要地圖圖片。點地圖上的公園時，先在手機裡的公園清單查；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。你允許定位以後，看地圖時會用手機定位，在地圖上用狗腳印標出你在哪裡；按「回到我這裡」時也用它移動地圖、算公園離你多遠（都在你的手機上算）。這個位置豆米特不會存起來，也不會傳出去。按「我出門遛狗」以後，散步中會一直用定位記路線，走完只存在家人的散步紀錄裡（見下面「我出門遛狗」）。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。' },
       { title: '我出門遛狗', body: '按「我出門遛狗」以後，會記錄這次散步的路線和距離，只有家人看得到，可以隨時刪掉。地圖上給別人看的，還是只有大概的範圍：在公園裡就打卡在那座公園；在外面是大約 100 公尺的範圍，離家近的時候是 500 公尺、只寫區名。狗友看得到每天一共走了幾公里、幾分鐘（隱私設定可以關），看不到路線，也看不到幾點出門。你按「發到日記」或「分享」，才會把畫出來的路線給別人看（沒有地圖，家附近那一段藏起來，除非你自己打開「顯示家附近」）。家的位置只有你和家人知道。按「暫停」以後不記錄位置（定位還開著），按「繼續」才接著記。沒在散步的時候，不會記錄位置。' },
       { title: '還是測試', body: '試辦版的保護還不完整：狗聚、聊天和協尋這些共用的資料，懂技術的人可能改得到，請不要寫住址、電話這類敏感的事。資料放在 Supabase 的雲端資料庫。試辦版的颱風、高溫提醒是手動設定的，不是氣象署的即時資料。' },
       { title: '通知（選用）', body: '在「我的」打開通知，手機會給豆米特一個推播地址，由 Google、Apple、Mozilla 或 Microsoft 的推播服務轉送。有人在你的狗聚聊天室說話、私訊你或邀請你時，手機會跳出狗聚名稱或狗狗名字，不會有訊息內容。關掉通知或刪除我的資料，這個地址就刪掉。' },
@@ -2945,7 +2951,7 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
 
   // Google 地圖版（branch google-map）和 App 版（手機的 Google 地圖）：Google 規定隱私說明和使用條款要寫地圖由 Google 提供，
   // 並連到 Google 的政策和條款。網頁版沒有 Google 地圖的 key 時，上面原本的字一字不改。
-  var MAP_PRIVACY_GOOGLE = '地圖由 Google 提供：看地圖時，手機會跟 Google 要地圖，Google 會知道你在看哪一帶的地圖，也適用 Google 的隱私權政策。點地圖上的公園時，先在手機裡的公園清單查（公園資料來自 OpenStreetMap）；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。按「回到我這裡」時會用手機定位，只用來移動地圖和算公園離你多遠（在你的手機上算），不會存起來。按「我出門遛狗」以後，散步中會一直用定位記路線，走完只存在家人的散步紀錄裡（見下面「我出門遛狗」）。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。';
+  var MAP_PRIVACY_GOOGLE = '地圖由 Google 提供：看地圖時，手機會跟 Google 要地圖，Google 會知道你在看哪一帶的地圖，也適用 Google 的隱私權政策。點地圖上的公園時，先在手機裡的公園清單查（公園資料來自 OpenStreetMap）；清單載不到時，才會把點的那個位置送去 OpenStreetMap 的公園資料服務查。你允許定位以後，看地圖時會用手機定位，在地圖上用狗腳印標出你在哪裡；按「回到我這裡」時也用它移動地圖、算公園離你多遠（都在你的手機上算）。這個位置豆米特不會存起來，也不會傳出去。按「我出門遛狗」以後，散步中會一直用定位記路線，走完只存在家人的散步紀錄裡（見下面「我出門遛狗」）。按「🧭 導航」會打開 Google 地圖帶你過去，目的地會交給 Google。';
   var MAP_PRIVACY_LINKS = [{ label: 'Google 隱私權政策', url: 'https://policies.google.com/privacy' }];
   var MAP_TERMS = { title: '地圖', body: '豆米特的地圖由 Google 提供。使用地圖，也要遵守 Google 地圖/Google 地球附加服務條款。',
     links: [{ label: 'Google 地圖/Google 地球附加服務條款', url: 'https://maps.google.com/help/terms_maps/' }] };
@@ -3826,9 +3832,10 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     // 開機時讀不到手機裡存的登入資料（例如手機開機後還沒解鎖過）：停在這一句和「再試一次」，不會變成新的狗
     storageFailed: '手機裡的登入資料暫時讀不到，請按「再試一次」。',
     // 手機問「要不要讓豆米特使用你的位置」時寫的原因（第二階段抄進 iPhone 的 Info.plist；Apple 要寫實話，每一種用法都要寫到）：
-    // locationWhy＝使用 App 的時候（回到我這裡、我出門遛狗、設定家的位置時的「用我現在的位置」）；
+    // locationWhy＝使用 App 的時候（看地圖時首頁地圖上的狗腳印「你在這裡」，2026-11-11；回到我這裡、我出門遛狗、設定家的位置時的
+    // 「用我現在的位置」；草稿，Willie 上線前看過才算）；
     // locationAlwaysWhy＝散步中放口袋、螢幕關掉也繼續（「永遠」）
-    locationWhy: '按「回到我這裡」、「我出門遛狗」或「用我現在的位置」時，用你的位置移動地圖、記錄散步路線，或存成家的位置。',
+    locationWhy: '看地圖時在地圖上標出你在哪裡；按「回到我這裡」、「我出門遛狗」或「用我現在的位置」時，用你的位置移動地圖、記錄散步路線，或存成家的位置。',
     locationAlwaysWhy: '散步中手機放口袋、螢幕關掉也繼續記錄路線；按「結束散步」就停止。',
     // 手機問「要不要讓豆米特使用相機」時寫的原因（第二階段抄進 iPhone 的 Info.plist）。App 裡同一個相機權限也用來
     // 幫狗狗拍照（名片、日記、聊天、私訊…），拍的照片會上傳，所以不能寫「不會傳出去」
@@ -4034,9 +4041,11 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
      exchanged here). Anything else is dropped. App.store keeps the sign-in in storage() (pickStorage).
    - openBrowser(url) / closeBrowser(): LINE / Google in the phone's system browser (@capacitor/browser), the app page
      staying where it is; their way back is authUrl() (App.store.oauthStart, App.me.oauthArrived).
-   - geo(): the phone's location for App.map (回到我這裡: once, in the foreground) and App.walkrec (a walk: also in the
-     background, a pocket with the screen off) — navigator.geolocation's three calls over the plugin's watchers
+   - geo(): the phone's location for App.map (回到我這裡: once, in the foreground), App.walkrec (a walk: also in the
+     background, a pocket with the screen off) and App.nmap (the 「你在這裡」 paw on the main map: in the foreground, a
+     watch that never asks — {ask: false}) — navigator.geolocation's three calls over the plugin's watchers
      (@capacitor-community/background-geolocation).
+   - locationStatus(): the phone's answer to the location question, read without asking (DogMeetNative).
    - supports(): what the app's own plugin DogMeetNative can do on this phone — home-screen widgets, the walk on the lock
      screen, the dog cut-out (iOS 17+; SPEC §38). */
 (function (App) {
@@ -4317,10 +4326,14 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
   // at the start: the watchers an earlier page of this app left on (before App.store.init(), so before any walk resumes)
   whenApp(function () { keptIds().forEach(function (id) { dropWatcher({ id: id }); }); });
   /** A watcher of the plugin → our number. ok({coords: {latitude, longitude, accuracy}, timestamp}) with the time the
-      fix was made (location.time); err({code}): 1 = the phone said no (NOT_AUTHORIZED), 2 = anything else. */
-  function addWatch(ok, err, background) {
+      fix was made (location.time); err({code}): 1 = the phone said no (NOT_AUTHORIZED), 2 = anything else. quiet: the
+      plugin never asks the person (requestPermissions false: the 「你在這裡」 paw, only once the phone allows location;
+      on a phone that does not, the plugin only says NOT_AUTHORIZED) and sends a fix only after the phone moved 5 m
+      (distanceFilter 5 = core/nmap.js YOU_M, the paw moves no less: a phone lying still sends none, 審查 M1). A walk
+      and a one-shot take every fix. */
+  function addWatch(ok, err, background, quiet) {
     var B = plugin('BackgroundGeolocation'), n = ++geoN, x = { id: null, off: false }, p;
-    var o = { requestPermissions: true, stale: false, distanceFilter: 0 };
+    var o = { requestPermissions: !quiet, stale: false, distanceFilter: quiet ? 5 : 0 };
     if (background) { o.backgroundTitle = App.content.walklog.bgTitle; o.backgroundMessage = App.content.walklog.bgMessage; }
     watches[n] = x;
     function cb(loc, e) {
@@ -4358,8 +4371,12 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     n = addWatch(function (pos) { end(ok, pos); }, function (e) { end(err, e); }, false);
     timer = setTimeout(function () { end(err, { code: 3, message: 'no position in ' + ms + ' ms' }); }, ms);
   }
-  /** Follows the phone until clearWatch(n); o.background: also in the background. */
-  function watchPosition(ok, err, o) { return addWatch(ok, err, !!(o && o.background)); }
+  /** Follows the phone until clearWatch(n); o.background: also in the background; o.ask false: never asks the person (in
+      the foreground only, a fix after every 5 m — the 「你在這裡」 paw, core/nmap.js). */
+  function watchPosition(ok, err, o) {
+    var quiet = !!(o && o.ask === false);
+    return addWatch(ok, err, !quiet && !!(o && o.background), quiet);
+  }
   /** {getCurrentPosition, watchPosition, clearWatch} in the app; null on the web and without the plugin. */
   function geo() {
     if (!plugin('BackgroundGeolocation')) return null;
@@ -4370,7 +4387,8 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
   // ------------------------------------------------------------------ the app's own plugin (SPEC §38)
   /* DogMeetNative (app/ios/App/App/DogMeetNative.swift, registered by DogMeetBridgeViewController): the home-screen
      widgets (core/widgets.js), the walk on the lock screen (core/walklive.js) and the dog cut-out (core/walkpic.js). An
-     iPhone below iOS 17 has none of them (the widget extension needs 17): supported() says so and nothing else is asked. */
+     iPhone below iOS 17 has none of them (the widget extension needs 17): supported() says so and nothing else of them is
+     asked. locationStatus() is for every iPhone (the main map's 「你在這裡」 paw, core/nmap.js). */
   var NONE = { widgets: false, live: false, cutOut: false }, supP = null;
   /** {widgets, live, cutOut} → Promise, asked once per page; every one false on the web, in an app without the plugin,
       or when it fails. */
@@ -4386,6 +4404,21 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
       return Object.assign({}, NONE);
     });
     return supP;
+  }
+  /** The phone's answer to the app's location question, read without asking the person (DogMeetNative.locationStatus:
+      CLLocationManager's status, every iPhone) → Promise<'granted' | 'denied' | 'prompt'>, never rejects. 'prompt' (not
+      asked yet) also on the web, in an app without the method (built before it) and when it fails: only 'granted' lets
+      the 「你在這裡」 paw follow the phone (core/nmap.js). Asked afresh each time (the person may have changed it in 設定). */
+  function locationStatus() {
+    var P = plugin('DogMeetNative');
+    if (!P || typeof P.locationStatus !== 'function') return Promise.resolve('prompt');
+    return Promise.resolve().then(function () { return P.locationStatus(); }).then(function (r) {
+      var s = r && r.status;
+      return s === 'granted' || s === 'denied' ? s : 'prompt';
+    }, function (e) {
+      console.warn('[native] DogMeetNative.locationStatus', e && (e.message || e));
+      return 'prompt';
+    });
   }
 
   App.native = {
@@ -4410,6 +4443,7 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     closeBrowser: closeBrowser,
     geo: geo,
     supports: supports,
+    locationStatus: locationStatus,
     // tests: how long the start waits for the app storage (a keychain that never answers: then 「再試一次」)
     _readyMs: READY_MS,
     // tests: how long a one-shot may wait for the position until the phone has answered its location question once
@@ -4694,8 +4728,11 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
    every call goes to core/nmap.js (App.nmap: the phone's own Google map), key or not — never one of the web maps.
    The router rebuilds a screen with innerHTML on every change, which would throw a Leaflet map away. So the map lives
    in one detached <div class="dj-map"> that attach() moves into the screen's slot after each render: the view, zoom
-   and labels survive re-renders. The user's position is only asked for by locate() (「📍 回到我這裡」) and is never
-   stored or sent anywhere — it only moves the map. */
+   and labels survive re-renders. The phone's position is asked for by position() / locate() (回到我這裡, 我出門遛狗,
+   用我現在的位置 — the browser may ask the person then), and once location is allowed it is watched for the
+   「你在這裡」 paw on the main map while that map is on the page and the page is visible (see 「你在這裡」 below; nothing
+   asks by itself). It is never stored or sent anywhere: it moves the map (回到我這裡 only — the map never follows the
+   paw), shows the paw and gives 「離你多遠」. */
 (function (App) {
   'use strict';
   var C = App.content;
@@ -4739,14 +4776,17 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     });
     map.on('dblclick', function () { clearTimeout(tapTimer); });
   }
-  /** Put the map into `slot` (a fresh element of the current render). opts: {onTap(latlng, zoom), onLabel(id)}. */
+  /** Put the map into `slot` (a fresh element of the current render). opts: {onTap(latlng, zoom), onLabel(id),
+      onWalker(id), you (首頁's map: the 「你在這裡」 paw — never a sheet that borrows the map)}. */
   function attach(slot, o) {
     if (!slot) return;
     if (inApp()) return App.nmap.attach(slot, o);
-    if (useG()) return gAttach(slot, o);
+    youWant = !!(o && o.you);
+    if (useG()) { gAttach(slot, o); youCheck(); return; }
     opts = o || {};
     if (!map) create();
     if (el.parentNode !== slot) slot.appendChild(el);
+    youCheck();
     // same size as last time (the usual re-render): leave the map alone, so a drag or pinch in progress goes on
     var w = slot.clientWidth, h = slot.clientHeight;
     if (w === lastW && h === lastH) return;
@@ -4824,6 +4864,8 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
           // kept in this page only, for 「離你多遠」 in the park lists (never stored or sent)
           api.lastPos = { lat: pos.coords.latitude, lng: pos.coords.longitude, at: Date.now() };
           resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+          // location is allowed now: the 「你在這裡」 paw may follow it (in the app: if the phone says so)
+          if (inApp()) App.nmap.located(); else youAllowed(geo);
         },
           function (e) { lastFail = e && e.code === 1 ? 'denied' : 'failed'; resolve(null); }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
       } catch (e) { lastFail = 'failed'; resolve(null); }
@@ -4965,6 +5007,7 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     gState = retry ? null : 'failed';
     if (retry) gRetryAt = Date.now() + api._gRetryMs;
     gShowFail();
+    youCheck(); // a map that cannot show: the paw stops following
   }
   /** In each Google map's box: the main map's, and 遛狗紀錄's route map when there is one. */
   function gShowFail() {
@@ -5000,6 +5043,7 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     gMap.addListener('dblclick', function () { clearTimeout(tapTimer); });
     gMap.addListener('dragend', function () { gDragEnd = Date.now(); });
     gSetLabels(gWant.labels); gSetWalks(gWant.walks); gSetDot(gWant.dot);
+    youCheck(); // the 「你在這裡」 paw can follow now (when location is allowed)
   }
   function gAttach(slot, o) {
     opts = o || {};
@@ -5090,6 +5134,129 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     node.className = 'dj-dot dj-gdot';
     gDotPin = new (pinClass())(gWant.dot.lat, gWant.dot.lng, node, 'overlayLayer');
     gDotPin.setMap(gMap);
+  }
+
+  // ================================================================== 「你在這裡」 (spec 2026-11-10, addendum 2026-11-11)
+  // Willie: 「一直顯示」, then 「還是藍點可以換成一隻狗狗呢？」「或是狗的腳印？」. The main map (Main's attach {you: true};
+  // never a sheet that borrows the map, never the route map) shows the paw where the phone is — the store app's picture
+  // (App.nmap.pawImage), the same on Leaflet's and Google's map — while that map is on the page and the page is visible,
+  // once the browser ALLOWS location: the Permissions API says 'granted', or a position() of this page got one
+  // (回到我這裡, 我出門遛狗, 用我現在的位置). Nothing asks by itself: before that there is no geolocation call at all. The
+  // watch (maximumAge 10 s) stops when the map leaves the page (another screen, a sheet borrows it, Google's map cannot
+  // show), when the page is hidden and when the browser says no. A hidden page also forgets the allow (審查 C1: iOS may
+  // end 允許一次 while Safari is in the background, a setting may change, Firefox forgets an allow after an hour — with
+  // no change event, so a watch started on the old allow would make the browser ask with nobody pressing anything): back
+  // on the page the browser is asked again, and only its new answer 'granted' starts the watch; else the next
+  // position(). The position stays in this closure, for the paw only: never stored, never sent, not api.lastPos; the
+  // map does not follow it (only 回到我這裡 moves the map). In the store app the paw is core/nmap.js's.
+  var youWant = false;  // the last attach was the main map's
+  var youGeo = null;    // the location that may be watched: it answered in this page, or the browser says 'granted' —
+                        // since the page was last shown (a hidden page forgets it)
+  var youW = null;      // the watch while it runs: {geo, id}
+  var youAt = null;     // the watch's last fix {lat, lng}
+  var youQ = 0;         // the browser's last question (youAsk): only its answer counts
+  var youLayer = null, gYouPin = null, youObs = null, youPerm = null, youOn = false;
+  function youSrc() { return api._geo || (navigator && navigator.geolocation) || null; }
+  function pageHidden() { return document.visibilityState === 'hidden'; }
+  /** The main map's element is on the page and shows a map (Google's: made, its key not refused). */
+  function youShown() { return useG() ? !!(gMap && gEl && gEl.isConnected && gState === 'ready') : !!(map && el && el.isConnected); }
+  /** Follow or stop, draw or take the paw away, after anything that may change it. */
+  function youCheck() {
+    if (inApp()) return;
+    if (youWant && !youOn) { // the first time 首頁's map is there: listen for the page being hidden, ask the browser
+      youOn = true;
+      // hidden: stop and forget (below); back: ask the browser again (also off 首頁, for when its map comes back) —
+      // nothing starts before its new answer
+      document.addEventListener('visibilitychange', function () { if (pageHidden()) youCheck(); else youAsk(); });
+      youAsk();
+    }
+    if (pageHidden()) youGeo = null; // nothing a hidden page knows or learns counts once it is back
+    var g = youSrc();
+    if (youWant && youShown() && !pageHidden() && youGeo && youGeo === g) youStart(g); else youStop();
+    youDraw();
+  }
+  /** The browser's answer, read without asking the person: the Permissions API, where there is one (not in older
+      Safari: there only a position() of this page lets the paw follow). Only the answer to the last question counts (a
+      late one from before the page was hidden again does not). 'prompt' leaves what this page learned since it was
+      shown. */
+  function youAsk() {
+    var P = navigator && navigator.permissions, q, n;
+    if (!P || typeof P.query !== 'function') return;
+    n = ++youQ;
+    try { q = P.query({ name: 'geolocation' }); } catch (e) { return; }
+    Promise.resolve(q).then(function (st) {
+      if (!st || n !== youQ) return; // asked again since (hidden and back): the newer answer decides
+      if (st !== youPerm) {
+        if (youPerm && youPerm.removeEventListener) youPerm.removeEventListener('change', youChanged);
+        youPerm = st;
+        if (st.addEventListener) st.addEventListener('change', youChanged); else st.onchange = youChanged;
+      }
+      if (st.state === 'granted') youGeo = youSrc();
+      else if (st.state === 'denied') youGeo = null;
+      youCheck();
+    }, function () { /* no answer: as without the API */ });
+  }
+  /** The browser's answer changed (the person, in its settings): 'granted' follows; anything else stops — a watch
+      started while it is 'prompt' would ask. */
+  function youChanged() {
+    youGeo = youPerm && youPerm.state === 'granted' ? youSrc() : null;
+    youCheck();
+  }
+  /** A position() of this page got one: that location may be watched. */
+  function youAllowed(geo) { youGeo = geo; youCheck(); }
+  function youStart(g) {
+    if (youW && youW.geo === g) return;
+    youStop();
+    if (!g || typeof g.watchPosition !== 'function') return;
+    var w = youW = { geo: g, id: null };
+    try {
+      w.id = g.watchPosition(function (pos) {
+        var c = pos && pos.coords;
+        if (youW !== w || !c || !isFinite(c.latitude) || !isFinite(c.longitude)) return;
+        youAt = { lat: c.latitude, lng: c.longitude };
+        youDraw();
+      }, function (e) {
+        if (youW !== w || !e || e.code !== 1) return; // only a no ends it: a slow or missing fix, the browser tries on
+        youGeo = null;
+        youCheck();
+      }, { enableHighAccuracy: false, maximumAge: 10000 });
+    } catch (e) { youW = null; return; }
+    // the map leaving the page (another screen; the router draws screens with innerHTML) ends the watch
+    if (!youObs && window.MutationObserver) youObs = new MutationObserver(function () { if (youW && !youShown()) youCheck(); });
+    if (youObs) youObs.observe(document.body, { childList: true, subtree: true });
+  }
+  function youStop() {
+    var w = youW;
+    youAt = null;
+    if (!w) return;
+    youW = null;
+    if (youObs) youObs.disconnect();
+    try { w.geo.clearWatch(w.id); } catch (e) { /* ignore */ }
+  }
+  /** The paw at the last fix while the watch runs; else none. Above the labels and walkers; not a button. */
+  function youDraw() {
+    var pt = youW && youAt && youWant && youShown() ? youAt : null;
+    if (useG()) { gYouDraw(pt); return; }
+    if (!pt) { if (youLayer && map) map.removeLayer(youLayer); youLayer = null; return; }
+    if (youLayer) { youLayer.setLatLng([pt.lat, pt.lng]); return; }
+    var L = window.L;
+    if (!map.getPane('dj-you')) { var pane = map.createPane('dj-you'); pane.style.zIndex = 650; pane.style.pointerEvents = 'none'; } // over the markers' 600
+    youLayer = L.marker([pt.lat, pt.lng], { pane: 'dj-you', icon: L.divIcon({ className: 'dj-pin-wrap', html: youNode(), iconSize: null, iconAnchor: [0, 0] }), keyboard: false, interactive: false }).addTo(map);
+  }
+  /** On Google's map: an HTML node in the top pane (floatPane, over the labels' overlayMouseTarget); taps go through it. */
+  function gYouDraw(pt) {
+    if (!pt || !gMap) { if (gYouPin) { gYouPin.setMap(null); gYouPin = null; } return; }
+    if (gYouPin) { gYouPin.moveTo(pt.lat, pt.lng); return; }
+    gYouPin = new (pinClass())(pt.lat, pt.lng, youNode(), 'floatPane');
+    gYouPin.wrap.classList.add('dj-gyou');
+    gYouPin.setMap(gMap);
+  }
+  /** The paw's picture, centred on its point (styles.css .dj-you: a tap there reaches the map). */
+  function youNode() {
+    var p = App.nmap.pawImage(), img = document.createElement('img');
+    img.className = 'dj-you'; img.src = p.url; img.width = p.width; img.height = p.height; img.alt = ''; img.draggable = false;
+    img.setAttribute('aria-hidden', 'true');
+    return img;
   }
 
   // ------------------------------------------------------------------ 遛狗紀錄: a second, separate map for one walk's route
@@ -5248,7 +5415,8 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
    with the kept camera, labels, walks and dot. Every plugin call of a map waits for the ones before it, and a box's new
    map is made only once its last one is destroyed (the plugin knows maps by id). A build without the key or the
    plugin says 「地圖暫時打不開」 in both boxes for good; a map the plugin would not make says it in its own box, and an
-   attach App.nmap._retryMs (10 s) later tries again (as the web's Google map, map.js _gRetryMs). */
+   attach App.nmap._retryMs (10 s) later tries again (as the web's Google map, map.js _gRetryMs).
+   The main map on 首頁 also shows the 「你在這裡」 paw where the phone is, once the phone allows location (see below). */
 (function (App) {
   'use strict';
   var C = App.content;
@@ -5326,6 +5494,7 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
         if (inst.dead) return;
         if (b.refusedAt) { b.refusedAt = 0; hideFail(b); mark(); } // made after a refusal: the note goes, the page opens over it
         settle(b); // the box may not have been there yet when the phone looked for it
+        if (b === main) youAsk(); // each new main map: the paw again, when the phone still allows location
         return listen(inst).then(null, warn(b.id + ' listeners'));
       }, function (e) {
         warn('the map could not be made')(e);
@@ -5357,7 +5526,7 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     var inst = b.inst;
     b.inst = null; inst.dead = true;
     unsettle(b);
-    if (b === main) clearTimeout(tapTimer);
+    if (b === main) { clearTimeout(tapTimer); youStop(); } // the paw's watch goes with its map
     b.tail = inst.q = inst.q.then(function () { if (inst.map) return inst.map.destroy(); }).then(null, warn(b.id + ' destroy'));
   }
   function fail(why) {
@@ -5422,10 +5591,12 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     b.settling = SETTLE_MS.map(function (ms) { return setTimeout(function () { display(b); }, ms); });
   }
   function unsettle(b) { if (b.settling) b.settling.forEach(clearTimeout); b.settling = null; }
-  /** The page is shown again: each map on it is asked for again (settle skips a box without a map). */
+  /** The page is shown again: each map on it is asked for again (settle skips a box without a map), and the paw follows
+      the phone again when it still allows location. Hidden (the app in the background): the paw stops. */
   function back() {
-    if (document.visibilityState === 'hidden') return;
+    if (document.visibilityState === 'hidden') { youStop(); return; }
     [main, route].forEach(function (b) { if (b.el && b.el.isConnected) settle(b); });
+    youAsk();
   }
   function display(b) {
     var inst = b.inst, P = App.native.plugin('CapacitorGoogleMaps');
@@ -5464,16 +5635,24 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
   // ------------------------------------------------------------------ the main map: labels, walks, the 其他地點 dot
   /** Put the map into `slot` (a fresh element of the current render). opts: {onTap(latlng, zoom), onLabel(id),
       onWalker(id)}, as App.map.attach. */
-  function attach(slot, o) { opts = o || {}; place(main, slot); }
+  function attach(slot, o) {
+    opts = o || {};
+    var was = youWant;
+    youWant = !!opts.you; // 首頁's map (o.you): the 「你在這裡」 paw; a sheet that borrows the map never has it
+    place(main, slot);
+    if (!youWant) youStop(); else if (!was) youAsk();
+  }
   function valid(items, walk) {
     return (Array.isArray(items) ? items : []).filter(function (it) { return it && typeof it.id === 'string' && num(it.lat) && num(it.lng) && (!walk || num(it.r)); })
       .map(function (it) { return { id: it.id, lat: it.lat, lng: it.lng, r: it.r, text: it.text == null ? '' : String(it.text), aria: it.aria == null ? '' : String(it.aria) }; });
   }
   function same(a, b) { return a.text === b.text && a.aria === b.aria && a.lat === b.lat && a.lng === b.lng && a.r === b.r; }
-  function marker(p, img, title, tag) {
+  /** z: the stack order (zIndex; the plugin's default is 0, the labels'): higher is drawn on top. */
+  function marker(p, img, title, tag, z) {
     return { tag: tag, make: function () {
       var i = typeof img === 'function' ? img() : img, o = { coordinate: { lat: p[0], lng: p[1] }, iconUrl: i.url, iconSize: { width: i.width, height: i.height }, iconAnchor: { x: i.anchor.x, y: i.anchor.y } };
       if (title) o.title = title;
+      if (z) o.zIndex = z;
       return o;
     } };
   }
@@ -5533,7 +5712,88 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     if (!t) return;
     if (t.kind === 'label') { if (opts.onLabel) opts.onLabel(t.id); }
     else if (t.kind === 'walk') { if (opts.onWalker) opts.onWalker(t.id); }
-    else tap(t.lat, t.lng);
+    else tap(t.lat, t.lng); // the 其他地點 dot: not a button, a tap on the map there
+    // (the 「你在這裡」 paw has no tag: a tap on it does nothing — see youMove)
+  }
+
+  // ------------------------------------------------------------------ 「你在這裡」: the paw where the phone is
+  /* Willie 2026-11-11: 「一直顯示」, then 「還是藍點可以換成一隻狗狗呢？」「或是狗的腳印？」. The main map on 首頁 (attach
+     {you: true}; never a sheet that borrows the map, never the route map) shows the paw (pawImage, the same picture as on
+     the web's maps) where the phone is — only while that map is on the page, the app is in front, and the phone ALREADY
+     allows location: App.native.locationStatus() (read without asking) says 'granted'. It is asked when a main map is
+     made, when the app is back in front, when 首頁 takes the map back from a sheet and after a position succeeded
+     (App.map.position: 回到我這裡, a walk's start, 用我現在的位置 — located()). Then a foreground watch of the location
+     plugin that never asks (App.native.geo().watchPosition {ask: false}: requestPermissions false, no background message,
+     a fix only after 5 m — distanceFilter 5) follows the phone; the paw moves when it moved 5 m or more (YOU_M), at most
+     every App.nmap._youMs (2 s), the new marker on first and the old one off after it (no blink); a tap on it does
+     nothing (not a tap on the map: no park lookup with the exact fix). The watch stops and the paw goes when the map
+     leaves the page (the native map is destroyed), when the app goes to the background and when the phone says no
+     (NOT_AUTHORIZED). A walk's own watcher is a different one and never touched. Not Google's own location dot
+     (enableCurrentLocation): it cannot be a paw, and the plugin turns it on even while the phone has not been asked —
+     then the Maps SDK asks the person. The position stays in this closure, for the paw: never stored, never sent. */
+  var youWant = false, youAsking = false, youAgain = false;
+  var you = null; // the watch while it runs: {inst (its map), n (App.native.geo()'s number), at, e (the marker), last (ms), next, timer}
+  var YOU_M = 5;  // metres the phone moves before the paw does
+  /** The paw may follow now: 首頁's map made and on the page, the app in front. */
+  function youCan() {
+    var i = main.inst;
+    return youWant && !!i && !i.dead && !!i.map && !!main.el && main.el.isConnected && document.visibilityState !== 'hidden';
+  }
+  /** Ask the phone (never the person) whether location is allowed, then follow or stop. One question at a time: a reason
+      to ask while one is open asks again after it. */
+  function youAsk() {
+    if (!youCan()) { youStop(); return; }
+    if (youAsking) { youAgain = true; return; }
+    youAsking = true;
+    Promise.resolve().then(function () { return App.native.locationStatus(); }).then(null, function () { return 'prompt'; }).then(function (st) {
+      youAsking = false;
+      if (youAgain) { youAgain = false; youAsk(); return; }
+      if (st === 'granted' && youCan()) youStart(); else youStop();
+    }).then(null, warn('the paw'));
+  }
+  function youStart() {
+    var inst = main.inst, G = App.native.geo();
+    if (you && you.inst === inst) return; // already following on this map
+    youStop();
+    if (!G) return;
+    var w = you = { inst: inst, n: null, at: null, e: null, last: 0, next: null, timer: null };
+    w.n = G.watchPosition(function (pos) { if (you === w && pos && pos.coords) youFix(w, pos.coords.latitude, pos.coords.longitude); },
+      function (e) { if (you === w && e && e.code === 1) youStop(); }, // the phone said no; a slow fix: the plugin goes on
+      { ask: false });
+  }
+  function youStop() {
+    var w = you;
+    if (!w) return;
+    you = null;
+    clearTimeout(w.timer);
+    var G = App.native.geo();
+    if (G && w.n != null) G.clearWatch(w.n);
+    if (w.e) drop(w.inst, 'marker', [w.e]); // (nothing to do on a map already gone)
+  }
+  /** A fix: the first one draws the paw; then it moves when the phone moved YOU_M or more, at most every _youMs. */
+  function youFix(w, lat, lng) {
+    if (!num(lat) || !num(lng)) return;
+    var p = { lat: lat, lng: lng };
+    if (!w.at) { youMove(w, p); return; }
+    w.next = metres(w.at, p) >= YOU_M ? p : null; // back near the paw: a move still waiting is dropped
+    if (!w.next || w.timer) return;
+    var wait = w.last + Math.max(0, Number(App.nmap._youMs) || 0) - Date.now();
+    if (wait <= 0) { youMove(w, p); return; }
+    w.timer = setTimeout(function () { w.timer = null; if (you === w && w.next) youMove(w, w.next); }, wait);
+  }
+  function youMove(w, p) {
+    var old = w.e;
+    w.at = p; w.next = null; w.last = Date.now();
+    // above the labels and walkers; no tag: a tap on the paw does nothing (審查 M2) — as a tap on the map it would be at
+    // the exact fix, and a park lookup sends the tapped point to OpenStreetMap when the park list did not load
+    w.e = marker([p.lat, p.lng], pawImage(), '', null, 10);
+    put(w.inst, 'marker', [w.e]);
+    if (old) drop(w.inst, 'marker', [old]); // after the new one is on
+  }
+  /** Metres between two points (flat: enough for a few metres). */
+  function metres(a, b) {
+    var k = Math.PI / 180, x = (b.lng - a.lng) * k * Math.cos((a.lat + b.lat) / 2 * k), y = (b.lat - a.lat) * k;
+    return Math.sqrt(x * x + y * y) * 6371000;
   }
 
   // ------------------------------------------------------------------ the main map's camera
@@ -5695,6 +5955,27 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     if (ring) { g.globalAlpha = 1; g.strokeStyle = d[2]; g.lineWidth = ring; g.beginPath(); g.arc(n / 2, n / 2, n / 2 - ring / 2, 0, Math.PI * 2); g.stroke(); }
     return (dots[kind] = { url: c.toDataURL('image/png'), width: n, height: n, anchor: { x: n / 2, y: n / 2 } });
   }
+  // the paw in its 28 px badge: [x, y, rx, ry, turn (radians)] — one big pad, four toes (the app's paw icon, smaller)
+  var PAW = [[14, 17.1, 4.8, 3.5, 0], [8.7, 12.6, 1.7, 2.1, -0.35], [11.9, 9.5, 1.7, 2.2, -0.1], [16.1, 9.5, 1.7, 2.2, 0.1], [19.3, 12.6, 1.7, 2.1, 0.35]];
+  var paw = null;
+  /** The 「你在這裡」 paw, the same picture on all three maps (core/map.js puts it on the web's): a round white badge, 28 px,
+      with a 2 px coral ring and a coral paw, a soft shadow, centred on its point; 4 px around it for the shadow. Made once. */
+  function pawImage() {
+    if (paw) return paw;
+    var n = 28, M = 4, W = n + 2 * M, s = ratio(), c = document.createElement('canvas');
+    c.width = c.height = Math.ceil(W * s);
+    var g = c.getContext('2d');
+    g.scale(s, s);
+    g.shadowColor = 'rgba(0, 0, 0, 0.25)'; g.shadowBlur = 4 * s; g.shadowOffsetY = 1 * s; // shadows do not follow scale()
+    g.fillStyle = '#FFFFFF';
+    g.beginPath(); g.arc(W / 2, W / 2, n / 2, 0, Math.PI * 2); g.fill();
+    g.shadowColor = 'rgba(0, 0, 0, 0)';
+    g.strokeStyle = CORAL; g.lineWidth = 2;
+    g.beginPath(); g.arc(W / 2, W / 2, n / 2 - 1, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = CORAL;
+    PAW.forEach(function (e) { g.beginPath(); g.ellipse(M + e[0], M + e[1], e[2], e[3], e[4], 0, Math.PI * 2); g.fill(); });
+    return (paw = { url: c.toDataURL('image/png'), width: W, height: W, anchor: { x: W / 2, y: W / 2 } });
+  }
 
   App.nmap = {
     attach: attach, setLabels: setLabels, setWalks: setWalks, dot: dot, setView: setView, center: center, zoom: zoom, inView: inView,
@@ -5703,9 +5984,14 @@ window.APP_BUILD = {"version":"2026-11-11.4594a24f","seedUrl":"seed-data.json","
     failed: function () { return broken || !!main.refusedAt || !!route.refusedAt; },
     routeLayers: function () { var c = route.inst ? route.inst.count : zero(); return { lines: c.lines, gapLines: c.gapLines, dots: c.dots, gapDots: c.gapDots }; },
     walkCircles: function () { return want.walks.map(function (w) { return { id: w.id, r: w.r }; }); },
-    labelImage: labelImage, dotImage: dotImage,
+    labelImage: labelImage, dotImage: dotImage, pawImage: pawImage,
+    /** A position succeeded (App.map.position: 回到我這裡, a walk's start, 用我現在的位置): the phone may allow location
+        now — the paw follows when it does. */
+    located: function () { youAsk(); },
     // tests: how long after a map the plugin would not make the next attach may try again
-    _retryMs: 10000
+    _retryMs: 10000,
+    // the paw moves at most this often (ms); tests shorten it
+    _youMs: 2000
   };
   // the main native map now on the page (App.map._native), or null
   Object.defineProperty(App.nmap, '_map', { get: function () { return (main.inst && main.inst.map) || null; } });
@@ -25379,7 +25665,8 @@ try {
       App.map.attach(slot, {
         onTap: function (latlng, zoom) { tapMap(ctx, latlng, zoom); },
         onLabel: function (id) { var pk = C.park(id); if (pk) openPark(ctx, pk); },
-        onWalker: function (id) { if (id !== App.me.actorId) App.go('DM_Invite', { id: id }); }
+        onWalker: function (id) { if (id !== App.me.actorId) App.go('DM_Invite', { id: id }); },
+        you: true // the 「你在這裡」 paw: on this map only, once location is allowed (core/map.js)
       });
       App.map.setLabels(labelsOf(ctx));
       App.map.setWalks(walksOf(ctx));
