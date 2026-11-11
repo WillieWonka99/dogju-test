@@ -15,7 +15,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-DyN+ttz4hNJjvnL78a9JAei9Op2PBkECEmg3SIpdydQ=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://azairfcdrzkgejrlivqg.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://azairfcdrzkgejrlivqg.supabase.co wss://azairfcdrzkgejrlivqg.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-kYynWKJB7RKNDVHL9fK9RTrw841zrWDiNebrayOcPKY=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://azairfcdrzkgejrlivqg.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://azairfcdrzkgejrlivqg.supabase.co wss://azairfcdrzkgejrlivqg.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
 <title>豆米特 DogMeet</title>
 <meta name="description" content="豆米特 DogMeet 試辦版：約附近的狗一起散步、玩。">
 <meta property="og:type" content="website">
@@ -950,8 +950,9 @@ button.row, a.row { cursor: pointer; }
 .dj-gpin { position: absolute; }
 .dj-rdot { width: 14px; height: 14px; transform: translate(-50%, -50%); border: 2px solid #FFFFFF; border-radius: 50%; box-sizing: border-box; pointer-events: none; }
 .dj-gdot { width: 20px; height: 20px; transform: translate(-50%, -50%); border: 3px solid #1F6670; border-radius: 50%; background: rgba(232, 119, 90, 0.9); box-sizing: border-box; pointer-events: none; }
-/* 「你在這裡」 (core/map.js): the paw picture, centred on its point; not a button — a tap there is a tap on the map */
-.dj-you { display: block; max-width: none; transform: translate(-50%, -50%); pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+/* 「你在這裡」 (core/map.js): the pin picture, its point on the spot (map.js sets the shift from the picture's anchor); not a
+   button — a tap there is a tap on the map */
+.dj-you { display: block; max-width: none; pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
 .dj-gpin.dj-gyou { pointer-events: none; } /* Google's top pane takes taps: this one lets them through */
 .dj-gcredit { margin: 0 0 4px 4px; padding: 0 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.8); color: #333; font-size: 10px; line-height: 16px; }
 .dj-gfail { position: absolute; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--cream); color: var(--ink); font-size: 15px; line-height: 22px; text-align: center; }
@@ -1085,7 +1086,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <div id="app"><div class="boot" role="status"><div class="h1-tab"><svg class="brand-mark" width="48" height="48" viewBox="0 0 64 64" aria-hidden="true"><g transform="matrix(0.5676 0 0 0.5676 -1.6622 25.1081)"><g fill="#E8775A"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><path d="M49 21C48.5 14 47 8.5 44.5 5.5C43.4 4.3 42 4.4 41 5.4C38.5 8 36.5 10.5 35 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#C9603F"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.4 16.2C44.9 12.6 44 9.9 42.9 8.6C42.4 8.1 41.8 8.1 41.3 8.6C40 10.1 38.8 11.6 38 12.8Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.5676 0 0 0.5676 29.3378 25.1081)"><g fill="#4FAFBC"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#2F8592"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.6216 0 0 0.6216 12.1081 20.0946)"><circle cx="32" cy="28" r="18.5" fill="#2F8592"/><g fill="#1F6670"><path d="M18.5 15.5C12.5 16 10 23.5 11.5 30C12.7 34.2 17 33.8 18.2 29.2C19.4 24.7 21 19 18.5 15.5Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><rect x="4" y="47" width="56" height="11" rx="5.5" fill="#1F6670"/><g fill="#E8775A"><ellipse cx="12.5" cy="48" rx="2.6" ry="2"/><ellipse cx="20.5" cy="48" rx="2.6" ry="2"/></g><g fill="#2F8592"><ellipse cx="27.6" cy="48" rx="2.6" ry="2"/><ellipse cx="36.4" cy="48" rx="2.6" ry="2"/></g><g fill="#4FAFBC"><ellipse cx="43.5" cy="48" rx="2.6" ry="2"/><ellipse cx="51.5" cy="48" rx="2.6" ry="2"/></g><g transform="matrix(0.34 0 0 0.34 21.12 -0.56)"><path d="M32 60C32 60 13.5 41.5 13.5 28C13.5 17.5 21.8 9 32 9C42.2 9 50.5 17.5 50.5 28C50.5 41.5 32 60 32 60Z" fill="#E8775A"/><circle cx="32" cy="28" r="7.5" fill="#FFFAF3"/></g></svg>豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
 (function () { var l = document.getElementById('dg-font'); if (l) l.media = 'all'; })();
-window.APP_BUILD = {"version":"2026-11-11.f090b575","seedUrl":"seed-data.json","storageNs":"test"};
+window.APP_BUILD = {"version":"2026-11-11.1fa952c2","seedUrl":"seed-data.json","storageNs":"test"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -5251,10 +5252,12 @@ window.APP_BUILD = {"version":"2026-11-11.f090b575","seedUrl":"seed-data.json","
     gYouPin.wrap.classList.add('dj-gyou');
     gYouPin.setMap(gMap);
   }
-  /** The paw's picture, centred on its point (styles.css .dj-you: a tap there reaches the map). */
+  /** The pin's picture with its point on the spot (core/nmap.js pawImage's anchor; styles.css .dj-you: a tap there
+      reaches the map). */
   function youNode() {
     var p = App.nmap.pawImage(), img = document.createElement('img');
     img.className = 'dj-you'; img.src = p.url; img.width = p.width; img.height = p.height; img.alt = ''; img.draggable = false;
+    img.style.transform = 'translate(' + (-p.anchor.x) + 'px, ' + (-p.anchor.y) + 'px)';
     img.setAttribute('aria-hidden', 'true');
     return img;
   }
@@ -5955,26 +5958,38 @@ window.APP_BUILD = {"version":"2026-11-11.f090b575","seedUrl":"seed-data.json","
     if (ring) { g.globalAlpha = 1; g.strokeStyle = d[2]; g.lineWidth = ring; g.beginPath(); g.arc(n / 2, n / 2, n / 2 - ring / 2, 0, Math.PI * 2); g.stroke(); }
     return (dots[kind] = { url: c.toDataURL('image/png'), width: n, height: n, anchor: { x: n / 2, y: n / 2 } });
   }
-  // the paw in its 28 px badge: [x, y, rx, ry, turn (radians)] — one big pad, four toes (the app's paw icon, smaller)
-  var PAW = [[14, 17.1, 4.8, 3.5, 0], [8.7, 12.6, 1.7, 2.1, -0.35], [11.9, 9.5, 1.7, 2.2, -0.1], [16.1, 9.5, 1.7, 2.2, 0.1], [19.3, 12.6, 1.7, 2.1, 0.35]];
+  // 「你在這裡」 (Willie 2026-11-11: 「2 白色腳印」 out of nine looks): a coral map pin with a white paw, its point on the
+  // spot, a small grey shadow on the ground under the point. In CSS px: the round head (radius PIN_R) is centred at
+  // (W / 2, PIN_M + PIN_R); the point is 1.5 · PIN_R below that centre (the mock-up's 22 px pin, scaled); the paw is
+  // [x, y, rx, ry, turn (radians)] from the head's centre — one big pad, four toes.
+  var PIN_R = 15, PIN_M = 3;
+  var PAW = [[0, 3.75, 5.1, 4.4, 0], [-6.5, -3.1, 2.05, 2.65, -0.35], [-2.2, -6.3, 2.05, 2.65, -0.1], [2.2, -6.3, 2.05, 2.65, 0.1], [6.5, -3.1, 2.05, 2.65, 0.35]];
   var paw = null;
-  /** The 「你在這裡」 paw, the same picture on all three maps (core/map.js puts it on the web's): a round white badge, 28 px,
-      with a 2 px coral ring and a coral paw, a soft shadow, centred on its point; 4 px around it for the shadow. Made once. */
+  /** The 「你在這裡」 picture, the same on all three maps (core/map.js puts it on the web's): a coral pin, 30 px wide, with a
+      thin white edge and a soft shadow, a white paw in its head, a small grey shadow under its point; anchor = the point.
+      Made once. (The name is the paw's: the picture was a round paw badge before Willie chose the pin.) */
   function pawImage() {
     if (paw) return paw;
-    var n = 28, M = 4, W = n + 2 * M, s = ratio(), c = document.createElement('canvas');
-    c.width = c.height = Math.ceil(W * s);
+    var R = PIN_R, M = PIN_M, W = 2 * (R + M), cx = W / 2, cy = M + R, k = R / 22, tip = cy + 33 * k, H = Math.ceil(tip + 3.5);
+    var s = ratio(), c = document.createElement('canvas');
+    c.width = Math.ceil(W * s); c.height = Math.ceil(H * s);
     var g = c.getContext('2d');
     g.scale(s, s);
-    g.shadowColor = 'rgba(0, 0, 0, 0.25)'; g.shadowBlur = 4 * s; g.shadowOffsetY = 1 * s; // shadows do not follow scale()
-    g.fillStyle = '#FFFFFF';
-    g.beginPath(); g.arc(W / 2, W / 2, n / 2, 0, Math.PI * 2); g.fill();
+    g.fillStyle = 'rgba(136, 135, 128, 0.45)'; // the shadow on the ground
+    g.beginPath(); g.ellipse(cx, tip, 6, 2.2, 0, 0, Math.PI * 2); g.fill();
+    g.beginPath();                              // the pin: the point, up the left side, over the head, down the right side
+    g.moveTo(cx, tip);
+    g.bezierCurveTo(cx - 4 * k, cy + 25 * k, cx - R, cy + 15 * k, cx - R, cy);
+    g.arc(cx, cy, R, Math.PI, 2 * Math.PI);
+    g.bezierCurveTo(cx + R, cy + 15 * k, cx + 4 * k, cy + 25 * k, cx, tip);
+    g.closePath();
+    g.shadowColor = 'rgba(0, 0, 0, 0.2)'; g.shadowBlur = 3 * s; g.shadowOffsetY = 1 * s; // shadows do not follow scale()
+    g.fillStyle = CORAL; g.fill();
     g.shadowColor = 'rgba(0, 0, 0, 0)';
-    g.strokeStyle = CORAL; g.lineWidth = 2;
-    g.beginPath(); g.arc(W / 2, W / 2, n / 2 - 1, 0, Math.PI * 2); g.stroke();
-    g.fillStyle = CORAL;
-    PAW.forEach(function (e) { g.beginPath(); g.ellipse(M + e[0], M + e[1], e[2], e[3], e[4], 0, Math.PI * 2); g.fill(); });
-    return (paw = { url: c.toDataURL('image/png'), width: W, height: W, anchor: { x: W / 2, y: W / 2 } });
+    g.strokeStyle = '#FFFFFF'; g.lineWidth = 1.5; g.lineJoin = 'round'; g.stroke();
+    g.fillStyle = '#FFFFFF';
+    PAW.forEach(function (e) { g.beginPath(); g.ellipse(cx + e[0], cy + e[1], e[2], e[3], e[4], 0, Math.PI * 2); g.fill(); });
+    return (paw = { url: c.toDataURL('image/png'), width: W, height: H, anchor: { x: cx, y: tip } });
   }
 
   App.nmap = {
