@@ -15,7 +15,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-oM6fXF6jvpnog3Jbs5Y4UM4ZAZf2JLrO2HfRsDF/15k=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://azairfcdrzkgejrlivqg.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://azairfcdrzkgejrlivqg.supabase.co wss://azairfcdrzkgejrlivqg.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ZyKtvGpPBIKw4NjX7bQmnAD48lphrnOBKJ3qZZr/p6A=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://azairfcdrzkgejrlivqg.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://azairfcdrzkgejrlivqg.supabase.co wss://azairfcdrzkgejrlivqg.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
 <title>豆米特 DogMeet</title>
 <meta name="description" content="豆米特 DogMeet 試辦版：約附近的狗一起散步、玩。">
 <meta property="og:type" content="website">
@@ -726,6 +726,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
 @media (max-width: 359px) { :root { --gutter: 16px; } }
 
 *, *::before, *::after { box-sizing: border-box; }
+/* two quick taps never zoom the whole page (iPhone 18 Pro Max 2026-11-11: 離開公園 in a sheet, then the 狗聚 tab at
+   once → the whole app at 1.5×); pinch zoom and scrolling stay. On every element, not only the page: iPhone starts
+   touch-action over at each box that scrolls by itself (a sheet, the chat). Stricter rules stay (the walk lock, the map).
+   It is not a promise from WebKit (1 of 8 tries in the store app still zoomed, 2026-11-12), so the store app's page
+   cannot zoom at all (tools/build_app.py APP_VIEWPORT, webfix2 round 2 R3); the website keeps pinch zoom. */
+* { touch-action: manipulation; }
 html { -webkit-text-size-adjust: 100%; background: var(--page); }
 body {
   margin: 0; background: var(--page); color: var(--body);
@@ -902,10 +908,20 @@ button.row, a.row { cursor: pointer; }
 .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; }
 .sheet-actions { margin-top: 20px; display: flex; gap: 12px; }
 .sheet-actions .btn { flex: 1; }
+/* three in a row (the park sheet's 常客榜・在這裡揪團・我在這裡): each as wide as its words plus an equal share of the rest,
+   so none breaks a word down to a 320-px phone (iPhone 17e 2026-11-11: three equal buttons → 「在這裡揪／團」「我在這／裡」) */
+.sheet-actions.fit .btn { flex: 1 1 auto; width: auto; padding-left: 12px; padding-right: 12px; }
 /* a long list above (我在公園: every nearby park): the buttons stay in sight, with what they will do (Willie 2026-10-30:
    「從公園打卡沒效果？」 — the 打卡 button was two screens down) */
 .sheet-sticky { position: sticky; bottom: calc(-20px - var(--safe-b)); z-index: 2; flex-wrap: wrap; margin: 16px calc(-1 * var(--gutter)) 0; padding: 12px var(--gutter) calc(20px + var(--safe-b)); background: var(--page); box-shadow: 0 -10px 16px -14px rgba(52, 40, 36, .45); }
 .sheet-sticky-at { flex-basis: 100%; margin: 0; overflow-wrap: anywhere; }
+/* typing on a phone (fitSheets in ui.js: the backdrop covers only what is still in sight above the keyboard and Safari's bars):
+   the sheet no taller than that, its last row of buttons (also at the end of its form: 回報問題, 家人's codes) kept at its
+   bottom, no home-bar room under the keyboard (webfix2 W2: 寫日記's 取消 / 發布 were under Safari's address bar and the
+   keyboard's ∧ ∨ ✓ bar). Its colour goes on 120 px under it (a shadow: no taps), behind those see-through bars, instead of
+   the page under the sheet. */
+.overlay.kb .sheet { max-height: 100%; padding-bottom: 12px; box-shadow: 0 120px 0 0 var(--page); }
+.overlay.kb .sheet > .sheet-actions:last-child, .overlay.kb .sheet > form:last-child > .sheet-actions:last-child { position: sticky; bottom: 0; z-index: 2; margin: 16px calc(-1 * var(--gutter)) 0; padding: 12px var(--gutter); background: var(--page); box-shadow: 0 -10px 16px -14px rgba(52, 40, 36, .45); }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: .6; } to { transform: none; opacity: 1; } }
 
@@ -1013,6 +1029,9 @@ img.photo { display: block; max-width: 100%; height: auto; background: var(--cre
 .fd-walkpost > .dy-walk { margin: 0 0 0 48px; }
 /* 遛狗紀錄: 「散步中 mm:ss」 on every other screen while a walk records (core/walkrec.js); a tap goes back to 散步中 */
 .walk-bar { position: sticky; top: 0; z-index: 29; display: block; width: 100%; min-height: 44px; margin: 0; padding: calc(10px + var(--safe-t)) var(--gutter) 10px; border: none; background: #1F2A2C; color: #F4F1EC; font-family: inherit; font-size: 15px; line-height: 22px; font-weight: 700; text-align: left; font-variant-numeric: tabular-nums; cursor: pointer; }
+/* its dark goes on past the 430-px column to both edges (iPhone 18 Pro Max, 440 pt, 2026-11-11: a 5-pt cream strip each
+   side), cut to the bar's own height; the words keep the column */
+.walk-bar { box-shadow: 0 0 0 100vmax #1F2A2C; clip-path: inset(0 -100vmax); }
 .app-banner + .walk-bar, .update-banner + .walk-bar { padding-top: 10px; }
 #app.app-chat > .walk-bar { flex-shrink: 0; position: relative; }
 
@@ -1086,7 +1105,7 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <div id="app"><div class="boot" role="status"><div class="h1-tab"><svg class="brand-mark" width="48" height="48" viewBox="0 0 64 64" aria-hidden="true"><g transform="matrix(0.5676 0 0 0.5676 -1.6622 25.1081)"><g fill="#E8775A"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><path d="M49 21C48.5 14 47 8.5 44.5 5.5C43.4 4.3 42 4.4 41 5.4C38.5 8 36.5 10.5 35 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#C9603F"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.4 16.2C44.9 12.6 44 9.9 42.9 8.6C42.4 8.1 41.8 8.1 41.3 8.6C40 10.1 38.8 11.6 38 12.8Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.5676 0 0 0.5676 29.3378 25.1081)"><g fill="#4FAFBC"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#2F8592"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.6216 0 0 0.6216 12.1081 20.0946)"><circle cx="32" cy="28" r="18.5" fill="#2F8592"/><g fill="#1F6670"><path d="M18.5 15.5C12.5 16 10 23.5 11.5 30C12.7 34.2 17 33.8 18.2 29.2C19.4 24.7 21 19 18.5 15.5Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><rect x="4" y="47" width="56" height="11" rx="5.5" fill="#1F6670"/><g fill="#E8775A"><ellipse cx="12.5" cy="48" rx="2.6" ry="2"/><ellipse cx="20.5" cy="48" rx="2.6" ry="2"/></g><g fill="#2F8592"><ellipse cx="27.6" cy="48" rx="2.6" ry="2"/><ellipse cx="36.4" cy="48" rx="2.6" ry="2"/></g><g fill="#4FAFBC"><ellipse cx="43.5" cy="48" rx="2.6" ry="2"/><ellipse cx="51.5" cy="48" rx="2.6" ry="2"/></g><g transform="matrix(0.34 0 0 0.34 21.12 -0.56)"><path d="M32 60C32 60 13.5 41.5 13.5 28C13.5 17.5 21.8 9 32 9C42.2 9 50.5 17.5 50.5 28C50.5 41.5 32 60 32 60Z" fill="#E8775A"/><circle cx="32" cy="28" r="7.5" fill="#FFFAF3"/></g></svg>豆米特</div><p class="sub">載入中…</p></div></div>
 <script>
 (function () { var l = document.getElementById('dg-font'); if (l) l.media = 'all'; })();
-window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","storageNs":"test"};
+window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","storageNs":"test"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1954,6 +1973,31 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     if (t === true || t === false) return t;
     try { return !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches); } catch (e) { return false; }
   }
+  /* A tap through a sheet that just went (rough-use pass 2026-11-12, P1). A finger taps a sheet — its button, ✕, the
+     backdrop — and the sheet closes; a quick second tap (a double tap, an impatient finger) then lands on what was under
+     it: a tab, another button, the map. That tap was meant for the sheet, never for what the person has not seen yet
+     (「出門（1 隻）」 tapped twice: the second tap opened 訊息 and the walk never started). So once a sheet that a finger
+     has tapped anywhere closes — whatever closes it: its own action, Escape, the router, a script (the next tap was
+     still aimed at that sheet) — a tap whose finger comes down less than TAP_THROUGH_MS later, or was already down when
+     it closed, does nothing: its click, and the focus its mousedown would give a box, never reach the page. Only a
+     finger's tap: a click with no finger (detail 0: a keyboard, a screen reader, a script) always goes through, and a
+     sheet no finger touched (used with the keyboard, or opened and closed by a script) starts nothing. tapThrough() is
+     the same rule for the maps, which take their taps themselves (Google's, the phone's own: core/map.js, nmap.js). */
+  var TAP_THROUGH_MS = 400, FINGER_MS = 1000, sheetGoneAt = -Infinity, fingerAt = -Infinity;
+  /** A tap made at `at` (default now) comes right after a sheet a finger tapped closed (or before it closed). */
+  function tapThrough(at) { return sheetGoneAt > (at == null ? Date.now() : at) - TAP_THROUGH_MS; }
+  function fingerDown() { fingerAt = Date.now(); }
+  function dropThrough(e) {
+    if (!e || !(e.detail > 0) || Date.now() - fingerAt > FINGER_MS || !tapThrough(fingerAt)) return;
+    e.preventDefault();
+    if (e.type === 'click') e.stopImmediatePropagation();
+  }
+  try {
+    window.addEventListener('pointerdown', fingerDown, true);
+    window.addEventListener('touchstart', fingerDown, { capture: true, passive: true });
+    window.addEventListener('mousedown', dropThrough, true);
+    window.addEventListener('click', dropThrough, true);
+  } catch (e) { /* no window to listen to */ }
   /**
    * sheet({title, render(s) -> SafeHtml, actions:{name(s, dataset, ev, el)}, onClose, state, live, autofocus, dismissable})
    * live: true → the sheet re-renders whenever the screen under it re-renders (shared data changed).
@@ -1990,6 +2034,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     s.close = function (result) {
       if (s.closed) return;
       s.closed = true;
+      if (s._finger) sheetGoneAt = Date.now();   // (a finger tapped it: a tap right after this lands on nothing; see tapThrough)
       overlay.remove();
       openSheets = openSheets.filter(function (x) { return x !== s; });
       if (!openSheets.length) lockPage(false);
@@ -1999,6 +2044,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     };
     function onKey(e) { if (e.key === 'Escape' && openSheets[openSheets.length - 1] === s && o.dismissable !== false) s.close(); }
     overlay.addEventListener('click', function (e) {
+      if (e.detail > 0) s._finger = true;   // a finger's tap (not a keyboard's): see tapThrough
       if (e.target === overlay) { if (o.dismissable !== false) s.close(); return; }
       var t = e.target.closest('[data-close],[data-act],[data-go]');
       if (!t || !panelEl.contains(t)) return;
@@ -2006,6 +2052,9 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
       if (t.tagName === 'INPUT' && t.type === 'file') { keepPicker(t, panelEl, function (ev) { if (!s.closed) onInput(ev); }); return; }
       if (t.hasAttribute('data-close')) { s.close(); return; }
       if (t.hasAttribute('data-go')) { s.close(); App.go(t.getAttribute('data-go'), parseParams(t)); return; }
+      // a tap inside a <form data-act> (its box, its label): the form runs its action on submit only (its button, Enter),
+      // as on a screen — the tap ran 回報問題's 送出 (iPhone 17 simulator, while checking webfix2 W2)
+      if (t.tagName === 'FORM') return;
       var name = t.getAttribute('data-act');
       if (name === '__feedback') { if (App.openFeedback) App.openFeedback(); return; }
       var fn = o.actions && o.actions[name];
@@ -2042,11 +2091,39 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     openSheets.push(s);
     lockPage(true);
     s.update();
+    watchViewport(); fitSheets(); // (a keyboard already up: inside what is in sight at once)
     var first = panelEl.querySelector('input, textarea, select, button:not([data-close])');
     var typeNow = o.autofocus === true || (o.autofocus !== false && !coarse()); // (autofocus above)
     if (first && typeNow && first.tagName !== 'BUTTON') { try { first.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
     else { panelEl.setAttribute('tabindex', '-1'); try { panelEl.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
     return s;
+  }
+  /* Typing on a phone, the keyboard covers the bottom of the page, and in Safari its floating address bar and the
+     keyboard's ∧ ∨ ✓ bar sit over the part above the keyboard (webfix2 W2, the Safari pass 2026-11-12: 寫日記's 取消 / 發布
+     were half under them, and a tap on 發布 only closed the keyboard). The visual viewport is what is still in sight — on
+     the iPhone 17 simulator it ends right above Safari's address bar. While it is shorter than the page (and not zoomed),
+     the open sheets' backdrop covers just that part (class kb): a sheet ends above the bars, no taller than what is in
+     sight, its last row of buttons kept at its bottom (styles.css). With no keyboard up (a computer, the keyboard down)
+     nothing changes; the store app's web view follows the same rule. */
+  var vvSeen = null;
+  function watchViewport() {
+    var vv = window.visualViewport;
+    if (!vv || vv === vvSeen || !vv.addEventListener) return;
+    vvSeen = vv;
+    vv.addEventListener('resize', fitSheets);
+    vv.addEventListener('scroll', fitSheets);
+  }
+  function fitSheets() {
+    var vv = window.visualViewport, ih = window.innerHeight;
+    var kb = !!vv && Math.abs((vv.scale || 1) - 1) < 0.01 && vv.height > 0 && vv.height < ih - 1;
+    openSheets.forEach(function (s) {
+      var ov = s.el && s.el.parentNode;
+      if (!ov || !ov.style) return;
+      ov.classList.toggle('kb', kb);
+      ov.style.top = kb ? vv.offsetTop + 'px' : '';
+      ov.style.height = kb ? vv.height + 'px' : '';
+      ov.style.bottom = kb ? 'auto' : '';
+    });
   }
   function closeAllSheets() { openSheets.slice().forEach(function (s) { s.close(); }); }
   /** router: after a screen re-render, re-render the open sheets that asked for it (live: true) */
@@ -2095,18 +2172,32 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     if (!keys.length) return;
     Array.prototype.forEach.call(root.querySelectorAll('[data-act]'), function (el) { if (busy[actKey(el)]) el.setAttribute('aria-busy', 'true'); });
   }
+  /* Waiting for the person or the phone — Safari's (or the store app's) question about the location, then the phone's
+     fix — is not sending: 5 s after 回到我這裡 with Safari's question still open the page said 「網路有點慢，還在送…」
+     (webfix2 W4, the Safari pass 2026-11-12). notSending(p) marks such a wait (App.map.position): while one runs,
+     runGuarded's line waits, and its 5 s start again when the answer comes. */
+  var asking = 0, answeredAt = 0;
+  function notSending(p) {
+    asking++;
+    function done() { asking = Math.max(0, asking - 1); answeredAt = Date.now(); }
+    return Promise.resolve(p).then(function (v) { done(); return v; }, function (e) { done(); throw e; });
+  }
   /** Runs an (async) handler, marks the control busy, reports errors as a toast. `busy` (a screen's or sheet's map)
       + `key` (actKey) refuse a second run of the same action while the first is still running, whatever the screen
-      re-rendered meanwhile. After 5 s a quiet toast says it is still sending (writes can take up to ~20 s). */
+      re-rendered meanwhile. After 5 s a quiet toast says it is still sending (writes can take up to ~20 s) — 5 s of
+      its own sending: not while a confirmation it opened or a question of the phone (notSending) waits for the person. */
   function runGuarded(el, fn, busy, key) {
     if (el && el.getAttribute('aria-busy') === 'true') return Promise.resolve();
     if (busy && key && busy[key]) return Promise.resolve();
     if (busy && key) busy[key] = true;
     if (el) el.setAttribute('aria-busy', 'true');
     var seq0 = sheetSeq;
-    var slowT = setTimeout(function () {
+    var slowT = setTimeout(function slow() {
       // not while a confirmation (opened by this action) waits for the person
       if (sheetSeq !== seq0 && openSheets.length) return;
+      // nor while the phone asks the person or looks for a fix: the 5 s count from the answer
+      var wait = asking ? 1000 : answeredAt + 5000 - Date.now();
+      if (wait > 0) { slowT = setTimeout(slow, wait); return; }
       toast('網路有點慢，還在送…');
     }, 5000);
     var p;
@@ -2148,11 +2239,12 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     try { el.focus({ preventScroll: true }); if (f.sel && f.sel[0] != null && el.setSelectionRange) el.setSelectionRange(f.sel[0], f.sel[1]); } catch (e) { /* ignore */ }
   }
   /** 分享: the phone's share sheet (straight to LINE) when the page runs on its own; otherwise (or when sharing is not
-      possible) copy to the clipboard like copyText. Closing the share sheet is not an error. */
+      possible) copy to the clipboard like copyText. Closing the share sheet is not an error. The share sheet waits for
+      the person, not the network: no 「網路有點慢」 meanwhile (notSending; webfix2 round 2). */
   function share(text, okMsg) {
     try {
-      if (navigator.share && window.top === window.self) {
-        return navigator.share({ text: text }).catch(function (e) { if (!e || e.name !== 'AbortError') return copyText(text, okMsg); });
+      if (navigator.share && (window.top === window.self || (App.ui && App.ui._frameOk))) {
+        return notSending(navigator.share({ text: text })).catch(function (e) { if (!e || e.name !== 'AbortError') return copyText(text, okMsg); });
       }
     } catch (e) { /* fall through */ }
     return copyText(text, okMsg);
@@ -2369,8 +2461,9 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     }
     try {
       var file = new File([blob], name || 'file', { type: blob.type });
-      if (window.top === window.self && navigator.canShare && navigator.share && navigator.canShare({ files: [file] })) {
-        return navigator.share({ files: [file], title: o.title || undefined }).then(function () { return 'shared'; }, function (e) {
+      if ((window.top === window.self || (App.ui && App.ui._frameOk)) && navigator.canShare && navigator.share && navigator.canShare({ files: [file] })) {
+        // the share / save sheet waits for the person, not the network: no 「網路有點慢」 meanwhile (webfix2 round 3)
+        return notSending(navigator.share({ files: [file], title: o.title || undefined })).then(function () { return 'shared'; }, function (e) {
           return e && e.name === 'AbortError' ? 'cancelled' : download();
         });
       }
@@ -2476,13 +2569,15 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     chip: chip, tag: tag, badge: badge, switchCtl: switchCtl, field: field, listRow: listRow,
     warnPanel: warnPanel, infoPanel: infoPanel, emptyState: emptyState, loading: loading, progress: progress, dateBlock: dateBlock,
     dogAvatar: dogAvatar, dogSwitch: dogSwitch, dogPicker: dogPicker, photo: photo, photoPreview: photoPreview, resizeImage: resizeImage, photoInput: photoInput, dot: dot, feedbackBtn: feedbackBtn,
-    banner: banner, _reattachBanner: reattachBanner,
+    banner: banner, _reattachBanner: reattachBanner, tapThrough: tapThrough,
     toast: toast, reportError: reportError, sheet: sheet, closeAllSheets: closeAllSheets, confirm: confirm, copyText: copyText, share: share,
+    notSending: notSending,
     // 狗狗健康卡 (SPEC §17)
     qr: qr, drawQr: drawQr, healthCardImage: healthCardImage, saveFile: saveFile, blobUrl: blobUrl, openFile: openFile,
     printPage: printPage, printWallet: printWallet, tpl: tplStr,
     _parseParams: parseParams, _refreshLiveSheets: refreshLiveSheets, _runGuarded: runGuarded, _actKey: actKey, _markBusy: markBusy, _captureFocus: captureFocus, _restoreFocus: restoreFocus, _keepPicker: keepPicker,
-    _coarse: null // tests: true = a touch phone, false = a computer (sheet autofocus); null = ask the device
+    _coarse: null, // tests: true = a touch phone, false = a computer (sheet autofocus); null = ask the device
+    _frameOk: false // tests: share() and saveFile() use the phone's share sheet inside a frame too (the tests run the app in frames)
   };
 })(window.App = window.App || {});
 
@@ -2552,6 +2647,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     // Google 地圖版（branch google-map）：地圖角落的公園資料來源，和 Google 地圖打不開時地圖那一格的字
     parkCredit: '公園資料 © OpenStreetMap',
     navigate: '🧭 導航', // 公園頁和狗聚頁：打開 Google 地圖帶路過去
+    // 地圖還在查一座公園、或剛剛按的出門還在找位置時，又點了地圖或按了我出門遛狗／出門（一次只查一個）
+    busy: '查詢中，請稍等',
     googleFailed: '地圖暫時打不開，請稍後再試。',
     // 全台灣有名字的公園（從 OpenStreetMap 抓下來放在 App 裡；更新方法見 tools/build_parks.py）。點地圖先查這份
     parksUrl: 'data/parks-tw.json',
@@ -2633,10 +2730,14 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
   // Android 的瀏覽器或主畫面、在不在 LINE 裡。最後一句 after 不說「重新整理」：從主畫面打開的沒有那個按鈕（審查 2026-10-29）。
   // 上架的 App（app 開頭的四個）：App 裡的網頁也說自己是 iPhone，但 Safari 的設定管不到 App，所以寫 App 自己的設定，
   // appSettings 按鈕打開手機「設定」裡豆米特那一頁（模擬器 P4，2026-11-11）；網頁版照舊。
+  // iphoneSite 只接在 iphone 那一行後面，而且只在 Safari 裡（從主畫面打開的沒有網址列）：在 Safari 自己的「網站設定」
+  // 按過拒絕，到手機「設定」改不回來（2026-11-12 Safari 測試 P5；字照 iOS 27 的 Safari：網址列裡最左邊的 ≡ 選單 →
+  // 網站設定⋯ → 位置。網址列左邊外面還有一個 ‹ 圓鈕，所以寫「裡最左邊的選單（≡）」）。
   var LOCATION_HELP = {
     title: '打開位置權限',
     lead: '手機沒有讓豆米特用位置。想讓豆米特自動找到你：',
     iphone: 'iPhone、iPad：設定 → 隱私權與安全性 → 定位服務（要打開）→ Safari 網站 → 選「使用 App 期間」。',
+    iphoneSite: '如果之前在這個網站按過「不允許」：點網址列裡最左邊的選單（≡）→ 網站設定 → 位置 → 允許。',
     iphoneBrowser: 'iPhone 上的 Chrome 等瀏覽器：設定 → 那個瀏覽器（例如 Chrome）→ 位置 → 選「使用 App 期間」。',
     iphoneLine: '在 LINE 裡打開的：iPhone 設定 → LINE → 位置 → 選「使用 App 期間」。也可以改用 Safari 打開這個網址。',
     android: 'Android（Chrome）：點網址列左邊的圖示 → 權限 → 位置 → 允許。',
@@ -2709,6 +2810,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     reportPrivate: '只有主揪看得到',
     dmConsent: '先送邀請，對方按接受，才開始聊天。',
     required: '必填',                    // 要填的欄位旁的小標（2026-10-28：其他欄位不寫「選填」）
+    nameNeeded: '請填狗狗的名字',          // 狗狗名片（第一次、編輯、新增一隻狗）名字沒填就按完成：寫在名字框下面
     waitlistShort: '額滿自動候補',
     firstAidSub: '建議先截圖存在手機',
     checkinPrivacy: '位置只給狗友看',
@@ -3628,6 +3730,10 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     title: '日記', friends: '狗友', mine: '我的', write: '寫日記',
     feedTitle: '狗友動態', feedEmpty: '追蹤狗狗後，牠們這 7 天的日記、打卡會出現在這裡。', more: '看更多動態'
   };
+  // 清單讀不到的時候（2026-11-11 雙家測試 N2：讀不到也說「還沒有日記」，會以為日記被刪了）：狗狗的日記、日記分頁的狗友和我的、
+  // 狗聚清單、訊息的狗聚聊天室，改說現在打不開。先用健康卡連結打不開時的那兩句（同一個，沒有新的字）；
+  // 要給清單自己的字，把這裡換成 { title: '…', body: '…' } 就好。
+  var LIST_FAILED = HEALTH.view.failed;
   /** 發到日記 (散步分享): the Walk_Post screen and the buttons on 走完了. */
   var WALKPOST = {
     toDiary: '發到日記', seeIt: '看這篇日記', title: '發到日記',
@@ -3712,7 +3818,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     unlockMs: 1000,
     unlock: '長按 1 秒解鎖',
     wakeHint: '螢幕要開著才記得到路線',
-    noGeoHint: '沒有定位權限，這次只記時間',
+    // 散步中沒有定位的時候（一開始就沒有，或走到一半手機說不允許：之前走的公里還在上面）。走完以後的那一句是上面的 noRoute
+    noGeoHint: '沒有定位權限，這段只記時間',
     gapNotice: '剛剛切到別的 App，這段路線是大約的',
     // App 版：散步中手機放口袋也繼續記，Android 手機上方一直顯示的通知（標題、內容）
     bgTitle: '豆米特正在記錄散步',
@@ -4007,7 +4114,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     dogs: { sizes: SIZES, sizeShort: SIZE_SHORT, breeds: BREEDS, tags: TAGS, tagGroups: TAG_GROUPS, tagRenames: TAG_RENAMES, neuter: NEUTER, ie: IE, aggressive: AGGRESSIVE, aggressiveNote: AGGRESSIVE_NOTE, aggressiveRule: AGGRESSIVE_RULE, ruleBreeds: RULE_BREEDS, aggressiveShort: TEXTS.aggressiveShort },
     privacyNote: PRIVACY_NOTE, terms: TERMS, home: HOME, recovery: RECOVERY, shareCard: SHARE_CARD, login: LOGIN, loginGoogle: LOGIN_GOOGLE, bindCard: BIND_CARD, testTool: TEST_TOOL, push: PUSH, feedback: FEEDBACK, deleteMine: DELETE_MINE, updateBanner: UPDATE_BANNER, photo: PHOTO, firstRun: FIRST_RUN,
     freePlan: FREE_PLAN, health: HEALTH,
-    map: MAP, parkStatus: PARK_STATUS, walklog: WALKLOG, walkShare: WALKSHARE, widgets: WIDGETS, walkPost: WALKPOST, diaryHome: DIARY_HOME, findDog: FIND_DOG, scan: SCAN, native: NATIVE,
+    map: MAP, parkStatus: PARK_STATUS, walklog: WALKLOG, walkShare: WALKSHARE, widgets: WIDGETS, walkPost: WALKPOST, diaryHome: DIARY_HOME, listFailed: LIST_FAILED, findDog: FIND_DOG, scan: SCAN, native: NATIVE,
     healthNotes: HEALTH_NOTES, meets: MEETS, monthPic: MONTH_PIC,   // Track S (2026-11-10)
     /** A park by id: the three legacy parks, then the shared registry (parks/<id>, installed by core/data.js). null = unknown. */
     park: function (id) { return PARKS.filter(function (p) { return p.id === id; })[0] || (registry && registry(id)) || null; },
@@ -4820,6 +4927,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     else map.attributionControl.addAttribution(C.map.attribution);
     // a tap waits a moment: the two clicks of a double tap (zoom in) must not look up a park
     map.on('click', function (e) {
+      if (tapThrough()) return;
       var z = map.getZoom();
       clearTimeout(tapTimer);
       tapTimer = setTimeout(function () { if (opts.onTap) opts.onTap(e.latlng, z); }, 300);
@@ -4864,6 +4972,9 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
   }
   /** Google's map was dragged a moment ago: a mouse let go on a label that moved along is not a tap on it (審查). */
   function justDragged() { return Date.now() - gDragEnd < 300; }
+  /** A tap on the map right after a sheet a finger tapped closed was meant for that sheet (core/ui.js tapThrough; the
+      page drops such a tap's click, Google's map takes its taps itself): nothing happens. */
+  function tapThrough() { return !!(App.ui && App.ui.tapThrough && App.ui.tapThrough()); }
   /** Labels on parks: [{id, lat, lng, text, aria?}] (text is shown as text). Unchanged labels are kept. */
   function setLabels(items) {
     if (inApp()) return App.nmap.setLabels(items);
@@ -4903,10 +5014,11 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
   }
   var lastFail = null; // why the last position() gave null: 'denied' (the phone said no) | 'failed' (too slow, no fix, no API)
   /** The phone's position once, without moving the map: {lat, lng} or null. Kept in this page only (api.lastPos, for
-      「離你多遠」), never stored or sent. In the store app through the phone's own location (App.native.geo()). */
+      「離你多遠」), never stored or sent. In the store app through the phone's own location (App.native.geo()). The wait
+      (the phone's question, then its fix) is no sending: no 「網路有點慢」 meanwhile (ui.notSending, webfix2 W4). */
   function position() {
     var geo = api._geo || (App.native && App.native.geo()) || (navigator && navigator.geolocation);
-    return new Promise(function (resolve) {
+    var wait = new Promise(function (resolve) {
       if (!geo) { lastFail = 'failed'; resolve(null); return; }
       try {
         geo.getCurrentPosition(function (pos) {
@@ -4925,6 +5037,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
           }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
       } catch (e) { lastFail = 'failed'; resolve(null); }
     });
+    return App.ui && App.ui.notSending ? App.ui.notSending(wait) : wait;
   }
   /** Ask the phone for its position once and move the map there. Resolves {lat, lng} or null (denied / failed). */
   function locate() {
@@ -4954,12 +5067,15 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     function say() { if (hint) ui.toast(hint, ms ? { ms: ms } : undefined); }
     if (lastFail !== 'denied' || api._helped) { say(); return; }
     api._helped = true;
-    var app = inApp(), open = app && App.native.canOpenSettings();
-    var steps = app ? '' : locationHelp(api._ua || (navigator && navigator.userAgent), navigator && navigator.maxTouchPoints, fromHomeScreen());
+    var app = inApp(), open = app && App.native.canOpenSettings(), home = fromHomeScreen();
+    var steps = app ? '' : locationHelp(api._ua || (navigator && navigator.userAgent), navigator && navigator.maxTouchPoints, home);
     ui.sheet({
       title: H.title,
       render: function () {
-        if (!app) return ui.html`<p class="sub mt-4">${H.lead}</p><p class="mt-8">${steps}</p><p class="note mt-8">${H.after}</p><div class="sheet-actions">${ui.primaryBtn(H.ok, { act: 'ok' })}</div>`;
+        // Safari itself on an iPhone: also its own per-site setting (a 「拒絕」 there is not undone in 設定; webfix2 W5) —
+        // not the home-screen copy, which has no address bar and no ≡ menu (round 2, the review's Important 2)
+        var site = steps === H.iphone && !home && H.iphoneSite ? ui.html`<p class="mt-8">${H.iphoneSite}</p>` : '';
+        if (!app) return ui.html`<p class="sub mt-4">${H.lead}</p><p class="mt-8">${steps}</p>${site}<p class="note mt-8">${H.after}</p><div class="sheet-actions">${ui.primaryBtn(H.ok, { act: 'ok' })}</div>`;
         // one coral button: 打開設定 (with it, 我知道了 is the quiet one, on the left as in the app's other two-button sheets)
         return ui.html`<p class="sub mt-4">${H.lead}</p><p class="mt-8">${H.app}</p><p class="mt-8">${H.appServices}</p><p class="note mt-8">${H.appAfter}</p><div class="sheet-actions">${open ? ui.quietBtn(H.ok, { act: 'ok' }) : ui.primaryBtn(H.ok, { act: 'ok' })}${open ? ui.primaryBtn(H.appSettings, { act: 'settings' }) : ''}</div>`;
       },
@@ -5099,6 +5215,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     gMap.controls[g.ControlPosition.LEFT_BOTTOM].push(credit);
     // a tap waits a moment, as on Leaflet: the clicks of a double tap (zoom in) must not look up a park
     gMap.addListener('click', function (e) {
+      if (tapThrough()) return;
       var z = gMap.getZoom(), at = e && e.latLng ? { lat: e.latLng.lat(), lng: e.latLng.lng() } : null;
       clearTimeout(tapTimer);
       if (at) tapTimer = setTimeout(function () { if (opts.onTap) opts.onTap(at, z); }, 300);
@@ -5767,14 +5884,17 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
   }
   /** A tap counts 300 ms later, as on the web — unless a finger moves the map meanwhile. */
   function tap(lat, lng) {
-    if (!num(lat) || !num(lng)) return;
+    if (!num(lat) || !num(lng) || tapThrough()) return;
     var z = cam.zoom;
     clearTimeout(tapTimer);
     tapTimer = setTimeout(function () { if (opts.onTap) opts.onTap({ lat: lat, lng: lng }, z); }, 300);
   }
+  /** A tap on this map right after a sheet a finger tapped closed was meant for that sheet (core/ui.js tapThrough; the
+      phone's map is not in the page, so the page cannot drop it): the map, a label and a name do nothing. */
+  function tapThrough() { return !!(App.ui && App.ui.tapThrough && App.ui.tapThrough()); }
   function markerTap(inst, id) {
     var t = inst.byMarker[id];
-    if (!t) return;
+    if (!t || tapThrough()) return;
     if (t.kind === 'label') { if (opts.onLabel) opts.onLabel(t.id); }
     else if (t.kind === 'walk') { if (opts.onWalker) opts.onWalker(t.id); }
     else tap(t.lat, t.lng); // the 其他地點 dot: not a button, a tap on the map there
@@ -6776,7 +6896,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     var t = text(p, id), n = window.navigator, S = C.shareCard;
     if (!(api._frameOk || window.top === window.self) || !n.share) return ui.copyText(t, S.copiedText);
     var file = blob ? new File([blob], ((p.dog && p.dog.name) || '狗狗') + '的狗狗名片.png', { type: 'image/png' }) : null;
-    return n.share(file && canFiles(file) ? { files: [file], text: t } : { text: t }).catch(function (e) {
+    // the share sheet waits for the person, not the network: no 「網路有點慢」 meanwhile (ui.notSending; webfix2 round 3)
+    return ui.notSending(n.share(file && canFiles(file) ? { files: [file], text: t } : { text: t })).catch(function (e) {
       if (!e || e.name !== 'AbortError') return ui.copyText(t, S.copiedText);
     });
   }
@@ -9646,7 +9767,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
       syncDogs();
     }, function (e) { console.warn('[data] homes listener', e); });
     if (App.me.canPrivate() && App.me.homeId) {
-      S().doc('data/users/' + App.me.homeId + '/members').onSnapshot(function (s) { membersDoc = s.exists && isMap(s.data()) ? s.data() : {}; emit('people'); },
+      // 'members' too: the 家人 page reads its list of phones again (a nickname saved or removed on any family phone)
+      S().doc('data/users/' + App.me.homeId + '/members').onSnapshot(function (s) { membersDoc = s.exists && isMap(s.data()) ? s.data() : {}; emit('people'); emit('members'); },
         function (e) { console.warn('[data] members listener', e); });
     }
     watchLinkmarks();
@@ -9688,7 +9810,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
       chatIn[ev.id] = inNow;
     });
   }
-  /** cb(kind) on 'people' | 'sim' | 'follows' | 'tick'. The router re-renders the screen on each. */
+  /** cb(kind) on 'people' | 'sim' | 'follows' | 'tick' (and narrower kinds, e.g. 'members': this family's members doc
+      changed). The router re-renders the screen on each. */
   function onChange(cb) { listeners.add(cb); return function () { listeners.delete(cb); }; }
   /** Cache-backed watcher: cb(value) now (async) and whenever `kinds` change. Costs no subscription. */
   function cacheWatch(kinds, get, cb) {
@@ -10002,8 +10125,12 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     if (!privOk(who)) { memPrivate[who] = mergeDeep(memPrivate[who] || {}, patch); return Promise.resolve(); }
     return upsert(privRef(who), patch, {});
   }
-  // ---- home park (家附近只顯示「在附近」): private. A small per-actor cache so screens can read it synchronously.
-  var homeCache = {}, homeLoading = {}, homeInfo = {}, homeAtCache = {};
+  // ---- home park (家附近只顯示「在附近」) and home point (家的位置): private. A small per-actor cache so screens can read
+  // them synchronously. They are two values, cached apart (two-family pass 2026-11-11 P1: saving the home park forgot
+  // the home point for the rest of the session): homeCache + homeInfo hold the park, homeAtCache the point. A save
+  // changes only its own value; cacheHome() is the one place that fills them from a whole private doc.
+  var homeCache = {}, homeLoading = {}, homeInfo = {}, homeAtCache = {}, homeSaves = {};
+  function inCache(map, who) { return Object.prototype.hasOwnProperty.call(map, who); }
   // 「家附近」 is decided on the FIXED 0.005° grid: the home's cell and the 8 cells around it (≥ ~500 m past home in
   // every direction). A distance radius would leave a round hole of 100 m walks whose centre is the home.
   /** A private home point {lat, lng} (rounded 0.0001°) or null. */
@@ -10012,32 +10139,47 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     var lat = h && Number(h.lat), lng = h && Number(h.lng);
     return h && isFinite(lat) && isFinite(lng) && lat > 21 && lat < 26.5 && lng > 119 && lng < 123 ? { lat: lat, lng: lng } : null;
   }
-  /** The home park id from a private doc, or null. A home park that is not a legacy / registered park keeps its own
-      private copy (homeParkInfo) — it is never written to the shared registry. Also fills homeInfo[who]. */
-  function homeOf(p, who) {
+  /** {id, name} of the home park in a private doc, or null. A home park that is not a legacy / registered park keeps its
+      own private copy (homeParkInfo) — it is never written to the shared registry. */
+  function homeParkOf(p) {
     var id = p && typeof p.homePark === 'string' ? p.homePark : null;
     var known = id && App.content.park(id);
-    var info = known ? { id: id, name: known.name } : (id && p.homeParkInfo && PARK_ID_RE.test(id) && cleanParkName(p.homeParkInfo.name) ? { id: id, name: cleanParkName(p.homeParkInfo.name) } : null);
-    homeInfo[who] = info;
-    homeAtCache[who] = homeAtOf(p);
-    return info ? id : null;
+    return known ? { id: id, name: known.name } : (id && p.homeParkInfo && PARK_ID_RE.test(id) && cleanParkName(p.homeParkInfo.name) ? { id: id, name: cleanParkName(p.homeParkInfo.name) } : null);
   }
+  /** The home park id from a private doc, or null. */
+  function homeOf(p) { var info = homeParkOf(p); return info ? info.id : null; }
+  /** How many times this phone saved the home park ('park') and the home point ('at') of `who` in this session. */
+  function homeSeq(who) { var s = homeSaves[who] || {}; return { park: s.park || 0, at: s.at || 0 }; }
+  function homeSaved(who, k) { var s = homeSaves[who] = homeSaves[who] || {}; s[k] = (s[k] || 0) + 1; }
+  /** A whole private doc `p` of `who` was read, asked for when the saves stood at `seq` (homeSeq): the cached home park
+      (with its name) and home point follow it — each unless this phone saved that one after the read was asked for
+      (the save is newer than what the read brings back). */
+  function cacheHome(who, p, seq) {
+    var cur = homeSeq(who);
+    if (cur.park === seq.park) { var info = homeParkOf(p); homeInfo[who] = info; homeCache[who] = info ? info.id : null; }
+    if (cur.at === seq.at) homeAtCache[who] = homeAtOf(p);
+  }
+  /** This phone just wrote the home park of `who` (hp / hinfo as written): a save — cached, and counted (homeSaved). */
+  function savedHomePark(who, hp, hinfo) {
+    var info = homeParkOf({ homePark: hp, homeParkInfo: hinfo });
+    homeSaved(who, 'park'); homeInfo[who] = info; homeCache[who] = info ? info.id : null;
+  }
+  /** Read the home park and point of `who` while one of them is not cached yet (one read at a time). */
   function loadHome(who) {
-    if (!who || homeLoading[who]) return;
+    if (!who || homeLoading[who] || (inCache(homeCache, who) && inCache(homeAtCache, who))) return;
     homeLoading[who] = true;
-    getPrivate(who).then(function (p) {
-      homeCache[who] = homeOf(p, who);
-    }, function (e) { console.warn('[data] home park', e); homeLoading[who] = false; })
-      .then(function () { if (homeCache[who] !== undefined) emit('people'); });
+    var seq = homeSeq(who);
+    getPrivate(who).then(function (p) { homeLoading[who] = false; cacheHome(who, p, seq); emit('people'); },
+      function (e) { console.warn('[data] home park', e); homeLoading[who] = false; });
   }
   /** My home park id (private) or null. Loads lazily; the screen re-renders when it arrives. */
   function myHomePark() {
     var who = homeWho();
-    if (!Object.prototype.hasOwnProperty.call(homeCache, who)) { loadHome(who); return null; }
+    if (!inCache(homeCache, who)) { loadHome(who); return null; }
     return homeCache[who];
   }
   /** My private home point {lat, lng} or null (loads lazily like the home park). */
-  function myHomeAt() { var who = homeWho(); if (!Object.prototype.hasOwnProperty.call(homeCache, who)) { loadHome(who); return null; } return homeAtCache[who] || null; }
+  function myHomeAt() { var who = homeWho(); if (!inCache(homeAtCache, who)) { loadHome(who); return null; } return homeAtCache[who] || null; }
   /** {id, name} of my home park (works for a private, unregistered park) or null. */
   function myHomeParkInfo() { var id = myHomePark(); return id ? (homeInfo[homeWho()] || null) : null; }
   /** Boot: load the viewer's home park, and move an old shared people.privacy.homePark into the private doc once. */
@@ -10047,13 +10189,15 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     var old = p && p.privacy && typeof p.privacy.homePark === 'string' ? p.privacy.homePark : null;
     var job = Promise.resolve();
     if (old && App.content.park(old)) {
-      var keep = old;
+      var seq = homeSeq(who), priv = {};
       job = getPrivate(who).then(function (pv) {
-        if (homeOf(pv, who)) { keep = pv.homePark; return null; } // the private one wins
-        return setPrivate({ homePark: old }, who);
+        priv = pv;
+        if (homeOf(pv)) return null; // the private one wins
+        // the move is a save like any other: a read asked for before it cannot put 「no park」 back (review minor 2)
+        return setPrivate({ homePark: old }, who).then(function () { savedHomePark(who, old, null); });
       }).then(function () {
         return S().doc('people/' + who).update({ privacy: { homePark: null } });
-      }).then(function () { homeCache[who] = keep; homeLoading[who] = true; emit('people'); })
+      }).then(function () { cacheHome(who, priv, seq); emit('people'); })   // the rest as read: the point, the park that won (a moved one is cached above)
         .catch(function (e) { console.warn('[data] home park migration', e); });
     }
     watchHealthInboxCount();
@@ -10168,7 +10312,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
       else if (typeof arg === 'string' && App.content.park(arg)) hp = arg;
       delete patch.homePark;
       jobs.push(setPrivate({ homePark: hp, homeParkInfo: hinfo }, who).then(function () {
-        homeCache[who] = homeOf({ homePark: hp, homeParkInfo: hinfo }, who); homeLoading[who] = true; emit('people');
+        // the home park only: what this phone knows about the home point stays as it is
+        savedHomePark(who, hp, hinfo); emit('people');
         if (hp) return Promise.all(dogs.map(function (d) { return forgetParkInLogs(d, hp); }));
       }));
     }
@@ -10176,7 +10321,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
       var ha = homeAtOf({ homeAt: patch.homeAt });
       if (ha) ha = { lat: Math.round(ha.lat * 1e4) / 1e4, lng: Math.round(ha.lng * 1e4) / 1e4 };
       delete patch.homeAt;
-      jobs.push(setPrivate({ homeAt: ha }, who).then(function () { homeAtCache[who] = ha; if (!Object.prototype.hasOwnProperty.call(homeCache, who)) homeCache[who] = null; homeLoading[who] = true; emit('people'); }));
+      // the home point only (a home park not read yet stays unknown, so it is still read — not taken as 「no park」)
+      jobs.push(setPrivate({ homeAt: ha }, who).then(function () { homeSaved(who, 'at'); homeAtCache[who] = ha; emit('people'); }));
     }
     var shared = {};
     if (patch.checkinAudience !== undefined) shared.checkinAudience = patch.checkinAudience === 'public' ? 'public' : 'friends';
@@ -10266,12 +10412,15 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     return eventRef(id).onSnapshot(function (s) { got = true; cb(eventData(s)); }, function () { if (!got) cb(undefined); });
   }
   function getEvent(id) { if (!ok(id)) return Promise.resolve(null); return eventRef(id).get().then(eventData); }
-  /** watchEvents([opts], cb). opts.when: 'upcoming' (default: not ended, not cancelled) | 'past' | 'all'; opts.mine: only events I host or joined */
+  /** watchEvents([opts], cb). opts.when: 'upcoming' (default: not ended, not cancelled) | 'past' | 'all'; opts.mine: only events I host or joined;
+      opts.nullOnError: a read error before any list came delivers null (the 狗聚 list and 訊息 say it could not be read —
+      two-family pass N2) instead of [] (what the widgets, the admin page and 一起參加過狗聚的狗 count on) */
   function watchEvents(opts, cb) {
     if (typeof opts === 'function') { cb = opts; opts = {}; }
     opts = opts || {};
-    var last = [];
+    var last = [], got = false, failed = false;
     function deliver() {
+      if (failed) { cb(null); return; }
       var t = now();
       var list = last.filter(function (ev) {
         if (opts.when === 'past') return eventEnd(ev) <= t || ev.status === 'done';
@@ -10283,7 +10432,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
       cb(list);
       cleanupClosedChat(last);
     }
-    var unsub = S().collection('events').onSnapshot(function (qs) { last = listOf(qs).map(normEvent).filter(Boolean); deliver(); }, function () { cb([]); });
+    var unsub = S().collection('events').onSnapshot(function (qs) { got = true; failed = false; last = listOf(qs).map(normEvent).filter(Boolean); deliver(); },
+      function () { if (!opts.nullOnError) cb([]); else if (!got) { failed = true; deliver(); } });
     var off = onChange(function (k) { if (k === 'tick') deliver(); });
     return function () { unsub(); off(); };
   }
@@ -10957,18 +11107,19 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
   }
   /** Promise of the home's centre {lat, lng, park?} (park: true = the home park's centre, not the home point; same answer as the 家附近 check-in rule), or null when no home is known. */
   function homeCentre() {
-    var who = homeWho();
-    return getPrivate(who).then(function (priv) { return homeCentreOf(priv, homeOf(priv, who)); });
+    var who = homeWho(), seq = homeSeq(who);
+    return getPrivate(who).then(function (priv) { cacheHome(who, priv, seq); return homeCentreOf(priv, homeOf(priv)); });
   }
   /** {hours, audience, hideNearHome} from a people doc + the PRIVATE home park of `who` → is `parkId` 「家附近」? */
   function checkinRules(p, who) {
     var pv = (p && p.privacy) || {};
     who = homeWho();   // 一個家: the home park / point are the home's (the card's privacy fields are the same on every dog)
+    var seq = homeSeq(who);
     return getPrivate(who).then(function (priv) {
-      var home = homeOf(priv, who);
+      var home = homeOf(priv);
       // the home point; people who only picked a home park the old way get that park's centre
       var homeAt = homeCentreOf(priv, home);
-      homeCache[who] = home; homeLoading[who] = true;
+      cacheHome(who, priv, seq);
       function nearPoint(pt) { return !!(pv.hideNearHome && homeAt && pt && isFinite(pt.lat) && sameBlock(homeAt, pt)); }
       return {
         hours: pv.checkinHours === 2 ? 2 : 3,
@@ -11720,12 +11871,17 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
   function diaryDoc(who, text, photos, audience, at) {
     return Object.assign({ by: who, text: text, photos: photos, audience: audience === 'public' ? 'public' : 'friends', at: at, likes: {}, commentCount: 0, lastCommentAt: null }, nickField());
   }
-  /** cb(posts of dogId the viewer may see, newest first) */
+  /** cb(posts of dogId the viewer may see, newest first) — null when a read error came before any list (the screen says
+      it could not be read, not 「還沒有日記」: two-family pass N2); an error after a list keeps that list */
   function watchDiary(dogId, cb) {
     if (!ok(dogId)) return badWatch(cb, []);
-    var last = [];
-    function deliver() { cb(last.map(function (d) { return normDiary(d); }).filter(function (p) { return p && p.kind !== 'walk'; }).sort(function (a, b) { return b.at - a.at; })); }
-    var unsub = S().collection('diary').where('by', '==', dogId).onSnapshot(function (qs) { last = listOf(qs); deliver(); }, function () { cb([]); });
+    var last = [], got = false, failed = false;
+    function deliver() {
+      if (failed) { cb(null); return; }
+      cb(last.map(function (d) { return normDiary(d); }).filter(function (p) { return p && p.kind !== 'walk'; }).sort(function (a, b) { return b.at - a.at; }));
+    }
+    var unsub = S().collection('diary').where('by', '==', dogId).onSnapshot(function (qs) { got = true; failed = false; last = listOf(qs); deliver(); },
+      function () { if (!got) { failed = true; deliver(); } });
     var off = onChange(function (k) { if (k === 'follows' || k === 'people') deliver(); });
     return function () { unsub(); off(); };
   }
@@ -12054,12 +12210,14 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
             var doc = diaryDoc(who, c.text, photos, input.audience, f.parseKey(f.dateKey(n.start), '23:59'));
             delete doc.nick;   // 誰遛的 is family-only: a walk post never carries the family nickname
             doc.walk = walk;
-            return diaryRef(id).set(doc).then(function () {
-              if (!privOk(home)) { again.w.posted = mergeDeep(isMap(again.w.posted) ? again.w.posted : {}, obj(who, id)); return null; }
-              return walkRef(home, m).update({ walks: obj(input.id, { posted: obj(who, id) }) });
-            }).then(function () { emit('walks'); return { id: id, existing: false }; }, function (e) {
-              return diaryRef(id).delete().catch(function () {}).then(function () { throw e; });   // no post without its mark
-            });
+            // the walk's mark first, then the post (rough-use pass 2026-11-12, N8): the app killed between the two leaves at
+            // most a mark whose post is not there, which counts as not posted (look() above, Walk_Post and Walk_View check
+            // the post itself) — the next 發出去 makes the one post. (The post first left a post without its mark: a
+            // second post on the next try.) A post that cannot be written leaves that mark too, harmless the same way.
+            var marked = !privOk(home)
+              ? Promise.resolve().then(function () { again.w.posted = mergeDeep(isMap(again.w.posted) ? again.w.posted : {}, obj(who, id)); })
+              : walkRef(home, m).update({ walks: obj(input.id, { posted: obj(who, id) }) });
+            return marked.then(function () { return diaryRef(id).set(doc); }).then(function () { emit('walks'); return { id: id, existing: false }; });
           });
         });
       });
@@ -12625,15 +12783,18 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     });
   }
 
-  /** cb(diary posts of the dogs I follow that I may see, last 7 days, newest first) — the 狗友動態 list. */
+  /** cb(diary posts of the dogs I follow that I may see, last 7 days, newest first) — the 狗友動態 list; null when a read
+      error came before any list (like watchDiary) */
   function watchFollowDiary(cb) {
-    var last = [];
+    var last = [], got = false, failed = false;
     function deliver() {
+      if (failed) { cb(null); return; }
       var f = following(), from = now() - 7 * 24 * HOUR;
       cb(last.filter(function (d) { return f.indexOf(d.by) !== -1 && num(d.at) > from; }).map(function (d) { return normDiary(d); }).filter(Boolean)
         .sort(function (a, b) { return b.at - a.at; }));
     }
-    var unsub = S().collection('diary').onSnapshot(function (qs) { last = listOf(qs); deliver(); }, function () { cb([]); });
+    var unsub = S().collection('diary').onSnapshot(function (qs) { got = true; failed = false; last = listOf(qs); deliver(); },
+      function () { if (!got) { failed = true; deliver(); } });
     var off = onChange(function (k) { if (k === 'follows' || k === 'people') deliver(); });
     return function () { unsub(); off(); };
   }
@@ -12673,7 +12834,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     if (privOk(id)) jobs.push(notesRef(id).delete()); else delete memNotes[id];
     if (privOk(wh)) jobs.push(meetsRef(wh).delete()); else delete memMeets[wh];
     delete meetsKnown[wh];
-    delete homeCache[id]; delete homeLoading[id]; recP = {}; goalCache = {};
+    delete homeCache[id]; delete homeLoading[id]; delete homeAtCache[id]; recP = {}; goalCache = {};
     return Promise.all(jobs).then(function () { emit('people'); });
   }
   /** Write rows [{path, data}] (dev seeding). Values {"$ago": minutes} / {"$in": minutes} / {"$t": ISO} become ms. */
@@ -15709,8 +15870,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     var S = C.walkShare, dog = (o && o.dog) || null, D = App.data;
     var st = { style: 'big', photo: null, blob: null, url: null, failed: false, photoBad: false, seq: 0,
       // the line both ways once the home is in ({hidden, shown}: shown null = no switch), whether the walk has a route at
-      // all, and 「顯示家附近」 (never remembered)
-      pair: null, hadRoute: false, near: false,
+      // all (two points or more) or only the point where it started (it did not move), and 「顯示家附近」 (never remembered)
+      pair: null, hadRoute: false, hadPoint: false, near: false,
       // 「狗狗」 (the iPhone app, iOS 17+): cut (the chip shows), the card photo (undefined: not looked at yet; null: none or
       // not readable), a photo picked for it, the last cut-out and what it was cut from, no dog found, cutting now
       cut: false, dogCard: undefined, dogPick: null, cutImg: null, cutFor: null, cutBad: false, cutting: false };
@@ -15731,7 +15892,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
       // the line as it is shared by default (near home hidden), and the one without that hiding — null when it is the same
       // line: then nothing near home was hidden and there is no switch
       var p = App.walkshape.both(walk, { dog: dog, home: r[0], seed: r[1] });
-      st.pair = p; st.hadRoute = App.walklog.decode(App.walklog.ofDog(walk, dog).route).length >= 2;
+      var n = App.walklog.decode(App.walklog.ofDog(walk, dog).route).length;
+      st.pair = p; st.hadRoute = n >= 2; st.hadPoint = n > 0;
       if (p.shown && s && !s.closed) s.update();   // the switch shows as soon as it is known (the picture may still be drawing)
       return p;
     }) : Promise.reject(new Error('no walkshape'));
@@ -15739,11 +15901,12 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     /** What the picture draws: the line as chosen (near: 「顯示家附近」 on), its km and minutes. */
     function chosen(p, near) { var sh = near && p.shown ? p.shown : p.hidden; return { shape: sh, km: sh.km, minutes: sh.minutes }; }
     /** No line on the picture: why (no location at all, or every point near home / where the walk started and ended), and
-        that 「顯示家附近」 would draw one when the switch is there; '' when a line is drawn. */
+        that 「顯示家附近」 would draw one when the switch is there; '' when a line is drawn — and for a walk that had its
+        location but did not move (one point, 0 公里: rough-use pass 2026-11-12, P4). */
     function why() {
       var p = st.pair, sh = p && chosen(p, st.near).shape;
       if (!sh || !sh.empty) return '';
-      return st.hadRoute ? S.hiddenAll + (p.shown ? S.hiddenAllNear : '') : C.walklog.noRoute;
+      return st.hadRoute ? S.hiddenAll + (p.shown ? S.hiddenAllNear : '') : st.hadPoint ? '' : C.walklog.noRoute;
     }
     /** 「顯示家附近」 and the warning under it: only when the hiding takes something off this walk's line. */
     function nearRow() {
@@ -15785,7 +15948,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
         share: function () {
           if (!st.blob) return null;
           var n = window.navigator, f = new File([st.blob], 'dogmeet-walk.png', { type: 'image/png' });
-          return n.share({ files: [f] }).catch(function (e) { if (!e || e.name !== 'AbortError') ui.toast(S.shareFail); });
+          // the share sheet waits for the person, not the network: no 「網路有點慢」 meanwhile (ui.notSending; webfix2 round 3)
+          return ui.notSending(n.share({ files: [f] })).catch(function (e) { if (!e || e.name !== 'AbortError') ui.toast(S.shareFail); });
         }
       },
       onClose: function () { st.seq++; if (st.url) URL.revokeObjectURL(st.url); }
@@ -16050,7 +16214,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
         share: function () {
           if (!st.blob) return null;
           var f = new File([st.blob], ui.tpl(P.fileName, { dog: name, m: mon(st.m) }), { type: 'image/png' });
-          return window.navigator.share({ files: [f] }).catch(function (e) { if (!e || e.name !== 'AbortError') ui.toast(P.shareFail); });
+          // the share sheet waits for the person, not the network: no 「網路有點慢」 meanwhile (ui.notSending; webfix2 round 3)
+          return ui.notSending(window.navigator.share({ files: [f] })).catch(function (e) { if (!e || e.name !== 'AbortError') ui.toast(P.shareFail); });
         }
       },
       onClose: function () { st.seq++; if (st.url) URL.revokeObjectURL(st.url); }
@@ -16109,6 +16274,11 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
      is not counted and is not 「大約」 (App.walklog track().pause()). The clock and the saved minutes are the active
      time (wall time − paused time); 「這次散步結束了嗎？」 keeps wall time, so a walk left paused is still asked about.
      restore() at start-up brings the kept walk back (a paused one stays paused); resume() is only 繼續.
+   - The phone says 「不允許」 in the middle of a walk (rough-use pass 2026-11-12, P2: location set to 永不): what was
+     recorded stays — the route and the km so far, saved with the walk — and nothing more is recorded (S.geoOff;
+     current().noGeo: 散步中 says 「只記時間」 meanwhile). When the walk is in front of the person again (the page or the
+     app comes back, opens again, 還在走), the phone is asked without asking the person; once location is allowed,
+     recording goes on, the new part joined by a straight line (regain). It never asks for location by itself.
    No position is read outside a walk, and nothing leaves the phone until the family log saves the walk. */
 (function (App) {
   'use strict';
@@ -16144,7 +16314,8 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
   // ------------------------------------------------------------------ GPS and 螢幕保持亮著
   function watch() {
     unwatch();
-    if (!live() || S.noGeo || S.held) return; // (held: the app stopped following a forgotten walk until it is answered)
+    // (held: the app stopped following a forgotten walk until it is answered; geoOff: the phone said no, see regain)
+    if (!live() || S.noGeo || S.geoOff || S.held) return;
     var g = geo();
     if (!g || !g.watchPosition) { S.noGeo = true; return; }
     var o = { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 };
@@ -16159,7 +16330,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     watchId = null; watchGeo = null;
   }
   function onFix(pos) {
-    if (!live() || S.noGeo || !tr) return;
+    if (!live() || S.noGeo || S.geoOff || !tr) return;
     if (S.paused && !(tr.gapWaiting() && now() - S.pauseAt < PAUSE_GAP_MS)) {
       // the GPS goes on while paused and its fixes are ignored (a straight line still waiting past the window: the pause
       // join takes it, the walk is 大約) — but a walk forgotten paused in a pocket is held like a running one once the
@@ -16190,15 +16361,52 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     S.seenAt = Math.max(S.seenAt || 0, t);
     return t;
   }
-  /** Only 「不允許」 (code 1) stops the GPS: a slow fix (timeout) keeps watching. */
+  /** Only 「不允許」 (code 1) stops the GPS: a slow fix (timeout) keeps watching. What was recorded before stays — the
+      route and the km so far are kept and saved (rough-use pass 2026-11-12, P2: location set to 永不 at 0.94 km saved a
+      walk of time only) — and nothing more is recorded until location is allowed again (regain). */
   function onErr(e) {
     if (!live() || !e || e.code !== 1) return;
-    S.noGeo = true;
+    S.geoOff = true;
+    // the part without location is a straight line from the last point, waiting from now — so a 暫停 inside it follows
+    // the pause rules for a waiting line (繼續 soon: counted, 大約; a long pause: the join takes it, still 大約), never a
+    // plain pause join that is neither counted nor 大約 (review of the rough-use fixes, minor 2)
+    if (tr && tr.points.length) tr.gap();
     unwatch(); wakeOff(); save(); emit();
   }
+  /** The phone said no during the walk (S.geoOff): back in front of the person — the page or the app comes back, the
+      app opens again with the walk, 還在走 — the phone is asked, without asking the person, whether 豆米特 may use the
+      location now (the app: App.native.locationStatus(); the web: the Permissions API). Allowed: recording goes on, the
+      first new point closing the straight line onErr left waiting (大約; on the web the notice too when the page was
+      away, as for any straight line). 'prompt', 'denied', no answer: nothing changes — this never asks for location by
+      itself (the walk's own asking stays as it was). notice: the page was away ≥ 20 s. → Promise<boolean> (recording
+      again). */
+  var regaining = null;
+  function regain(notice) {
+    if (!live() || !S.geoOff || S.held) return Promise.resolve(false);
+    if (regaining) return regaining;
+    var p = regaining = Promise.resolve().then(locState).then(null, function () { return 'prompt'; }).then(function (st) {
+      regaining = null;
+      if (st !== 'granted' || !live() || !S.geoOff || S.held) return false;
+      S.geoOff = false;
+      if (notice && !inApp() && tr && tr.points.length && !S.paused) S.gapNotice = true;
+      watch(); wakeOn();
+      save(); emit(); syncBar();
+      return true;
+    });
+    return p;
+  }
+  /** The phone's answer about location, read without asking: 'granted' | 'denied' | 'prompt' (or a Promise of it). */
+  function locState() {
+    if (inApp()) return App.native.locationStatus();
+    var P = navigator && navigator.permissions;
+    if (!P || typeof P.query !== 'function') return 'prompt';   // (an older Safari: unknown, so never)
+    return Promise.resolve(P.query({ name: 'geolocation' })).then(function (s) { return s && s.state; });
+  }
+  /** No location at all so far: none from the start, or the phone said no before anything was recorded. */
+  function noLoc() { return !!S.noGeo || (!!S.geoOff && !(tr && tr.points.length)); }
   function wakeOn() {
     // (the app records with the screen off: wake 'app'; a paused walk lets the screen go off — review M-8)
-    if (inApp() || !live() || S.noGeo || S.paused || wakeS) return;
+    if (inApp() || !live() || S.noGeo || S.geoOff || S.paused || wakeS) return;
     var w = wakeApi();
     if (!w || !w.request) { wakeState = 'none'; emit(); return; }
     var p;
@@ -16206,7 +16414,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     try { p = w.request('screen'); } catch (e) { wakeState = 'off'; emit(); return; }
     Promise.resolve(p).then(function (s) {
       if (!s) return;
-      if (!live() || S.noGeo || S.paused || wakeS) { try { s.release(); } catch (e) { /* ignore */ } return; }
+      if (!live() || S.noGeo || S.geoOff || S.paused || wakeS) { try { s.release(); } catch (e) { /* ignore */ } return; }
       wakeS = s; wakeState = 'on';
       try { s.addEventListener('release', function () { if (wakeS === s) { wakeS = null; wakeState = 'off'; emit(); } }); } catch (e) { /* ignore */ }
       emit();
@@ -16238,7 +16446,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     if (!S) return;
     if (inApp()) { // the app goes on recording in a pocket: hidden is not away (no straight line, notice or new watch)
       save();
-      if (document.visibilityState !== 'hidden') { syncBar(); toWalkIfAsked(); }
+      if (document.visibilityState !== 'hidden') { syncBar(); toWalkIfAsked(); regain(false); }
       return;
     }
     if (document.visibilityState === 'hidden') {
@@ -16250,10 +16458,12 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     S.hiddenAt = null;
     if (live()) {
       // (paused: nothing was walked while away — the join after 繼續 draws that part; the away question still counts)
-      if (away >= GAP_MS && !S.noGeo && !S.paused && tr && tr.points.length) { tr.gap(); S.gapNotice = true; }
+      // (location off: no straight line yet — regain draws it when location is back)
+      if (away >= GAP_MS && !S.noGeo && !S.geoOff && !S.paused && tr && tr.points.length) { tr.gap(); S.gapNotice = true; }
       if (away >= AWAY_MS) { S.askAway = true; S.awayAt = hidAt; }
       watch();   // a fresh watch: iOS can leave the old one dead after the page was away
       wakeOn();
+      regain(away >= GAP_MS);
     }
     save(); emit(); syncBar();
     toWalkIfAsked();
@@ -16301,7 +16511,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
       var dogs = (Array.isArray(o.dogs) ? o.dogs : []).filter(function (d) { return typeof d === 'string' && d; });
       if (!dogs.length) throw fail('先選一隻狗');
       var t = now();
-      S = { v: 1, id: App.data && App.data.newId ? App.data.newId('wk') : 'wk' + t.toString(36), start: t, dogs: dogs, noGeo: !!o.noGeo, discarded: false, ended: false,
+      S = { v: 1, id: App.data && App.data.newId ? App.data.newId('wk') : 'wk' + t.toString(36), start: t, dogs: dogs, noGeo: !!o.noGeo, geoOff: false, discarded: false, ended: false,
         endAt: null, entry: null, hiddenAt: null, awayAt: null, seenAt: t, snoozeUntil: 0, askAway: false, gapNotice: false, track: null,
         paused: false, pauseAt: null, pausedMs: 0, resumedAt: null };
       tr = App.walklog.track();
@@ -16310,7 +16520,9 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
       resolve(current());
     });
   }
-  /** null, or {id, start, dogs, km (null without GPS), approx, noGeo, discarded, elapsed (active ms: frozen while paused),
+  /** null, or {id, start, dogs, km (null without GPS: none from the start, or the phone said no before anything was
+      recorded — what was recorded before a no stays), approx, noGeo (no location now: none from the start, or the phone
+      said no; the walk's 「只記時間」 shows while it is so), discarded, elapsed (active ms: frozen while paused),
       wake: 'on'|'off'|'none'|'app' (the store app: the screen may go off), ended, paused, pausedMs (every paused ms so far,
       the pause going on included), activeFrom (start + pausedMs: a clock running from it shows the active time — while
       not paused), held (the app stopped following a forgotten walk until 「這次散步結束了嗎？」 is answered: togglePause()
@@ -16318,7 +16530,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
   function current() {
     if (!S) return null;
     var t = S.ended ? S.endAt : now(), p = pausedAt(t);
-    return { id: S.id, start: S.start, dogs: S.dogs.slice(), km: S.noGeo ? null : (tr ? tr.km() : 0), approx: !!(tr && tr.approx), noGeo: !!S.noGeo,
+    return { id: S.id, start: S.start, dogs: S.dogs.slice(), km: noLoc() ? null : (tr ? tr.km() : 0), approx: !!(tr && tr.approx), noGeo: !!(S.noGeo || S.geoOff),
       discarded: !!S.discarded, elapsed: Math.max(0, t - S.start - p), wake: inApp() ? 'app' : wakeState, ended: !!S.ended,
       paused: !!S.paused, pausedMs: p, activeFrom: S.start + p, held: !!S.held };
   }
@@ -16380,7 +16592,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     endPause(t);
     unwatch(); wakeOff();
     var gone = left(), out = Object.keys(gone).filter(function (d) { return gone[d].at < t; });   // (gone at the end itself: it walked it all)
-    var geoOk = !S.noGeo && tr, r = geoOk ? App.walklog.routeOf(tr.points, tr.gaps, null, out.map(function (d) { return gone[d].upto; }), tr.pauses) : { route: '', gaps: [], pauses: [] };
+    var geoOk = !noLoc() && tr, r = geoOk ? App.walklog.routeOf(tr.points, tr.gaps, null, out.map(function (d) { return gone[d].upto; }), tr.pauses) : { route: '', gaps: [], pauses: [] };
     var paused = pausedAt(t);
     S.entry = { id: S.id, start: S.start, end: t, minutes: Math.round((t - S.start - paused) / 60000), km: geoOk ? tr.km() : null, approx: !!(geoOk && tr.approx),
       dogs: S.dogs.slice(), route: r.route, gaps: r.gaps, pee: false, poop: false };
@@ -16418,7 +16630,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     var gone = left(), on = S.dogs.filter(function (d) { return !Object.prototype.hasOwnProperty.call(gone, d); });
     if (on.indexOf(dog) === -1 || on.length < 2) return null;
     var t = now();
-    gone[dog] = { at: t, km: S.noGeo || !tr ? null : tr.km(), upto: S.noGeo || !tr ? 0 : tr.points.length, min: Math.round(activeAt(t) / 60000) };
+    gone[dog] = { at: t, km: noLoc() || !tr ? null : tr.km(), upto: noLoc() || !tr ? 0 : tr.points.length, min: Math.round(activeAt(t) / 60000) };
     S.left = gone;
     save(); emit();
     return current();
@@ -16476,6 +16688,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
       if (t - last >= AWAY_MS) { S.askAway = true; S.awayAt = last; }
       if (inApp() && askEnd()) S.held = true;
       arm();
+      regain(false);   // (location turned off during the walk: allowed again meanwhile?)
     } else listen();
     save(); emit(); barOn();
     toWalkIfAsked();
@@ -16493,7 +16706,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
   function snooze() {
     if (!live()) return;
     S.askAway = false; S.awayAt = null; S.snoozeUntil = now() + SNOOZE_MS;
-    if (S.held) { S.held = false; watch(); }
+    if (S.held) { S.held = false; watch(); regain(false); }
     save(); emit();
   }
   /** When the walk really ended if it ends now from the question: the last point, else when the phone was put away — but
@@ -17525,6 +17738,9 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     return out;
   }
   function err(msg) { return App.data.userError(msg); }
+  /** The phone's question (allow notifications?) waits for the person, not the network: no 「網路有點慢，還在送…」
+      meanwhile (ui.notSending; webfix2 round 2). */
+  function asking(p) { return App.ui && App.ui.notSending ? App.ui.notSending(p) : Promise.resolve(p); }
   function registration() { var sw = E().sw; return sw && sw.getRegistration ? Promise.resolve(sw.getRegistration()).catch(function () { return null; }) : Promise.resolve(null); }
   function current() { return registration().then(function (reg) { return reg && reg.pushManager ? reg.pushManager.getSubscription() : null; }).catch(function () { return null; }); }
 
@@ -17544,7 +17760,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     enable: function () {
       var C = App.content.push, e = E();
       if (!api.supported()) return Promise.reject(err(api.needInstall() ? C.needInstall : C.unsupported));
-      return Promise.resolve(e.Notification.requestPermission()).then(function (p) {
+      return asking(e.Notification.requestPermission()).then(function (p) {
         if (p !== 'granted') throw err(C.denied);
         return e.sw.register('sw.js');
       }).then(function (reg) {
@@ -17658,7 +17874,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
       var C = App.content.push;
       if (!appApi.supported()) return Promise.reject(err(C.unsupported));
       var P = plugin();
-      return Promise.resolve().then(function () { return P.requestPermissions(); }).then(function (p) {
+      return asking(Promise.resolve().then(function () { return P.requestPermissions(); })).then(function (p) {
         if (!p || p.receive !== 'granted') throw err(C.denied);
         return getToken(P);
       }).then(bind).catch(function (x) {
@@ -17825,6 +18041,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     } catch (e) { /* sandboxed: ignore */ }
     manualScroll();
     curD = depthNow();
+    note();
   }
   /* The router keeps the scroll itself (simfix P1, the simulator 2026-11-11): 'manual' on every entry (a new one may
      start as 'auto'). Going back, an iPhone's own restore sets the page's visible area to the one saved with that entry
@@ -17836,6 +18053,52 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
      Back / forward to an entry looks here first (the newest), then in the entry's own history.state.y (written before
      each step forward, kept across a reload), then in the router's list (an entry left by a typed link). */
   var places = {};
+  /* A Safari restart (iOS closes Safari in the background and opens the tab again; iPhone 17 simulator 2026-11-12,
+     webfix2 W1) keeps the tab's entries, their addresses and history.length, but not history.state: the page loads again
+     as a 'back_forward' navigation without state, and each entry it steps to answers popstate without state. Depth 0 then
+     made the page's ‹ open 地圖, and Safari's ‹ put 我的 at the top. So the router also notes in this browser's storage
+     what it knows of the tab — history.length, the entry shown (depth, address) and `places` — and a page that starts like
+     that with a note that fits (the same history.length and address) takes the entry's depth and `places` from it
+     (restored); an entry without state it then arrives at is the one a step back or forward when its address is the one
+     `places` has for that depth. */
+  var restored = false;
+  function noteKey() { var s = App.store; return (s && s.nsKey ? s.nsKey('dogju.nav') : 'dogju.nav') + (s && s.tab ? '.tab.' + s.tab : ''); }
+  /* Never in the note (webfix2 round 2, the review's Important 1): a public page — a vet's or a clinic's link, whose
+     address is the link's token — and any address with a token-like parameter. This browser's storage outlives the tab
+     (a shared clinic PC), and a link that did not open keeps its token in the address. */
+  var SECRET = /[?&#](t|token|code|state|ticket|key|secret|pass|password|pw|sig|signature|auth|access_token|refresh_token|id_token)=/i;
+  function keepable(h) {
+    if (typeof h !== 'string' || SECRET.test(h)) return false;
+    var m = /^#\/([^?&]+)/.exec(h);
+    return !(m && has(m[1]) && screens[m[1]].public);
+  }
+  function note() {
+    if (!pushMode || (cur && cur.def && cur.def.public) || !keepable(location.hash)) return;
+    var p = {};
+    Object.keys(places).forEach(function (k) { if (Math.abs(k - curD) <= 50 && keepable(places[k].h)) p[k] = places[k]; });
+    try { localStorage.setItem(noteKey(), JSON.stringify({ n: history.length, d: curD, h: location.hash, p: p })); } catch (e) { /* storage blocked / full */ }
+  }
+  /** router.start, before the first screen: a page Safari brought back without our state takes the depth noted for it. */
+  function restore() {
+    try {
+      var st = history.state;
+      if (st && st.dg) return;
+      var nav = performance.getEntriesByType('navigation')[0];
+      if (!nav || nav.type !== 'back_forward') return;
+      var j = JSON.parse(localStorage.getItem(noteKey()) || 'null');
+      if (!j || j.n !== history.length || j.h !== location.hash || typeof j.d !== 'number' || !(j.d >= 0) || j.d % 1 || !j.p || typeof j.p !== 'object') return;
+      history.replaceState({ dg: 1, d: j.d }, '');
+      Object.keys(j.p).forEach(function (k) { var x = j.p[k]; if (x && keepable(x.h) && typeof x.y === 'number') places[k] = { h: x.h, y: x.y }; });
+      restored = true;
+    } catch (e) { /* no storage / no navigation timing: as before */ }
+  }
+  /** popstate after a restore, to an entry without state: the one a step back or forward when `places` has its address
+      there — it gets that depth (and place) again. Else null (an entry the browser made: a link). */
+  function restoredState() {
+    var h = location.hash, k = [curD - 1, curD + 1].filter(function (n) { var p = places[n]; return n >= 0 && p && p.h === h; })[0];
+    if (k == null) return null;
+    try { history.replaceState({ dg: 1, d: k, y: places[k].y }, ''); return history.state; } catch (e) { return null; }
+  }
   /** Just before a step forward: where the screen being left is goes with its own history entry (history.state.y, the
       same address), so popstate finds it although a tab clears the router's list of screens and a reload starts anew. */
   function keepPlace(y) {
@@ -17997,11 +18260,12 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     if (stack.length > 40) stack = stack.slice(-40);
     show(name, params, push);
   };
-  /** Back to the previous screen (or Main). When the previous browser entry is ours, go there with the browser's own
-      back (popstate shows it), so the in-app back button and the system back stay in step. Otherwise (a frame) the
-      router's own list, and its place from there. */
+  /** Back to the previous screen (or Main). When the previous browser entry is ours (depth > 0), go there with the
+      browser's own back (popstate shows it), so the in-app back button and the system back stay in step — whatever the
+      router's own list says: the browser's ›, a tab and a reload leave that list short (webfix2 W1: after ‹ then ›, the
+      page's ‹ opened 地圖). Otherwise (the page's first entry, a frame) the router's own list, and its place from there. */
   App.back = function () {
-    if (pushMode && stack.length > 1 && depthNow() > 0) { try { history.back(); return; } catch (e) { /* fall through */ } }
+    if (pushMode && depthNow() > 0) { try { history.back(); return; } catch (e) { /* fall through */ } }
     if (stack.length > 1) { stack.pop(); var top = stack[stack.length - 1]; show(top.name, top.params); backTo(top, top.y); }
     else { stack = [{ name: 'Main', params: {} }]; show('Main', {}); }
   };
@@ -18011,6 +18275,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
   function onPop() {
     var st = null;
     try { st = history.state; } catch (e) { st = null; }
+    if (restored && !(st && st.dg)) st = restoredState() || st; // an entry a Safari restart left without state
     var nh = readHash();
     if (!nh || !has(nh.name)) nh = { name: 'Main', params: {} };
     if (stack.length > 1 && same(stack[stack.length - 2], nh)) stack.pop();
@@ -18152,6 +18417,7 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
         // (the browser already made an entry for the new address: no second one)
         if (nh && has(nh.name) && (!cur || nh.name !== cur.name || JSON.stringify(nh.params) !== JSON.stringify(cur.params))) App.go(nh.name, nh.params, { noHistory: true });
       });
+      restore(); // a tab Safari brought back after a restart: its depth from the note (before the first screen writes state)
       var h = readHash();
       var first = h && has(h.name) && !hidden(h.name) ? h : { name: 'Main', params: {} };
       stack = [];
@@ -18167,6 +18433,9 @@ window.APP_BUILD = {"version":"2026-11-11.fb6976d4","seedUrl":"seed-data.json","
     refresh: function () { queueRender(); },
     remount: remount,
     stack: function () { return stack.slice(); },
+    /** App.back() would go to a screen before this one (not its 地圖 fallback): the browser's back when the entry before
+        is ours, or the router's own list (提醒中心's own ‹ goes to 狗狗檔案 instead of 地圖; webfix2 round 2). */
+    hasBack: function () { return (pushMode && depthNow() > 0) || stack.length > 1; },
     /** tests: switch browser-history entries on/off for this page (default: on when the page is not in a frame) */
     _setHistoryMode: function (on) { pushMode = !!on; },
     _historyMode: function () { return pushMode; }
@@ -19770,7 +20039,9 @@ try {
       lent to this sheet (like 隱私 → 家的位置); the sheet is not drawn again while it is open, so the map stays put. */
   function openSpotSheet(ctx) {
     var S = C.spot, cur = ctx.state.spot, pt = cur ? { lat: cur.lat, lng: cur.lng } : null;
-    D.myHomeAt(); // starts reading this phone's private home point, for the check in 用這個地點
+    // the home read again now, for the check in 用這個地點: another family phone may have set 家的位置 since this one read
+    // it (D.homeCentre() refreshes what D.myHomeAt() knows). Never rejects: unread, the check uses what the phone knows.
+    var homeRead = D.homeCentre().then(null, function (e) { console.info('[Create_Event] home', e && (e.code || e.message)); });
     var sh = ui.sheet({
       title: S.title,
       state: { name: cur ? cur.name : '' },
@@ -19788,10 +20059,15 @@ try {
           if (!name) { ui.toast(S.needName); return; }
           if (!pt) { ui.toast(S.needPoint); return; }
           function done() { ctx.set({ placeId: 'spot', spot: { name: name.slice(0, 20), lat: pt.lat, lng: pt.lng } }); s.close(); }
-          // the point is near the home this phone set (隱私 → 家的位置): make sure it is not a home (審查 2026-10-29)
-          var home = D.myHomeAt();
-          if (home && D.distM(home, pt) < 200) return ui.confirm({ title: S.title, body: S.nearHome, ok: S.nearHomeOk, cancel: S.nearHomeNo }).then(function (yes) { if (yes) done(); });
-          done();
+          // the point is near the home (隱私 → 家的位置): make sure it is not a home (審查 2026-10-29)
+          function ask() {
+            var home = D.myHomeAt();
+            if (home && D.distM(home, pt) < 200) return ui.confirm({ title: S.title, body: S.nearHome, ok: S.nearHomeOk, cancel: S.nearHomeNo }).then(function (yes) { if (yes) done(); });
+            done();
+          }
+          // no point known yet (not read back, or none): wait for the read this sheet asked for — a tap before it came
+          // back skipped the question (two-family review, minor 1)
+          return D.myHomeAt() ? ask() : homeRead.then(ask);
         }
       },
       onClose: function () { App.map.dot(null); }
@@ -20740,7 +21016,7 @@ try {
     var pics = p.photos.length ? html`<div class="dy-pics n${p.photos.length}">${p.photos.map(function (ph) {
       return html`<img src="${one ? ph.url || ph.thumb : ph.thumb || ph.url}" alt="日記照片" loading="lazy">`;
     })}</div>` : '';
-    return html`<article class="dy-post">
+    return html`<article class="dy-post"${ui.attrs({ 'data-post': p.id })}>
       <button type="button" class="dy-open"${ui.go('Diary_Post', { id: p.id })}${ui.attrs({ 'aria-label': '打開這篇日記' })}>
         <div class="row-flex" style="gap:10px">${o.withDog ? ui.dogAvatar(D.person(p.by), { size: 32, label: false }) : ''}
           <span class="note">${o.withDog ? D.dogName(p.by) + '・' : ''}${meta(p)}</span></div>
@@ -20755,9 +21031,10 @@ try {
     </article>`;
   }
 
-  /** The list of one dog's posts (shared by Diary and the 我的 side of Diary_Home): loading, empty, or the cards. */
+  /** The list of one dog's posts (shared by Diary and the 我的 side of Diary_Home): loading, could not be read (null:
+      C.listFailed — never 「還沒有日記」 then, two-family pass N2), empty, or the cards. */
   function postList(posts, mine) {
-    return posts === undefined ? ui.loading() : !posts.length
+    return posts === undefined ? ui.loading() : posts === null ? ui.emptyState({ title: C.listFailed.title, body: C.listFailed.body }) : !posts.length
       ? ui.emptyState({ title: mine ? '還沒有日記' : '還沒有看得到的日記', body: mine ? '遛完狗、聚完會，記一下今天吧。預設只給狗友看。' : '有些日記只給狗友看，互相追蹤就看得到。' })
       : html`<div>${posts.map(function (p) { return postCard(p); })}</div>`;
   }
@@ -20795,19 +21072,39 @@ try {
           if (st.busy) return;
           st.text = readText(s);
           st.busy = true; s.update();
-          return D.createDiary({ text: st.text, files: st.files, audience: st.audience, dog: st.dog }).then(function () {
+          return D.createDiary({ text: st.text, files: st.files, audience: st.audience, dog: st.dog }).then(function (id) {
             s.close(); ui.toast('發布了');
-            // written for the dog whose posts are in front of the person: the new post is on top there already, so it
-            // stays and ‹ still goes back where it went (simfix2). Otherwise (狗友, or another dog of the home) where
-            // 發到日記 (Walk_Post) lands: the 日記 tab's 我的 side of the dog it was written for, the new post on top
-            // (simfix N4: from the 狗友 side the page stayed on 狗友 and the post was not seen)
+            // written for the dog whose posts are in front of the person: the list there has it already, so it stays
+            // and ‹ still goes back where it went (simfix2). Otherwise (狗友, or another dog of the home) where 發到日記
+            // (Walk_Post) lands: the 日記 tab's 我的 side of the dog it was written for (simfix N4: from the 狗友 side
+            // the page stayed on 狗友 and the post was not seen). Either way the new post is then put on the screen
+            // (seePost): the keyboard had pushed the page down (webfix2 W3), and today's walk posts sort above it
+            // (webfix2 round 2 R1)
             if (st.dog !== shown) App.go('Diary_Home', { tab: 'mine', id: st.dog }, { root: true });
+            seePost(id);
           }, function (e) { st.busy = false; s.update(); throw e; });
         }
       }
     });
     function readText(s) { var t = s.el && s.el.querySelector('[data-model="diaryText"]'); return t ? t.value : (st.text || ''); }
     return sh;
+  }
+  /** After 發布: the new post on the screen. A walk posted with 發到日記 carries 23:59 of its day (it hides the walk's
+      time), so today's walk posts stay above a post written now and 「the list's top」 was not enough (webfix2 round 2
+      R1, simulator re-check 2026-11-12: with three of them the new post was below the screen). The list draws it when the
+      store answers (up to 4 s): the page from the top when that shows the whole post, else the post near the top. */
+  function seePost(id) {
+    var end = Date.now() + 4000;
+    (function look() {
+      var el = id && document.querySelector('#screen .dy-post[data-post="' + String(id).replace(/[^A-Za-z0-9_-]/g, '') + '"]');
+      if (!el) { if (Date.now() < end) setTimeout(look, 50); return; }
+      try {
+        window.scrollTo(0, 0);
+        var r = el.getBoundingClientRect(), nav = document.querySelector('nav.nav');
+        var bottom = nav && !nav.hidden ? nav.getBoundingClientRect().top : window.innerHeight;
+        if (r.bottom > bottom) window.scrollTo(0, Math.max(0, window.scrollY + r.top - 12));
+      } catch (e) { /* ignore */ }
+    })();
   }
 
   App.register('Diary', {
@@ -20900,9 +21197,11 @@ try {
       return ev ? ui.listRow({ lead: lead, title: name + '開了一場狗聚', sub: ev.title + '・' + when, go: 'Event', params: { id: ev.id } }) : '';
     });
     var none = !items.length;
+    // the diary posts could not be read (null): say so — not 「追蹤狗狗後…」 (two-family pass N2); what else came stays below
+    var failed = ctx.state.feedPosts === null ? html`<div class="mt-8">${ui.emptyState({ title: C.listFailed.title, body: C.listFailed.body })}</div>` : '';
     return html`<section class="feed px mt-16" aria-labelledby="feed-h">
       <h2 class="sr-only" id="feed-h">${H.feedTitle}</h2>
-      ${none ? html`<p class="note mt-8">${H.feedEmpty}</p>`
+      ${failed}${none ? (failed ? '' : html`<p class="note mt-8">${H.feedEmpty}</p>`)
         : html`<ul class="list mt-8">${rows}</ul>${items.length > 8 && !ctx.state.feedAll ? ui.textBtn(H.more, { act: 'feedMore', icon: 'chevronRight', iconAfter: true }) : ''}`}
     </section>`;
   }
@@ -21456,7 +21755,9 @@ try {
     var tabs = [['upcoming', '即將到來'], ['mine', '我報名的'], ['past', '之前的']];
     var list = lists[view] || lists.upcoming;
     var body;
-    if (!all) body = ui.loading();
+    if (all === undefined) body = ui.loading();
+    // the list could not be read (null): say so, not 「附近還沒有狗聚」 (two-family pass N2)
+    else if (all === null) body = html`<div class="mt-12">${ui.emptyState({ icon: 'navEvents', title: C.listFailed.title, body: C.listFailed.body })}</div>`;
     else if (!list.length) {
       body = view === 'mine' ? ui.emptyState({ icon: 'navEvents', title: '你還沒報名狗聚', body: '在「即將到來」挑一團，點報名就好。', action: ui.secondaryBtn('看即將到來', { act: 'view', data: { v: 'upcoming' }, block: false }) }) :
         view === 'past' ? ui.emptyState({ icon: 'calendar', title: '還沒有聚過', body: '聚完的狗聚會留在這裡，方便回去送貼紙、看照片。' }) :
@@ -21925,7 +22226,7 @@ try {
       else {
         ctx.state.view = ['upcoming', 'mine', 'past'].indexOf(ctx.params.view) !== -1 ? ctx.params.view : 'upcoming';
         // 初次見面 (Track S 2026-11-10): the 狗聚 list records first meetings (debounced; old ones fill in silently)
-        ctx.live('events', function (o, cb) { return D.watchEvents(o, function (list) { cb(list); D.syncMeets(list); }); }, { when: 'all' });
+        ctx.live('events', function (o, cb) { return D.watchEvents(o, function (list) { cb(list); D.syncMeets(list); }); }, { when: 'all', nullOnError: true });
       }
     },
     render: function (ctx) { return ctx.params.id ? renderDetail(ctx) : renderList(ctx); },
@@ -21962,7 +22263,8 @@ try {
 /* ---- screens/Family.js ---- */
 try {
 /* Family（家人）— 一個家 (2026-10-28): this phone's family nickname, the family's phones and bound LINE / Google logins
-   (移除 / 這支手機離開), 邀請家人 (the home's recovery code; binding LINE / Google moved to the card on 我的, 2026-11-03),
+   (移除 / 這支手機離開; read again when the page comes back to the front or a family nickname changes, 2026-11-11),
+   邀請家人 (the home's recovery code; binding LINE / Google moved to the card on 我的, 2026-11-03),
    and 加入家人的家 (this home's dogs move into a family member's home: the code is checked first, so the confirm sheet
    names that home). App.openHomeWelcome: the
    sheet a phone sees right after it came into a family's home with the code (歡迎來到…, 你的暱稱). App.homeLeave: 這支手機離開這個家
@@ -22042,10 +22344,23 @@ try {
   }
 
   // ---------------------------------------------------------------- the family's phones
-  function loadMembers(ctx) {
-    ctx.state.membersAsked = true;
-    return D.homeMembers().then(function (rows) { if (!ctx.dead) ctx.set({ members: rows, membersErr: false }); },
-      function (e) { console.info('[Family] members', e && (e.userMessage || e.message)); if (!ctx.dead) ctx.set({ members: [], membersErr: true }); });
+  /** Read the family's phones. The newest answer wins (an older one coming later is dropped); a failed read never hides
+      an answer — not while another read is still on its way, not after a newer one came (review minor 3). quiet: read
+      again because the page came back to the front or a family nickname changed — when that fails, the list on screen
+      stays (nothing on screen yet: C.home.membersFail). */
+  function loadMembers(ctx, quiet) {
+    var st = ctx.state, n = st.membersRead = (st.membersRead || 0) + 1;
+    st.membersAsked = true;
+    st.membersWait = (st.membersWait || 0) + 1;   // reads on their way
+    return D.homeMembers().then(function (rows) {
+      st.membersWait--;
+      if (!ctx.dead && n > (st.membersGot || 0)) { st.membersGot = n; ctx.set({ members: rows, membersErr: false }); }
+    }, function (e) {
+      st.membersWait--;
+      console.info('[Family] members', e && (e.userMessage || e.message));
+      if (ctx.dead || st.membersWait > 0 || n < (st.membersGot || 0)) return;
+      if (!quiet || st.members === null) ctx.set({ members: [], membersErr: true });
+    });
   }
   function memberRow(m) {
     var H = C.home, login = m.how === 'line' || m.how === 'google' ? H.loginRow[m.how] : null;
@@ -22149,6 +22464,15 @@ try {
         if (App.me.homeReady !== false) loadMembers(ctx);
         // the database had no home functions when the app started: ask again (Willie may have pasted the SQL since)
         else App.me.loadDogs().then(function () { if (!ctx.dead && App.me.homeReady !== false) loadMembers(ctx); });
+        // the list catches up without leaving the page (two-family pass 2026-11-11 P2): when the page comes back to the
+        // front (a phone joined or left while this one was in another app or tab — the server's list of phones tells
+        // nobody) and when a family nickname is saved or removed on any phone (D's 'members': the members doc the app
+        // already listens to, no new subscription)
+        var again = function () { if (!ctx.dead && ctx.state.membersAsked) loadMembers(ctx, true); };
+        var onVis = function () { if (document.visibilityState === 'visible') again(); };
+        document.addEventListener('visibilitychange', onVis);
+        ctx.onCleanup(function () { document.removeEventListener('visibilitychange', onVis); });
+        ctx.onCleanup(D.onChange(function (k) { if (k === 'members') again(); }));
       }
     },
 
@@ -25559,7 +25883,7 @@ try {
   function tapMap(ctx, latlng, zoom) {
     if (pickWalk) { pickWalk = false; var dogs = pickWalkDogs; pickWalkDogs = null; return startWalk(ctx, latlng, dogs, true); }
     if (zoom < C.map.tapZoom) { ui.toast('放大一點再點公園'); return; }
-    if (looking) { ui.toast('查詢中，請稍等'); return; }
+    if (looking) { ui.toast(C.map.busy); return; }
     looking = true;
     ui.toast('查詢中…');
     return App.osm.parkAt(latlng.lat, latlng.lng).then(function (p) {
@@ -25630,30 +25954,38 @@ try {
     });
   }
   /** The button: 散步中 already → back to it; 帶誰去 (2+ dogs); 「先設定家的位置」 the first time; then the position once
-      (no position → tap the map). */
+      (no position → tap the map). A walk asked for is never dropped without a word (rough-use pass 2026-11-12, P1: a
+      tab change while 「找位置中…」 cancelled it): when the person left the map meanwhile, the walk still starts and 散步中
+      opens; what needs the map (the home question, a tap where they are) brings the map back first (toMap); while the
+      map is busy (a park looked up, or the walk asked for a moment ago still finding the position) it says so — before
+      帶誰去, so nobody picks dogs for a walk that cannot start now (review minor 3). */
   function walkNow(ctx, dogs) {
     if (App.walkrec.current()) { App.go('Walk_Now'); return null; }
+    if (looking) { ui.toast(C.map.busy); return null; }
     if (!dogs && many()) return openWalkPick(ctx);
-    if (looking) return null;
     looking = true;
     return D.walkHomeNeeded().catch(function () { return false; }).then(function (ask) {
       looking = false;
-      if (ctx.dead) return null;
-      if (ask) return openHomeAsk(ctx, function (p) { return locateAndStart(ctx, dogs, p); });
+      if (ask) { toMap(); return openHomeAsk(ctx, function (p) { return locateAndStart(ctx, dogs, p); }); }
       return locateAndStart(ctx, dogs);
     });
+  }
+  /** The map is not on the screen (the person went to another tab while the walk was getting ready): back to it. */
+  function toMap() {
+    var cur = App.router && App.router.current ? App.router.current() : null;
+    if (!cur || cur.name !== 'Main') App.go('Main', {}, { root: true });
   }
   /** Start at `at` (the position the home sheet just read), else ask for the position once. */
   function locateAndStart(ctx, dogs, at) {
     if (at) return startWalk(ctx, at, dogs);
-    if (looking) return null;
+    if (looking) { ui.toast(C.map.busy); return null; }
     looking = true;
     ui.toast('找位置中…');
     return App.map.locate().then(function (p) {
       looking = false;
-      if (ctx.dead) return;
-      if (!p) { pickWalk = true; pickWalkDogs = dogs || null; App.map.noPosition('沒有拿到位置，在地圖上點一下你大概在哪裡', 5000); return; }
-      return startWalk(ctx, p, dogs);
+      // (the map back first: the tap goes there — and Main's mount forgets an earlier 「tap where you are」)
+      if (!p) { toMap(); pickWalk = true; pickWalkDogs = dogs || null; App.map.noPosition('沒有拿到位置，在地圖上點一下你大概在哪裡', 5000); return; }
+      return startWalk(ctx, p, dogs);   // (also when the person left the map meanwhile: startWalk opens 散步中)
     }, function (e) { looking = false; throw e; });
   }
   /** Already walking / checked in: how long, end it, or check in at a park instead. */
@@ -25724,7 +26056,7 @@ try {
           ${park.rule ? html`<p class="note mt-8">${park.rule}</p>` : ''}
           ${App.map.navUrl(park.lat, park.lng) ? html`<p class="mt-8"><a class="link" href="${App.map.navUrl(park.lat, park.lng)}" target="_blank" rel="noopener noreferrer">${C.map.navigate}</a></p>` : ''}
           ${App.parkPick.statusChips(pstat)}
-          <div class="sheet-actions">
+          <div class="sheet-actions fit">
             ${D.parkShared(park.id) ? ui.quietBtn('常客榜', { act: 'board' }) : ''}
             ${ui.quietBtn('在這裡揪團', { act: 'host' })}
             ${ui.primaryBtn('我在這裡', { act: 'here' })}
@@ -25933,7 +26265,7 @@ try {
     title: '訊息',
     tab: 'msgs',
     mount: function (ctx) {
-      ctx.live('events', D.watchEvents, { when: 'all' }); // ended meetups too: their chats stay open for a while
+      ctx.live('events', D.watchEvents, { when: 'all', nullOnError: true }); // ended meetups too: their chats stay open for a while
       ctx.live('reqs', D.watchDmRequests);                 // re-render when an invite comes in or is answered
     },
     render: function (ctx) {
@@ -25949,7 +26281,10 @@ try {
           go: 'DM_Invite', params: many() ? { chat: th.otherId, mine: th.mine } : { chat: th.otherId },
           right: th.unread ? ui.dot({ label: '有新私訊' }) : '' });
       });
+      var F = App.content.listFailed;
       var chatBody = ctx.state.events === undefined ? ui.loading()
+        // the meetups could not be read (null): say so, not 「報名狗聚後…」 (two-family pass N2)
+        : ctx.state.events === null ? html`<div class="mt-8">${ui.emptyState({ title: F.title, body: F.body })}</div>`
         : chats.length ? html`<ul class="list mt-8">${chatRows}</ul>`
         : html`<p class="note mt-8">報名狗聚後，聊天室會在這裡。</p>`;
       return html`
@@ -26692,10 +27027,23 @@ try {
       '.pf-bind-btns{display:flex;flex-wrap:wrap;gap:8px}',
       '.pf-bind .btn-text{font-size:14px}',
       '.pf-bound{margin:0;display:flex;align-items:flex-start;gap:6px;font-size:14px;line-height:20px;color:var(--teal-ink)}',
-      '.pf-bound .ic{flex-shrink:0;margin-top:1px}'
+      '.pf-bound .ic{flex-shrink:0;margin-top:1px}',
+      // a note's last two characters stay together (keepEnd)
+      '.pf-keep{white-space:nowrap}'
     ].join('\n');
     document.head.appendChild(s);
   })();
+
+  /** A note of this screen never ends with one character alone on its last line (iPhone 17e 2026-11-11: 「…就能追／蹤」;
+      at other widths 「…狗友動／態」「…找回狗／狗。」「…通知／你」): its last two characters, with the punctuation after
+      them, stay together. Same words; a one- or two-character note stays as it is. */
+  function keepEnd(s) {
+    s = String(s == null ? '' : s);
+    var m = /\S\s?\S[、。，．：；！？」』）…]*$/.exec(s);
+    return m && m.index > 0 ? html`${s.slice(0, m.index)}<span class="pf-keep">${m[0]}</span>` : s;
+  }
+  /** ui.listRow with its sub line's end kept together (keepEnd). */
+  function row(o) { return ui.listRow(typeof o.sub === 'string' ? Object.assign({}, o, { sub: keepEnd(o.sub) }) : o); }
 
   function badgeList(p) {
     var dog = p.dog || {};
@@ -26747,12 +27095,12 @@ try {
       body = rows.length || meet ? html`<ul>${meet}${rows.map(function (x) {
         // a sticker without a drawing of its own keeps the spacing but shows no (misleading) borrowed icon
         return html`<li><span class="ic-wrap" aria-hidden="true">${x.s.icon ? ui.icon(x.s.icon, { size: 18 }) : ''}</span><span class="grow">${x.s.label}</span><span class="n">×${x.n}</span></li>`;
-      })}</ul>` : html`<p class="note mt-8">聚完互送貼紙，雙方都送了才公開。</p>`;
+      })}</ul>` : html`<p class="note mt-8">${keepEnd('聚完互送貼紙，雙方都送了才公開。')}</p>`;
     }
     return html`<section class="pf-stk" aria-labelledby="pf-stickers">
       <h2 class="pf-h" id="pf-stickers">收到的貼紙</h2>
       ${body}
-      <p class="small mt-8">${C.texts.stickerReveal}</p>
+      <p class="small mt-8">${keepEnd(C.texts.stickerReveal)}</p>
     </section>`;
   }
 
@@ -26762,14 +27110,14 @@ try {
     return html`<button type="button" class="pf-follow"${ui.go('DM_Invite')}${ui.attrs({ 'aria-label': '追蹤的狗友 ' + n + ' 隻，看狗友' })}>
       <span class="pf-h" aria-hidden="true">追蹤的狗友</span>
       <span class="num" aria-hidden="true">${n}</span>
-      <span class="small mt-4" aria-hidden="true">${sub}</span>
+      <span class="small mt-4" aria-hidden="true">${keepEnd(sub)}</span>
     </button>`;
   }
 
   /** 健康筆記 (Track S 2026-11-10): the row with today's short line, 「今天：精神很好・吃光光」 or 「今天還沒記」. */
   function notesRow(ctx) {
     var N = C.healthNotes, s = ctx.state.notes ? D.healthNotesView(ctx.state.notes).summary : '';
-    return ui.listRow({ icon: 'calendar', iconSize: 20, title: N.entry, sub: s ? ui.tpl(N.summary, { what: s }) : N.none, go: 'Health_Notes' });
+    return row({ icon: 'calendar', iconSize: 20, title: N.entry, sub: s ? ui.tpl(N.summary, { what: s }) : N.none, go: 'Health_Notes' });
   }
 
   /** 找回碼（換手機用）: real people only (not personas, not the claude.ai build). */
@@ -26789,19 +27137,19 @@ try {
     var mark = ui.icon('checkSmall', { size: 18 });
     if (on.length && !left.length) {
       // the gutter on a wrapper: .pf-bound's margin:0 would cancel .px (side margins) on the same element
-      return html`<div class="px mt-16"><p class="pf-bound">${mark}<span>${B.doneAll.split('{logins}').join(done.map(function (k) { return k.name; }).join('、'))}</span></p></div>`;
+      return html`<div class="px mt-16"><p class="pf-bound">${mark}<span>${keepEnd(B.doneAll.split('{logins}').join(done.map(function (k) { return k.name; }).join('、')))}</span></p></div>`;
     }
     var standaloneOff = left.length && App.me.standalone() && !App.me.loginInStandalone;
     var googleBlocked = !standaloneOff && left.some(function (k) { return k.p === 'google'; }) && !!App.me.inAppBrowser();
     return html`<section class="px mt-16" aria-labelledby="pf-bind">
       <div class="card cream pf-bind">
         <h2 class="pf-h" id="pf-bind">${title}</h2>
-        ${done.map(function (k) { return html`<p class="pf-bound">${mark}<span>${(k.p === 'line' ? C.login : C.loginGoogle).linked}</span></p>`; })}
+        ${done.map(function (k) { return html`<p class="pf-bound">${mark}<span>${keepEnd((k.p === 'line' ? C.login : C.loginGoogle).linked)}</span></p>`; })}
         ${usable.length ? html`<div class="pf-bind-btns">${usable.map(function (k) { return ui.secondaryBtn((k.p === 'line' ? C.login : C.loginGoogle).linkTitle, { act: k.act, block: false }); })}</div>
-          <p class="note">${B.note}</p>` : ''}
-        ${standaloneOff ? html`<p class="note">${B.standalone}</p>` : ''}
-        ${googleBlocked ? html`<p class="note">${C.loginGoogle.inApp}</p>` : ''}
-        ${!on.length ? html`<p class="note">${B.codeNote}</p>` : ''}
+          <p class="note">${keepEnd(B.note)}</p>` : ''}
+        ${standaloneOff ? html`<p class="note">${keepEnd(B.standalone)}</p>` : ''}
+        ${googleBlocked ? html`<p class="note">${keepEnd(C.loginGoogle.inApp)}</p>` : ''}
+        ${!on.length ? html`<p class="note">${keepEnd(B.codeNote)}</p>` : ''}
         ${ui.textBtn(B.code, { go: 'Family', icon: 'chevronRight', iconAfter: true, iconSize: 16 })}
       </div>
     </section>`;
@@ -26817,11 +27165,11 @@ try {
   }
   function pushRow(ctx) {
     var P = C.push;
-    if (App.push.needInstall()) return ui.listRow({ icon: 'bell', iconSize: 20, title: P.title, sub: P.needInstall });
+    if (App.push.needInstall()) return row({ icon: 'bell', iconSize: 20, title: P.title, sub: P.needInstall });
     if (!App.push.supported()) return '';
     var st = ctx.state.push;
     var sub = st === 'on' ? P.onSub : st === 'denied' ? P.denied : P.offSub;
-    return ui.listRow({ icon: 'bell', iconSize: 20, title: P.title, sub: sub, act: 'push', right: st === 'on' ? html`<span class="pf-on">${P.on}</span>` : '' });
+    return row({ icon: 'bell', iconSize: 20, title: P.title, sub: sub, act: 'push', right: st === 'on' ? html`<span class="pf-on">${P.on}</span>` : '' });
   }
 
   App.register('Profile', {
@@ -26917,27 +27265,27 @@ try {
         </div>
 
         <ul class="list pf-rows px mt-24">
-          ${App.me.canPrivate() && App.me.homeReady !== false ? ui.listRow({ icon: 'plus', iconSize: 20, title: C.home.addDog, go: 'Profile_Create', params: { mode: 'add' } }) : ''}
-          ${recoveryOn() ? ui.listRow({ icon: 'lockAlt', iconSize: 20, title: C.home.family, sub: C.home.familyRowSub, go: 'Family' }) : ''}
+          ${App.me.canPrivate() && App.me.homeReady !== false ? row({ icon: 'plus', iconSize: 20, title: C.home.addDog, go: 'Profile_Create', params: { mode: 'add' } }) : ''}
+          ${recoveryOn() ? row({ icon: 'lockAlt', iconSize: 20, title: C.home.family, sub: C.home.familyRowSub, go: 'Family' }) : ''}
           ${pushRow(ctx)}
-          ${ui.listRow({ icon: 'hospital', iconSize: 20, title: C.health.entry, sub: healthInbox ? C.health.inbox.title + '（' + healthInbox + '）' : C.health.entrySub, go: 'Health_Card', right: healthInbox ? ui.dot({ label: C.health.inbox.title }) : '' })}
+          ${row({ icon: 'hospital', iconSize: 20, title: C.health.entry, sub: healthInbox ? C.health.inbox.title + '（' + healthInbox + '）' : C.health.entrySub, go: 'Health_Card', right: healthInbox ? ui.dot({ label: C.health.inbox.title }) : '' })}
           ${notesRow(ctx)}
-          ${ui.listRow({
+          ${row({
             lead: html`<span class="pf-ring" aria-hidden="true">${ui.dogAvatar(p, { size: 36, ring: true, label: false })}</span>`,
             title: '請保持距離', sub: spaceSub, go: 'Yellow_Space',
             right: spaceOn ? html`<span class="pf-on">開著</span>` : ''
           })}
-          ${ui.listRow({ icon: 'navMap', iconSize: 20, title: C.walklog.logTitle, sub: walkSub(ctx), go: 'Walk_Log' })}
-          ${ui.listRow({ icon: 'privacy', iconSize: 20, title: many ? C.home.settings : '我的隱私', sub: '打卡給誰看、家附近', go: 'Privacy' })}
-          ${ui.listRow({ icon: 'infoSmall', iconSize: 20, title: C.privacyNote.title, sub: C.terms.title + '、' + C.deleteMine.title, go: 'Privacy', params: { section: 'note' } })}
+          ${row({ icon: 'navMap', iconSize: 20, title: C.walklog.logTitle, sub: walkSub(ctx), go: 'Walk_Log' })}
+          ${row({ icon: 'privacy', iconSize: 20, title: many ? C.home.settings : '我的隱私', sub: '打卡給誰看、家附近', go: 'Privacy' })}
+          ${row({ icon: 'infoSmall', iconSize: 20, title: C.privacyNote.title, sub: C.terms.title + '、' + C.deleteMine.title, go: 'Privacy', params: { section: 'note' } })}
         </ul>
 
 
         <section class="px mt-24" aria-labelledby="pf-more">
           ${ui.sectionHead('更多', '', { id: 'pf-more' })}
           <ul class="list pf-rows mt-8">
-            ${ui.listRow({ icon: 'megaphone', iconSize: 20, iconKind: 'warn', title: '走失協尋', sub: '發協尋、看附近走失的狗', go: 'Lost_Dog' })}
-            ${ui.listRow({ icon: 'alertCircle', iconSize: 20, iconKind: 'warn', title: '出事了速查卡', sub: C.texts.firstAidSub, go: 'First_Aid' })}
+            ${row({ icon: 'megaphone', iconSize: 20, iconKind: 'warn', title: '走失協尋', sub: '發協尋、看附近走失的狗', go: 'Lost_Dog' })}
+            ${row({ icon: 'alertCircle', iconSize: 20, iconKind: 'warn', title: '出事了速查卡', sub: C.texts.firstAidSub, go: 'First_Aid' })}
           </ul>
         </section>`;
     },
@@ -27030,7 +27378,11 @@ try {
       '.pc-tag-group{margin-top:10px}',
       '.pc-tag-title{display:block;margin-bottom:6px;font-size:13px;line-height:18px;font-weight:700;color:var(--muted)}',
       '.pc-switch-icon{flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center}',
-      '.pc-lead{margin-bottom:8px}'
+      '.pc-lead{margin-bottom:8px}',
+      /* 「請填狗狗的名字」 under the name box (rough-use pass 2026-11-12, P3); the box goes this far from the top when it is
+         scrolled to (room for a 散步中 bar), above where a phone's keyboard comes up */
+      '.pc-name{scroll-margin-top:72px}',
+      '.pc-name-bad .field-note{color:#9A3B22;font-weight:700}'
     ].join('\n');
     document.head.appendChild(s);
   })();
@@ -27113,6 +27465,15 @@ try {
         }
       }
     });
+  }
+
+  /** The name box. Saved with no name (empty, or spaces only): the words right under it, said to screen readers by the box
+      itself, until a name is there (rough-use pass 2026-11-12, P3: as a toast they were under the keyboard the box had
+      just brought up). */
+  function nameField(s) {
+    var bad = !!s.nameBad && !String(s.name || '').trim();
+    return ui.field({ label: '名字', required: true, model: 'name', value: s.name, placeholder: '狗狗的名字', maxlength: 12, id: 'pc-name', enterkeyhint: 'done',
+      cls: 'pc-name' + (bad ? ' pc-name-bad' : ''), note: bad ? C.texts.nameNeeded : null });
   }
 
   function sizeChips(s) {
@@ -27263,7 +27624,8 @@ try {
         chip: '', chipOrig: '', chipLoading: false,
         sizeTouched: !!p, heatTouched: !!p, heatAuto: false,
         // photo: the saved one (edit), a newly chosen File + its local preview, or a removal
-        keepPhoto: p && D.photoOf(p) ? dog.photo : null, photoFile: null, preview: null, removePhoto: false, saving: false
+        keepPhoto: p && D.photoOf(p) ? dog.photo : null, photoFile: null, preview: null, removePhoto: false, saving: false,
+        nameBad: false   // saved once with no name: 「請填狗狗的名字」 under the box (nameField)
       });
       if (edit && p) {
         ctx.state.chipLoading = true;
@@ -27285,7 +27647,7 @@ try {
           <h1 class="h1 px">${C.home.addDog}</h1>
           <p class="note px mt-4">${C.home.addNote.replace('{home}', D.homeName())}</p>
           <section class="px mt-20" aria-label="基本資料">
-            ${ui.field({ label: '名字', required: true, model: 'name', value: s.name, placeholder: '狗狗的名字', maxlength: 12, id: 'pc-name', enterkeyhint: 'done' })}
+            ${nameField(s)}
             ${sizeChips(s)}
             ${breedRow(s)}
           </section>
@@ -27302,7 +27664,7 @@ try {
         <section class="px mt-20" aria-label="基本資料">
           <div class="pc-top">
             ${photoArea(s)}
-            <div class="grow" style="min-width:0">${ui.field({ label: '名字', required: true, model: 'name', value: s.name, placeholder: '狗狗的名字', maxlength: 12, id: 'pc-name', enterkeyhint: 'done' })}</div>
+            <div class="grow" style="min-width:0">${nameField(s)}</div>
           </div>
           ${photoActs(s)}
           ${sizeChips(s)}
@@ -27359,8 +27721,12 @@ try {
         var edit = s.edit;
         var name = String(s.name || '').trim();
         if (!name) {
-          ui.toast('請填狗狗的名字');
-          var f = document.getElementById('pc-name'); if (f) { try { f.focus(); } catch (e) { /* ignore */ } }
+          // the words under the box (nameField), the box at the top of the screen — above where the keyboard comes up —
+          // and the cursor in it (the page draws itself again with the words; the router keeps that focus)
+          ctx.set({ nameBad: true });
+          var f = document.getElementById('pc-name'), box = f && f.closest('.field');
+          if (box && box.scrollIntoView) { try { box.scrollIntoView({ block: 'start' }); } catch (e) { /* ignore */ } }
+          if (f) { try { f.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
           return;
         }
         if (s.add) {
@@ -27598,8 +27964,9 @@ try {
         });
       },
       test: function () { if (App.me.isAdmin && App.me.openTestSheet) App.me.openTestSheet(); },
-      // opened from a link / reload with no history → go to 狗狗檔案 (as in the design) instead of the map
-      back: function () { if (App.router.stack().length > 1) App.back(); else App.go('Profile', {}, { root: true }); }
+      // opened from a link / reload with no history → go to 狗狗檔案 (as in the design) instead of the map; otherwise back
+      // the way the page's ‹ goes (after the browser's › too: the router's list alone said no, webfix2 round 2)
+      back: function () { if (App.router.hasBack()) App.back(); else App.go('Profile', {}, { root: true }); }
     }
   });
 })(window.App);
@@ -28681,6 +29048,8 @@ try {
      says 「某某先回家了（20 分鐘）」 (the minutes it walked). The last dog has none: 結束散步 ends the walk.
    - 暫停 / 繼續 (2026-11-10, Track W): a secondary button after 結束散步 (App.walkrec.togglePause). While paused the
      title (and the lock) says 「暫停中」, the time and the km stop, and the button reads 「繼續」.
+   - No location now (current().noGeo): 「沒有定位權限，這段只記時間」. The km line shows whenever the walk has a km — the
+     phone said no in the middle of the walk: the km so far stays, and grows again once location is back (2026-11-12, P2).
    With no walk: 「現在沒有在散步」 — never a redirect. */
 (function (App) {
   'use strict';
@@ -28690,7 +29059,13 @@ try {
     if (document.getElementById('css-Walk_Now')) return;
     var s = document.createElement('style'); s.id = 'css-Walk_Now';
     s.textContent = [
-      '.screen.scr-Walk_Now{background:#1F2A2C;color:#F4F1EC}',
+      /* no text to select and no long-press menu anywhere on it: a finger still down after the lock's long press must not
+         select 「這次不記錄」 and bring up 拷貝／查詢 (iPhone 18 Pro Max, 2026-11-11); a text field would stay selectable */
+      '.screen.scr-Walk_Now{background:#1F2A2C;color:#F4F1EC;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}',
+      '.scr-Walk_Now input,.scr-Walk_Now textarea{-webkit-user-select:text;user-select:text}',
+      /* the page beside the 430-px column is dark too (iPhone 18 Pro Max, 440 pt, 2026-11-11: a 5-pt cream strip down
+         each side); the content keeps its column */
+      'html:has(.scr-Walk_Now),html:has(.scr-Walk_Now) body{background:#1F2A2C}',
       '.scr-Walk_Now .fb-link{color:#B9D9DD}',
       '.scr-Walk_Now .btn-text{color:#B9D9DD}',
       '.wn-top{min-height:60px;display:flex;align-items:center;gap:10px;padding:8px var(--gutter)}',
@@ -28727,7 +29102,7 @@ try {
   function clock(ms) { var sec = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60); return (h ? h + ':' + pad(m) : pad(m)) + ':' + pad(sec % 60); }
   function kmLine(cur) { return (cur.approx ? C.walklog.approx + ' ' : '') + (cur.km || 0).toFixed(2) + ' ' + C.walklog.km; }
   /** What changes the screen's layout (anything else only changes the numbers). */
-  function shape(cur) { return cur ? [cur.id, cur.ended, cur.discarded, cur.noGeo, cur.wake, cur.paused, Object.keys(App.walkrec.left()).join(',')].join('|') : 'none'; }
+  function shape(cur) { return cur ? [cur.id, cur.ended, cur.discarded, cur.noGeo, cur.km === null, cur.wake, cur.paused, Object.keys(App.walkrec.left()).join(',')].join('|') : 'none'; }
   /** The numbers, without a re-render (a re-render every second is not needed for two numbers). */
   function paint(el) {
     var cur = App.walkrec.current(), t = el && el.querySelector('.wn-time'), k = el && el.querySelector('.wn-km');
@@ -28861,14 +29236,14 @@ try {
       }
       if (ctx.state.locked) {
         return html`${top}<button type="button" class="wn-lock${paused ? ' wn-paused' : ''}" aria-label="${state}，${W.unlock}">
-          ${paused ? html`<span class="wn-state">${W.paused}</span>` : ''}<span class="wn-time">${clock(cur.elapsed)}</span>${cur.noGeo ? '' : html`<span class="wn-km">${kmLine(cur)}</span>`}
+          ${paused ? html`<span class="wn-state">${W.paused}</span>` : ''}<span class="wn-time">${clock(cur.elapsed)}</span>${cur.km == null ? '' : html`<span class="wn-km">${kmLine(cur)}</span>`}
           <span class="wn-unlock"><span class="wn-bar"><span></span></span>${W.unlock}</span>
         </button>`;
       }
       var gone = App.walkrec.left();
       return html`${top}
         <div class="wn-time${paused ? ' wn-paused' : ''}" role="timer" aria-label="${state}">${clock(cur.elapsed)}</div>
-        ${cur.noGeo ? '' : html`<div class="wn-km${paused ? ' wn-paused' : ''}">${kmLine(cur)}</div>`}
+        ${cur.km == null ? '' : html`<div class="wn-km${paused ? ' wn-paused' : ''}">${kmLine(cur)}</div>`}
         <div class="wn-dogs" aria-label="${ui.tpl(W.nowWith, { dogs: cur.dogs.map(function (d) { return D.dogName(d); }).join('、') })}">${cur.dogs.map(function (d) {
           var l = ui.own(gone, d);
           var walked = l ? (l.min != null ? l.min : (l.at - cur.start) / 60000) : 0;   // (the minutes it walked: a pause does not count)
@@ -28984,18 +29359,21 @@ try {
       var P = C.walkPost, W = C.walklog, w = ctx.state.walk, top = ui.topBar({ title: P.title });
       if (w === undefined) return html`${top}${ui.loading()}`;
       if (!w) return html`${top}<div class="px">${ui.emptyState({ title: W.notFound, body: W.notFoundBody })}</div>`;
-      var st = ctx.state, dog = dogFor(ctx, w), v = App.walklog.ofDog(w, dog), hasRoute = App.walklog.decode(v.route).length >= 2;
+      var st = ctx.state, dog = dogFor(ctx, w), v = App.walklog.ofDog(w, dog), pts = App.walklog.decode(v.route).length, hasRoute = pts >= 2;
       // a dog that already has its post for this walk (and the post is still there): 看這篇日記 instead of the form
       var marks = {}, mine = null;
       w.dogs.forEach(function (d) { var id = D.walkPostFor(w, d); if (id && st.exist[id] === true) { marks[d] = P.alreadyMark; if (d === dog) mine = id; } });
       // 「顯示家附近」: offered only when the hiding takes something off this line (and there is a post to make)
       var canNear = !!st.shapeOpen && !mine, near = canNear && !!st.near, sh = near ? st.shapeOpen : st.shape;
       var ready = !!sh && !st.shapeFail;
+      // no line drawn — why: every point near home / where it started (hiddenAll), or no location at all (noRoute); a walk
+      // that had its location but did not move (one point, 0 公里) says neither (rough-use pass 2026-11-12, P4)
+      var why = hasRoute ? C.walkShare.hiddenAll + (canNear ? C.walkShare.hiddenAllNear : '') : pts ? '' : W.noRoute;
       return html`
         ${top}
         <div class="px">${ui.dogSwitch({ dogs: w.dogs.length > 1 ? w.dogs : [], current: dog, act: 'dog', marks: marks })}</div>
         <div class="px mt-8"><div class="wp-route"${ui.attrs({ role: ready && !sh.empty ? 'img' : null, 'aria-label': ready && !sh.empty ? (near ? P.routeAriaNear : P.routeAria) : null })}>
-          ${ready ? (sh.empty ? html`<p class="note">${hasRoute ? C.walkShare.hiddenAll + (canNear ? C.walkShare.hiddenAllNear : '') : W.noRoute}</p>` : App.walkshape.svg(sh, { width: 240, height: 240 })) : st.shapeFail ? '' : html`<div class="wp-wait" role="status">${P.drawing}</div>`}
+          ${ready ? (sh.empty ? (why ? html`<p class="note">${why}</p>` : '') : App.walkshape.svg(sh, { width: 240, height: 240 })) : st.shapeFail ? '' : html`<div class="wp-wait" role="status">${P.drawing}</div>`}
           <div class="wp-stats">
             ${v.km != null ? html`<div><div class="wp-num">${App.walklog.kmText(v.km)}<span class="wp-unit"> ${W.km}</span></div></div>` : ''}
             <div><div class="wp-num">${ui.fmt.minutes(v.minutes)}</div></div>
