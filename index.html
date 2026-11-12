@@ -15,7 +15,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ZyKtvGpPBIKw4NjX7bQmnAD48lphrnOBKJ3qZZr/p6A=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://azairfcdrzkgejrlivqg.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://azairfcdrzkgejrlivqg.supabase.co wss://azairfcdrzkgejrlivqg.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-E5hBxMp+//L0QeK8ZlxBM8UJAmgxkF92sdTBoWx8hNo=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://azairfcdrzkgejrlivqg.supabase.co https://tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' https://azairfcdrzkgejrlivqg.supabase.co wss://azairfcdrzkgejrlivqg.supabase.co https://overpass-api.de https://overpass.private.coffee https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src https://*.google.com; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
 <title>豆米特 DogMeet</title>
 <meta name="description" content="豆米特 DogMeet 試辦版：約附近的狗一起散步、玩。">
 <meta property="og:type" content="website">
@@ -794,6 +794,17 @@ button.app-banner.reload { text-decoration: underline; text-underline-offset: 3p
 .brand-name { display: inline-flex; flex-direction: column; min-width: 0; }
 .brand-zh { font-size: 30px; line-height: 32px; }
 .brand-en { display: flex; justify-content: space-between; padding: 0 1px; font-size: 14px; line-height: 18px; color: var(--teal); }
+/* ui.brandUnder: the logo (--bs px) with 「Dog Meet」 (--be px) under it (Willie 2026-11-12 「我所有的logo 下面都要加上dog meet」).
+   The drawing ends 6/64 above its box, so the English is pulled up 8 % of the logo to sit right under the bench; it is at
+   least as wide as the drawing (56/64 of the box): at 11 px and more it is already wider, so the logo is centred over it. */
+.brand-under { display: inline-flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.brand-under .brand-en { min-width: calc(var(--bs) * .875); margin-top: calc(var(--bs) * -.08); padding: 0; font-family: var(--font-head); font-weight: 400; font-size: var(--be); line-height: calc(var(--be) + 2px); white-space: nowrap; }
+/* ui.brandStack: the start screen's lockup (載入中 and the iPhone launch picture), the home header's stacked in the home
+   header's proportions: the logo 142, 豆米特 40 pulled up 6 under the bench, Dog Meet 18.7 spread to 豆米特's width */
+.brand-stack { display: inline-flex; flex-direction: column; align-items: center; font-family: var(--font-head); font-weight: 400; color: var(--ink); }
+.brand-stack .brand-name { margin-top: -6px; }
+.brand-stack .brand-zh { font-size: 40px; line-height: 44px; }
+.brand-stack .brand-en { font-size: 18.7px; line-height: 24px; }
 .iconbtn { width: 44px; height: 44px; flex-shrink: 0; padding: 0; border: none; border-radius: 22px; background: transparent; color: var(--ink); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .iconbtn.tint { background: var(--teal-tint); color: var(--teal-ink); }
 .iconbtn:disabled { opacity: .45; }
@@ -938,9 +949,18 @@ button.row, a.row { cursor: pointer; }
 .test-pill.acting span { background: var(--teal-tint); color: var(--teal-ink); }
 
 /* ---------- Boot ---------- */
-.boot { min-height: 100vh; min-height: 100dvh; padding: 24px var(--gutter); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--muted); text-align: center; }
+.boot { position: relative; min-height: 100vh; min-height: 100dvh; padding: 24px var(--gutter); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--muted); text-align: center; }
 .boot .sub { max-width: 340px; overflow-wrap: anywhere; }
-.boot .h1-tab { display: flex; align-items: center; gap: 8px; }
+/* 「載入中…」 (and 再試一次) hang 14 px under the lockup (204 tall), so the lockup stays in the middle of the screen, where
+   the iPhone launch picture has it */
+.boot-msg { position: absolute; left: 0; right: 0; top: calc(50% + 116px); padding: 0 var(--gutter); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+/* a window under 480 px tall (the website on a phone held sideways): a smaller lockup, and the message and 再試一次 back
+   in the column, so 再試一次 is on the screen (review M2). An iPhone held upright, where the lockup lines up with the
+   launch picture, is at least 568 tall. */
+@media (max-height: 479px) {
+  .boot .brand-stack { zoom: .7; }
+  .boot-msg { position: static; padding: 0; }
+}
 
 /* ---------- Main (reference screen) ---------- */
 .map { position: relative; flex-shrink: 0; height: 256px; border-radius: 24px; overflow: hidden; background: var(--cream); }
@@ -1102,10 +1122,10 @@ svg.qr { display: block; background: #FFFFFF; border-radius: 8px; }
 <script src="app-config.js" defer></script>
 </head>
 <body>
-<div id="app"><div class="boot" role="status"><div class="h1-tab"><svg class="brand-mark" width="48" height="48" viewBox="0 0 64 64" aria-hidden="true"><g transform="matrix(0.5676 0 0 0.5676 -1.6622 25.1081)"><g fill="#E8775A"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><path d="M49 21C48.5 14 47 8.5 44.5 5.5C43.4 4.3 42 4.4 41 5.4C38.5 8 36.5 10.5 35 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#C9603F"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.4 16.2C44.9 12.6 44 9.9 42.9 8.6C42.4 8.1 41.8 8.1 41.3 8.6C40 10.1 38.8 11.6 38 12.8Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.5676 0 0 0.5676 29.3378 25.1081)"><g fill="#4FAFBC"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#2F8592"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.6216 0 0 0.6216 12.1081 20.0946)"><circle cx="32" cy="28" r="18.5" fill="#2F8592"/><g fill="#1F6670"><path d="M18.5 15.5C12.5 16 10 23.5 11.5 30C12.7 34.2 17 33.8 18.2 29.2C19.4 24.7 21 19 18.5 15.5Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><rect x="4" y="47" width="56" height="11" rx="5.5" fill="#1F6670"/><g fill="#E8775A"><ellipse cx="12.5" cy="48" rx="2.6" ry="2"/><ellipse cx="20.5" cy="48" rx="2.6" ry="2"/></g><g fill="#2F8592"><ellipse cx="27.6" cy="48" rx="2.6" ry="2"/><ellipse cx="36.4" cy="48" rx="2.6" ry="2"/></g><g fill="#4FAFBC"><ellipse cx="43.5" cy="48" rx="2.6" ry="2"/><ellipse cx="51.5" cy="48" rx="2.6" ry="2"/></g><g transform="matrix(0.34 0 0 0.34 21.12 -0.56)"><path d="M32 60C32 60 13.5 41.5 13.5 28C13.5 17.5 21.8 9 32 9C42.2 9 50.5 17.5 50.5 28C50.5 41.5 32 60 32 60Z" fill="#E8775A"/><circle cx="32" cy="28" r="7.5" fill="#FFFAF3"/></g></svg>豆米特</div><p class="sub">載入中…</p></div></div>
+<div id="app"><div class="boot" role="status"><span class="brand-stack"><svg class="brand-mark" width="142" height="142" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g transform="matrix(0.5676 0 0 0.5676 -1.6622 25.1081)"><g fill="#E8775A"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><path d="M49 21C48.5 14 47 8.5 44.5 5.5C43.4 4.3 42 4.4 41 5.4C38.5 8 36.5 10.5 35 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#C9603F"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.4 16.2C44.9 12.6 44 9.9 42.9 8.6C42.4 8.1 41.8 8.1 41.3 8.6C40 10.1 38.8 11.6 38 12.8Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.5676 0 0 0.5676 29.3378 25.1081)"><g fill="#4FAFBC"><path d="M15 21C15.5 14 17 8.5 19.5 5.5C20.6 4.3 22 4.4 23 5.4C25.5 8 27.5 10.5 29 12.5Z"/><circle cx="32" cy="28" r="18.5"/></g><g fill="#2F8592"><path d="M18.6 16.2C19.1 12.6 20 9.9 21.1 8.6C21.6 8.1 22.2 8.1 22.7 8.6C24 10.1 25.2 11.6 26 12.8Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><g transform="matrix(0.6216 0 0 0.6216 12.1081 20.0946)"><circle cx="32" cy="28" r="18.5" fill="#2F8592"/><g fill="#1F6670"><path d="M18.5 15.5C12.5 16 10 23.5 11.5 30C12.7 34.2 17 33.8 18.2 29.2C19.4 24.7 21 19 18.5 15.5Z"/><path d="M45.5 15.5C51.5 16 54 23.5 52.5 30C51.3 34.2 47 33.8 45.8 29.2C44.6 24.7 43 19 45.5 15.5Z"/></g><circle cx="32" cy="28.5" r="11.5" fill="#FFFAF3"/><circle cx="27.8" cy="26.5" r="2" fill="#342824"/><circle cx="36.2" cy="26.5" r="2" fill="#342824"/><ellipse cx="32" cy="31.2" rx="2.6" ry="2" fill="#342824"/><path d="M30.6 34.4C30.6 36.8 33.4 36.8 33.4 34.4Z" fill="#E8775A"/><path d="M29.3 33.8Q32 35.6 34.7 33.8" fill="none" stroke="#342824" stroke-width="1.5" stroke-linecap="round"/></g><rect x="4" y="47" width="56" height="11" rx="5.5" fill="#1F6670"/><g fill="#E8775A"><ellipse cx="12.5" cy="48" rx="2.6" ry="2"/><ellipse cx="20.5" cy="48" rx="2.6" ry="2"/></g><g fill="#2F8592"><ellipse cx="27.6" cy="48" rx="2.6" ry="2"/><ellipse cx="36.4" cy="48" rx="2.6" ry="2"/></g><g fill="#4FAFBC"><ellipse cx="43.5" cy="48" rx="2.6" ry="2"/><ellipse cx="51.5" cy="48" rx="2.6" ry="2"/></g><g transform="matrix(0.34 0 0 0.34 21.12 -0.56)"><path d="M32 60C32 60 13.5 41.5 13.5 28C13.5 17.5 21.8 9 32 9C42.2 9 50.5 17.5 50.5 28C50.5 41.5 32 60 32 60Z" fill="#E8775A"/><circle cx="32" cy="28" r="7.5" fill="#FFFAF3"/></g></svg><span class="brand-name"><span class="brand-zh">豆米特</span><span class="brand-en" aria-hidden="true"><span>D</span><span>o</span><span>g</span><span>&nbsp;</span><span>M</span><span>e</span><span>e</span><span>t</span></span><span class="sr-only"> Dog Meet</span></span></span><div class="boot-msg"><p class="sub">載入中…</p></div></div></div>
 <script>
 (function () { var l = document.getElementById('dg-font'); if (l) l.media = 'all'; })();
-window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","storageNs":"test"};
+window.APP_BUILD = {"version":"2026-11-12.afe31a7a","seedUrl":"seed-data.json","storageNs":"test"};
 /* ---- core/vendor/leaflet.js ---- */
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1546,6 +1566,26 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
     var size = Number(o.size) || 44;
     return html`<svg class="brand-mark" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true" focusable="false">${raw(BRAND_SVG)}</svg>`;
   }
+  /** 「Dog Meet」 one letter per span (.brand-en spreads or centres them); its caller hides them from screen readers. */
+  function brandLetters() {
+    return BRAND_EN.split('').map(function (ch) { return html`<span>${ch === ' ' ? raw('&nbsp;') : ch}</span>`; });
+  }
+  /** The logo (size px) with 「Dog Meet」 (en px) right under it — every small logo in the app (Willie 2026-11-12
+   *  「我所有的logo 下面都要加上dog meet」). Decorative like the logo: beside a page title, screen readers hear the title. */
+  function brandUnder(size, en) {
+    return html`<span class="brand-under" style="--bs:${size}px;--be:${en}px" aria-hidden="true">${brandMark({ size: size })}<span class="brand-en">${brandLetters()}</span></span>`;
+  }
+  /** The name with 「Dog Meet」 under it, spread to the same width (Willie 2026-10-30 「英文是要跟中文一樣長度」); screen
+   *  readers hear 「Dog Meet」 once, as words. */
+  function brandName(name) {
+    return html`<span class="brand-name"><span class="brand-zh">${name}</span><span class="brand-en" aria-hidden="true">${brandLetters()}</span><span class="sr-only"> ${BRAND_EN}</span></span>`;
+  }
+  /** The start screen's lockup (Willie 2026-11-12 picked A): the home header's, stacked — the logo 142, the name 40 px and
+   *  「Dog Meet」 18.7 px under it. The 載入中 page (core/app.js, and tools/build_web.py's copy shown before any script runs)
+   *  and the iPhone launch picture (tools/splash.html draws it from this) line up, so opening the app does not jump. */
+  function brandStack(name) {
+    return html`<span class="brand-stack">${brandMark({ size: 142 })}${brandName(name)}</span>`;
+  }
   function art(name, opts) {
     opts = opts || {};
     var def = own(App.art, name);
@@ -1662,20 +1702,22 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
   }
 
   /** Top bar for non-tab screens: back, the logo in the middle (left of the title when there is one), right.
-   *  back: true (App.back) | false. right: SafeHtml. The logo is on every screen's top (Willie 2026-11-01 「在個頁面上面都要有」). */
+   *  back: true (App.back) | false. right: SafeHtml. The logo is on every screen's top (Willie 2026-11-01 「在個頁面上面都要有」),
+   *  34 px with 「Dog Meet」 11 px under it, beside a title too (2026-11-12: a 28-px logo would leave the English 9 px). */
   function topBar(o) {
     o = o || {};
     var back = o.back === false ? html`<span style="width:44px"></span>` :
       html`<button type="button" class="iconbtn" data-act="__back" aria-label="${o.backLabel || '返回'}">${icon('back')}</button>`;
-    var mid = o.title ? html`<div class="topbar-title">${brandMark({ size: 28 })}<span>${o.title}</span></div>` : html`<span class="grow topbar-brand">${brandMark({ size: 34 })}</span>`;
+    var mid = o.title ? html`<div class="topbar-title">${brandUnder(34, 11)}<span>${o.title}</span></div>` : html`<span class="grow topbar-brand">${brandUnder(34, 11)}</span>`;
     return html`<div class="topbar">${back}${mid}${o.right || html`<span style="width:44px"></span>`}</div>`;
   }
   /** Big header for tab screens: the logo, then the title. brand: the home header, 豆米特 with 「Dog Meet」 under it spread to
-   *  the same width (Willie 2026-10-30 「英文是要跟中文一樣長度」); screen readers hear 「Dog Meet」 once, as words. */
+   *  the same width (Willie 2026-10-30 「英文是要跟中文一樣長度」); screen readers hear 「Dog Meet」 once, as words. The other
+   *  tabs: the logo 44 with 「Dog Meet」 12 px under it (2026-11-12), then the tab's title. */
   function appHead(title, o) {
     o = o || {};
-    var name = o.brand ? html`<span class="brand-name"><span class="brand-zh">${title}</span><span class="brand-en" aria-hidden="true">${BRAND_EN.split('').map(function (ch) { return html`<span>${ch === ' ' ? raw('&nbsp;') : ch}</span>`; })}</span><span class="sr-only"> ${BRAND_EN}</span></span>` : title;
-    return html`<header class="apphead"><h1 class="h1-tab">${brandMark({ size: 44 })}${name}</h1>${o.right || ''}</header>`;
+    var lead = o.brand ? html`${brandMark({ size: 44 })}${brandName(title)}` : html`${brandUnder(44, 12)}${title}`;
+    return html`<header class="apphead"><h1 class="h1-tab">${lead}</h1>${o.right || ''}</header>`;
   }
   function sectionHead(title, right, o) {
     o = o || {};
@@ -1986,9 +2028,38 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
   var TAP_THROUGH_MS = 400, FINGER_MS = 1000, sheetGoneAt = -Infinity, fingerAt = -Infinity;
   /** A tap made at `at` (default now) comes right after a sheet a finger tapped closed (or before it closed). */
   function tapThrough(at) { return sheetGoneAt > (at == null ? Date.now() : at) - TAP_THROUGH_MS; }
-  function fingerDown() { fingerAt = Date.now(); }
+  /* A finger's click away from its finger (the simulator's last check 2026-11-12, S1: ‹ and at once 地圖 opened a 狗聚
+     the person never chose). Right after the page moves by itself — the router's scroll to the top of a new screen, or
+     to the place of a screen gone back to — the iPhone's web view still takes a tap for a moment with the page where it
+     was before the move: its touch events say where the finger really is, but its pointer events and its click come at
+     that point on the page before the move (an event log, iPhone 17 simulator: touchstart 40,805 · click 40,540 — 265 px
+     higher, on a row of the 狗聚 list just put back 265 px down; with 我的 put back 789 px down the click hit nothing,
+     or never came). So a finger's click, and its mousedown (no box gets the focus), more than FINGERTIP_PX (44 px) on
+     either axis from where that finger came down — its touchstart — does nothing: the person taps again (44 px passes,
+     45 px does not). 44 px, a fingertip, is an estimate: every correct click in the logs sat exactly on its touchstart
+     (0 px); the room is for WebKit moving a tap onto a button nearby (its touch adjustment, not measured here). Only a
+     click within FINGER_MS (1 s) of its touchstart is checked. A click where its finger is goes through however quick
+     (two tabs; the same button twice — a double tap's second click comes at the first tap's place). As before: a click
+     with no finger (detail 0: a keyboard, a screen reader, a script), and a mouse (a computer, an iPad's trackpad: its
+     pointerdown clears the point and it sends no touch). A pen's pointerdown clears the point too, but a pen that also
+     sends touch events (an Apple Pencil) sets it again with its touchstart: it is checked like a finger. Not covered: a
+     move of 44 px or less (its click passes), dblclick, the pointer events themselves (they carry the old point too), and
+     the website's Google map, which takes its taps itself (core/map.js asks tapThrough() only). */
+  var FINGERTIP_PX = 44, finger = null;   // finger: {x, y, at}, where the last finger came down (its touchstart)
+  function fingerDown(e) {
+    fingerAt = Date.now();
+    var t = e && e.changedTouches && e.changedTouches[0];
+    if (t) finger = { x: t.clientX, y: t.clientY, at: fingerAt };
+    else if (e && e.pointerType && e.pointerType !== 'touch') finger = null;
+  }
+  /** A finger's mousedown / click more than a fingertip from where that finger came down. */
+  function astray(e) {
+    return !!finger && Date.now() - finger.at <= FINGER_MS && typeof e.clientX === 'number' &&
+      (Math.abs(e.clientX - finger.x) > FINGERTIP_PX || Math.abs(e.clientY - finger.y) > FINGERTIP_PX);
+  }
+  /** Both rules, on window before anything else sees the event: a tap through a sheet, a click away from its finger. */
   function dropThrough(e) {
-    if (!e || !(e.detail > 0) || Date.now() - fingerAt > FINGER_MS || !tapThrough(fingerAt)) return;
+    if (!e || !(e.detail > 0) || Date.now() - fingerAt > FINGER_MS || !(tapThrough(fingerAt) || astray(e))) return;
     e.preventDefault();
     if (e.type === 'click') e.stopImmediatePropagation();
   }
@@ -2563,9 +2634,9 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
   App.SafeHtml = SafeHtml;
   App.ui = {
     html: html, raw: raw, esc: esc, join: join, attrs: attrs, data: data, isSafe: isSafe, go: go, act: act, own: own, links: links,
-    icon: icon, art: art, brandMark: brandMark, fmt: fmt,
+    icon: icon, art: art, brandMark: brandMark, brandEn: BRAND_EN, fmt: fmt,
     primaryBtn: primaryBtn, secondaryBtn: secondaryBtn, quietBtn: quietBtn, whiteBtn: whiteBtn, textBtn: textBtn, iconBtn: iconBtn,
-    topBar: topBar, appHead: appHead, sectionHead: sectionHead,
+    topBar: topBar, appHead: appHead, sectionHead: sectionHead, brandUnder: brandUnder, brandStack: brandStack,
     chip: chip, tag: tag, badge: badge, switchCtl: switchCtl, field: field, listRow: listRow,
     warnPanel: warnPanel, infoPanel: infoPanel, emptyState: emptyState, loading: loading, progress: progress, dateBlock: dateBlock,
     dogAvatar: dogAvatar, dogSwitch: dogSwitch, dogPicker: dogPicker, photo: photo, photoPreview: photoPreview, resizeImage: resizeImage, photoInput: photoInput, dot: dot, feedbackBtn: feedbackBtn,
@@ -15505,15 +15576,22 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
 
   // ------------------------------------------------------------------ to the 0..1000 box
   function lenOf(pts) { var s = 0; for (var i = 1; i < pts.length; i++) s += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); return s; }
-  /** Douglas–Peucker over [x, y] integers, tolerance tol (box units); keeps both ends. */
+  /** Douglas–Peucker over [x, y] integers, tolerance tol (box units); keeps both ends (a loop, start = end: its farthest
+      point first). Each point is measured to the chord's SEGMENT, not to the endless line through its ends: a point past
+      either end counts from that end, so a walk straight out and part-way back keeps its far end (review 2026-11-12: it
+      was dropped, and the picture showed a shorter walk). Answers a subset of the very points given, in their order, never
+      a new point. App.walkpic cleans the 拍立得's line with it too (2026-11-12). */
   function simplify(pts, tol) {
     if (pts.length < 3) return pts.slice();
     var keep = {}, stack = [[0, pts.length - 1]];
     keep[0] = keep[pts.length - 1] = true;
     while (stack.length) {
-      var r = stack.pop(), a = pts[r[0]], b = pts[r[1]], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), worst = -1, at = -1;
+      var r = stack.pop(), a = pts[r[0]], b = pts[r[1]], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), L2 = dx * dx + dy * dy, worst = -1, at = -1;
       for (var i = r[0] + 1; i < r[1]; i++) {
-        var d = L ? Math.abs(dy * (pts[i][0] - a[0]) - dx * (pts[i][1] - a[1])) / L : Math.hypot(pts[i][0] - a[0], pts[i][1] - a[1]);
+        var q = pts[i], t = dx * (q[0] - a[0]) + dy * (q[1] - a[1]), d;   // t / L2: where q falls along a → b
+        if (!L || t <= 0) d = Math.hypot(q[0] - a[0], q[1] - a[1]);          // before a (or a loop, a = b): from a
+        else if (t >= L2) d = Math.hypot(q[0] - b[0], q[1] - b[1]);          // past b: from b
+        else d = Math.abs(dy * (q[0] - a[0]) - dx * (q[1] - a[1])) / L;      // beside the chord: from the chord
         if (d > worst) { worst = d; at = i; }
       }
       if (at !== -1 && worst > tol) { keep[at] = true; stack.push([r[0], at], [at, r[1]]); }
@@ -15608,7 +15686,7 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
     return ui.html`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${vb}" aria-hidden="true" focusable="false">${lines}${paw}</svg>`;
   }
 
-  var api = App.walkshape = { make: make, both: both, homeCentre: homeCentre, svg: svg, _trim: trim, _prng: prng,
+  var api = App.walkshape = { make: make, both: both, homeCentre: homeCentre, svg: svg, simplify: simplify, _trim: trim, _prng: prng,
     HIDE_M: HIDE_M, TRIM_MAX_M: TRIM_MAX_M, MIN_VISIBLE_M: MIN_VISIBLE_M, BOX: BOX, MAX_PTS: MAX_PTS };
 })(window.App = window.App || {});
 
@@ -15618,14 +15696,18 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
    draw(style, data, photo?) → Promise<Blob>: a PNG drawn on this phone, never uploaded.
      'big'      1080 x 1080, transparent: route (teal line on a cream edge), 距離 / 時間, the logo — a sticker for IG / FB stories
      'strip'    1080 x 360, transparent: the cream rounded pill itself — route, numbers and the logo in a row
-     'polaroid' 1080 x 1350, opaque: the photo above, a white strip below with the route, numbers and the logo
+     'polaroid' 1080 x 1350, opaque (Willie 2026-11-12, the 對齊版): the photo above (950 x 898, 65 from the top and sides);
+                under it 距離 | the route | 時間 on one grid, placed by their ink — 距離 from the photo's left edge, 時間 to
+                its right edge, the route centred between them — and the logo with 豆米特 and 「Dog Meet」 centred under
+                them, its ink 65 above the bottom. No paw, and the line is cleaned of GPS wobble before it is drawn
+                (Douglas–Peucker at 7 units of the shape's 0..1000 box).
      'dog'      1080 x 1350, transparent (the iPhone app, iOS 17+: SPEC §38): the dog cut out of a photo on the phone
                 (DogMeetNative.cutOut — nothing uploaded or kept) large at the bottom with a cream edge, the route and the
                 numbers above it, the small logo on top
    data = { shape, km, minutes }: shape is App.walkshape.make()'s answer (0..1000 whole numbers, near home already hidden —
    unless the person turned 「顯示家附近」 on in the sheet, 2026-11-11); this file draws from the segments only and never
-   sees a walk record, a coordinate or a time. The paw is coral and sits at the
-   last point of the last segment; dotted segments are dashed. The picture carries no dog name, no date, no place. */
+   sees a walk record, a coordinate or a time. On big, strip and dog the paw is coral and sits at the last point of the
+   last segment (the 拍立得 has none); dotted segments are dashed. The picture carries no dog name, no date, no place. */
 (function (App) {
   'use strict';
   var ui = App.ui, C = App.content;
@@ -15649,11 +15731,12 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
   function logoImg(size) {
     return loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(String(ui.brandMark({ size: size })).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ')));
   }
-  /** The rounded heading font, if it comes within 3 s (a slow network must not hold the picture). */
+  /** The rounded heading font, if it comes within 3 s (a slow network must not hold the picture); its Latin letters too, for
+      「Dog Meet」 under 豆米特. */
   function fontsReady() {
     var f = document.fonts;
     if (!f || !f.load) return Promise.resolve();
-    var t = C.walkShare.dist + C.walkShare.time + C.walkShare.km + C.walkShare.min + C.walkShare.brand + '0123456789.';
+    var t = C.walkShare.dist + C.walkShare.time + C.walkShare.km + C.walkShare.min + C.walkShare.brand + ui.brandEn + '0123456789.';
     return Promise.race([
       Promise.all([f.load('100px Huninn', t), f.load('50px Huninn', C.walkShare.brand)]).catch(function () { return null; }),
       new Promise(function (r) { setTimeout(r, 3000); })
@@ -15669,7 +15752,8 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
     });
   }
 
-  /** The route inside the square (bx, by, size): lw is the teal line's width, edge (sticker only) the extra cream round it. */
+  /** The route inside the square (bx, by, size): lw is the teal line's width, edge (sticker only) the extra cream round it,
+      pawK the paw's width over size (0: no paw — the 拍立得). */
   function route(g, shape, bx, by, size, lw, edge, pawK) {
     var segs = (shape && shape.segments) || [], k = size / 1000, last = null;
     if (!segs.length) return;
@@ -15685,7 +15769,15 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
     if (edge) segs.forEach(function (s) { if (s.pts.length) trace(s, lw + edge * 2, COL.cream); });
     segs.forEach(function (s) { if (s.pts.length) { trace(s, lw, COL.teal); last = s.pts[s.pts.length - 1]; } });
     g.setLineDash([]);
-    if (last) paw(g, bx + last[0] * k, by + last[1] * k, size * pawK, edge ? edge * 0.8 : 0);
+    if (last && pawK > 0) paw(g, bx + last[0] * k, by + last[1] * k, size * pawK, edge ? edge * 0.8 : 0);
+  }
+  /** The line without its GPS wobble (the 拍立得, Willie 2026-11-12: 「要把路線畫得清楚一點」): every segment through
+      App.walkshape.simplify (Douglas–Peucker) at tol units of the shape's own 0..1000 box, so a drawing of any size is the
+      same line. Only the segment's own points stay, never a new one, so nothing make() hid can come back; dotted stays
+      dotted, and the shape given is left as it is (the same line goes on to 發到日記). */
+  function clean(shape, tol) {
+    var S = App.walkshape;
+    return Object.assign({}, shape, { segments: shape.segments.map(function (g) { return Object.assign({}, g, { pts: S.simplify(g.pts, tol) }); }) });
   }
   /** The coral paw, w wide, centred on (cx, cy); a cream edge round it when edge > 0. */
   function paw(g, cx, cy, w, edge) {
@@ -15729,7 +15821,7 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
     var x = o.x !== undefined ? o.x : o.cx - total / 2;
     g.textAlign = 'left'; g.textBaseline = 'alphabetic';
     cols.forEach(function (c, i) {
-      var dy = o.step ? i * o.step : 0;   // step: the columns stack (the polaroid) instead of standing side by side
+      var dy = o.step ? i * o.step : 0;   // step: the columns stack (the dog picture) instead of standing side by side
       g.font = (o.edge ? 'bold ' : '500 ') + o.lab * k + 'px ' + BODY; g.fillStyle = o.labCol; text(g, c[0], x, o.y1 + dy, o.edge ? o.edge * 0.6 : 0);
       g.font = o.big * k + 'px ' + HEAD; g.fillStyle = o.ink; text(g, c[1], x, o.y2 + dy, o.edge);
       g.font = o.unit * k + 'px ' + BODY; text(g, c[2], x + w[i].n + o.pad * k, o.y2 + dy, o.edge * 0.8);
@@ -15753,18 +15845,160 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
     columns(g, d, { x: d.shape.empty ? 60 : 350, maxRight: 915, lab: 36, big: 78, unit: 42, pad: 6, gap: 42, y1: 150, y2: 240, ink: COL.ink, labCol: COL.muted, edge: 0 });
     logo(g, img, 942, 135, 90);
   }
-  function polaroid(g, d, img, photo) {
-    g.fillStyle = COL.white; g.fillRect(0, 0, 1080, 1350);
-    g.save(); box(g, 65, 65, 950, 810, 16); g.clip();
-    g.fillStyle = COL.muted; g.fillRect(65, 65, 950, 810);
-    if (photo) {
-      var iw = photo.naturalWidth || photo.width, ih = photo.naturalHeight || photo.height;
-      if (iw && ih) { var s = Math.max(950 / iw, 810 / ih); g.drawImage(photo, 65 + (950 - iw * s) / 2, 65 + (810 - ih * s) / 2, iw * s, ih * s); }
+  // ------------------------------------------------------------------ the brand lockup
+  // Huninn's ascent and descent per px of font size (TextMetrics.fontBoundingBoxAscent / Descent in Chrome, 2026-11-12: 940
+  // and 180 at 1000 px), for a WebKit that does not give them: the lockup's baselines still land where CSS puts them
+  var HUNINN_BOX = { ascent: 0.94, descent: 0.18 };
+  /** A text's baseline in a CSS line box (its top, line height lh): top + (lh − (ascent + descent)) / 2 + ascent, with the
+      font's own ascent and descent (m: the text's TextMetrics; px: the font's size, for the fallback — whole px, as CSS
+      layout rounds them). */
+  function lineBase(m, top, lh, px) {
+    var a = m.fontBoundingBoxAscent, d = m.fontBoundingBoxDescent;
+    if (typeof a !== 'number' || typeof d !== 'number') { a = Math.round(px * HUNINN_BOX.ascent); d = Math.round(px * HUNINN_BOX.descent); }
+    return top + (lh - (a + d)) / 2 + a;
+  }
+  /** The home header's brand lockup (ui.appHead's brand) on a canvas, centred on cx with its middle on my, for any picture's
+      logo (Willie 2026-11-12: 「我所有的logo 下面都要加上dog meet」; the 拍立得 is the first). With k = s / 44 (the header's
+      logo is 44 px): the logo img (logoImg) s px, a gap of 8k, then a column — 豆米特 (HEAD 30k px in a 32k line box) over
+      the English (App.ui.brandEn, HEAD 14k px in an 18k line box), its letters each drawn on their own and spread so it is
+      exactly as wide as 豆米特 (the header's CSS space-between with 1k padding each side, the space counting as a letter:
+      Willie 2026-10-30 「英文是要跟中文一樣長度」). The column's middle is the logo's middle; the lockup is max(s, 50k) tall.
+      col: {zh, en} the two colours. Answers its layout box round (cx, my): {l, r, t, b}. */
+  function lockup(g, img, cx, my, s, col) {
+    var k = s / 44, zh = C.walkShare.brand, en = ui.brandEn, ch = en.split(''), pad = k, zf = 30 * k + 'px ' + HEAD, ef = 14 * k + 'px ' + HEAD;
+    g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.font = zf; var mz = g.measureText(zh);
+    g.font = ef; var me = g.measureText(en), ws = ch.map(function (c) { return g.measureText(c).width; });
+    var sum = ws.reduce(function (a, b) { return a + b; }, 0), w = Math.max(mz.width, sum + 2 * pad), W = s + 8 * k + w, H = Math.max(s, 50 * k);
+    var x0 = cx - W / 2, tx = x0 + s + 8 * k, top = my - 25 * k;   // the column: 32k + 18k = 50k tall
+    g.font = zf; g.fillStyle = col.zh; g.fillText(zh, tx, lineBase(mz, top, 32 * k, 30 * k));
+    g.font = ef; g.fillStyle = col.en;
+    var by = lineBase(me, top + 32 * k, 18 * k, 14 * k), gap = (w - 2 * pad - sum) / (ch.length - 1), x = tx + pad;
+    ch.forEach(function (c, i) { if (c !== ' ') g.fillText(c, x, by); x += ws[i] + gap; });
+    logo(g, img, x0, my - s / 2, s);   // after the words, as in the approved preview: then the 拍立得 is that picture to the pixel
+    return { l: -W / 2, r: W / 2, t: -H / 2, b: H / 2 };
+  }
+  // ------------------------------------------------------------------ ink: what a drawing or a text really covers
+  // (the 對齊版 places everything by its ink, not by its box; the other share pictures will use these next)
+  /** What a drawing really covers: draw(q) on a spare w × h canvas, then the box round its pixels with alpha over 8 —
+      {x0, y0, x1, y1}, the ends exclusive — or null when nothing was drawn or the page may not read the canvas. */
+  function pixelBox(w, h, draw) {
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    var q = c.getContext('2d'); draw(q);
+    try {
+      var D = q.getImageData(0, 0, w, h).data, x0 = w, y0 = h, x1 = -1, y1 = -1;
+      for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) if (D[(y * w + x) * 4 + 3] > 8) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+      return x1 < 0 ? null : { x0: x0, y0: y0, x1: x1 + 1, y1: y1 + 1 };
+    } catch (e) { return null; }   // a canvas the page may not read
+  }
+  /** The lockup's ink — what it really covers, logo and words — round its middle: {l, r, t, b} in whole px from (cx, my).
+      Measured from its own pixels, drawn once on a spare canvas at a whole-px middle, as the logo is a picture no text
+      metric can see; with a canvas the page may not read, its layout box. */
+  function lockInk(img, s, col) {
+    var w = Math.ceil(5 * s), h = Math.ceil(2 * s), cx = Math.round(w / 2), cy = Math.round(h / 2), lay;
+    var b = pixelBox(w, h, function (q) { lay = lockup(q, img, cx, cy, s, col); });
+    return b ? { l: b.x0 - cx, r: b.x1 - cx, t: b.y0 - cy, b: b.y1 - cy } : lay;
+  }
+  // the labels' ink top as a part of their size, if neither TextMetrics nor a canvas can tell (「距離時間」, 500 27 px
+  // PingFang TC in Chrome, 2026-11-12: 22.22 px): the two baselines stay where they are
+  var LABEL_ASCENT = 0.823;
+  /** What text t really covers, drawn in font f (a px size) and colour col: {L left of where it is drawn, R right of it, A
+      above the baseline, D below it (null when unknown), w its advance}.
+      - TextMetrics.actualBoundingBox*, where they are real (Chrome).
+      - Where they are clamped to the text's box, the text's own pixels, drawn once on a spare canvas (whole px). WebKit, in
+        Safari and in the app on every iPhone, answers L = max(0, the real one) and R = max(the advance, the real one), so a
+        「1」 seems to start where it is drawn though its ink starts 7 px further right (review 2026-11-12). The same where
+        the metrics are missing (an older WebKit).
+      - A canvas the page may not read: the metrics as they are, or the box. */
+  function ink(g, f, t, col) {
+    g.font = f;
+    var m = g.measureText(t), L = m.actualBoundingBoxLeft, R = m.actualBoundingBoxRight, w = m.width, real = typeof L === 'number' && typeof R === 'number';
+    var A = typeof m.actualBoundingBoxAscent === 'number' ? m.actualBoundingBoxAscent : null, D = typeof m.actualBoundingBoxDescent === 'number' ? m.actualBoundingBoxDescent : null;
+    if (real && (L > 0 || R < w)) return { L: L, R: R, A: A, D: D, w: w };   // real: not the box
+    var size = /(\d+(?:\.\d+)?)px/.exec(f), pad = size ? Math.ceil(Number(size[1])) : 0, base = 2 * pad;
+    var b = pad && pixelBox(Math.ceil(w) + 2 * pad, 3 * pad, function (q) { q.font = f; q.textAlign = 'left'; q.textBaseline = 'alphabetic'; q.fillStyle = col || COL.ink; q.fillText(t, pad, base); });
+    if (b) return { L: pad - b.x0, R: b.x1 - pad, A: base - b.y0, D: b.y1 - base, w: w };
+    return { L: real ? L : 0, R: real ? R : w, A: A, D: D, w: w };
+  }
+
+  // ------------------------------------------------------------------ 拍立得
+  // Willie 2026-11-12, after five rounds of previews: 13 三欄置中 (距離 | the route | 時間, the logo centred under them);
+  // then A (the logo 64, 「Dog Meet」 under 豆米特 like the home header); then 2 (no paw, the line cleaned of GPS wobble, the
+  // route's box 180 tall); then the 對齊版 (「我需要你改是排版 之前的排版都不太對齊」 → 「照對齊版做」): one grid, everything
+  // placed by its ink. Three vertical lines: the photo's edges (edge = 65 from the picture's) and the middle x 540. From
+  // the bottom up: the lockup's ink ends `edge` above the bottom, centred on 540; gap; the row (its route box rH tall);
+  // gap; the photo takes the rest. Rows: labels and numbers on two baselines `base` apart; the route's box at most rW
+  // wide and at least `side` from each block.
+  var POLAROID = { s: 64, edge: 65, gap: 36, side: 48, rW: 380, rH: 180, lw: 6, clean: 7, lab: 27, big: 64, unit: 32, pad: 8, base: 72 };
+  function hasLine(d) { return !d.shape.empty && d.shape.segments.length > 0; }
+  /** The photo filling (x, y, w, h), cut to fit (never stretched) and smoothed well, inside corners r; the muted fill shows
+      with no photo. */
+  function photoIn(g, photo, x, y, w, h, r) {
+    g.save(); box(g, x, y, w, h, r); g.clip();
+    g.fillStyle = COL.muted; g.fillRect(x, y, w, h);
+    var iw = photo && (photo.naturalWidth || photo.width), ih = photo && (photo.naturalHeight || photo.height);
+    if (iw && ih) {
+      var s = Math.max(w / iw, h / ih);
+      g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';   // a phone's photo is cut down to a quarter or less
+      g.drawImage(photo, x + (w - iw * s) / 2, y + (h - ih * s) / 2, iw * s, ih * s);
     }
     g.restore();
-    if (!d.shape.empty && d.shape.segments.length) route(g, d.shape, 65, 955, 300, 12, 0, 0.1875);
-    columns(g, d, { x: 414, maxRight: 900, lab: 32, big: 76, unit: 40, pad: 8, gap: 0, step: 140, y1: 1030, y2: 1100, ink: COL.ink, labCol: COL.muted, edge: 0 });
-    logo(g, img, 929, 1062, 86);
+  }
+  /** The route fitted to its own shape (aspect kept, not a square) inside the box (x, y, w, h) and centred in it, the
+      line's round ends (lw / 2) counted in; no paw. */
+  function routeFit(g, shape, x, y, w, h, lw) {
+    var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    shape.segments.forEach(function (s) { s.pts.forEach(function (p) { x0 = Math.min(x0, p[0]); y0 = Math.min(y0, p[1]); x1 = Math.max(x1, p[0]); y1 = Math.max(y1, p[1]); }); });
+    if (x0 > x1) return;
+    var k = Math.min(x1 > x0 ? (w - lw) / (x1 - x0) : Infinity, y1 > y0 ? (h - lw) / (y1 - y0) : Infinity);
+    if (!isFinite(k)) k = 1;   // a single point: one dot, the same at any scale
+    route(g, shape, x + w / 2 - (x0 + x1) / 2 * k, y + h / 2 - (y0 + y1) / 2 * k, 1000 * k, lw, 0, 0);
+  }
+  /** The label baseline y1 and the number baseline y2 (P.base under it) of a row whose middle line m is halfway between the
+      labels' ink top (both labels measured at once, so they share it) and the numbers' baseline. */
+  function rowAt(g, m, P) {
+    var A = ink(g, '500 ' + P.lab + 'px ' + BODY, C.walkShare.dist + C.walkShare.time, COL.muted).A;
+    if (A === null) A = LABEL_ASCENT * P.lab;
+    var y1 = Math.round(m - (P.base + A) / 2 + A);
+    return { y1: y1, y2: y1 + P.base };
+  }
+  /** A stat block (the label over the number and its unit) measured by its ink: w is its ink's width. */
+  function statOf(g, lab, n, unit, P) {
+    var fl = '500 ' + P.lab + 'px ' + BODY, fn = P.big + 'px ' + HEAD, fu = P.unit + 'px ' + BODY;
+    var a = ink(g, fl, lab, COL.muted), b = ink(g, fn, n, COL.ink), c = ink(g, fu, unit, COL.ink);
+    return { lab: lab, n: n, unit: unit, fl: fl, fn: fn, fu: fu, a: a, b: b, pad: P.pad, w: Math.max(b.L + b.w + P.pad + c.R, a.L + a.R) };
+  }
+  /** Block s with its ink starting at x: the label's ink (muted) and the number's (ink) both start at x — one left edge per
+      block — and the unit comes pad after the number's advance; labels on y.y1, numbers and units on y.y2. */
+  function statAt(g, s, x, y) {
+    g.textAlign = 'left';
+    g.font = s.fl; g.fillStyle = COL.muted; g.fillText(s.lab, x + s.a.L, y.y1);
+    g.font = s.fn; g.fillStyle = COL.ink; g.fillText(s.n, x + s.b.L, y.y2);
+    g.font = s.fu; g.fillText(s.unit, x + s.b.L + s.b.w + s.pad, y.y2);
+  }
+  /** 距離 | the route | 時間 between xl and xr on the middle line m: 距離's ink starts at xl and 時間's block ends at xr; the
+      route's box (at most P.rW wide, at least P.side from each block, P.rH tall) is centred between the two blocks, so the
+      line has the same gap on both sides. A line but no km: the route centred between xl and 時間. No line: 距離 at xl and
+      時間 ending at xr — or 時間 alone, centred. */
+  function statRow(g, d, xl, xr, m, P) {
+    var y = rowAt(g, m, P), time = statOf(g, C.walkShare.time, num(d.minutes), C.walkShare.min, P);
+    var dist = hasKm(d.km) ? statOf(g, C.walkShare.dist, num(d.km, 1), C.walkShare.km, P) : null;
+    if (!hasLine(d)) {
+      if (dist) { statAt(g, dist, xl, y); statAt(g, time, xr - time.w, y); } else statAt(g, time, (xl + xr - time.w) / 2, y);
+      return;
+    }
+    var a = dist ? xl + dist.w : xl, b = xr - time.w, w = Math.max(P.lw, Math.min(P.rW, b - a - 2 * P.side));   // (never under a dot)
+    routeFit(g, clean(d.shape, P.clean), (a + b - w) / 2, m - P.rH / 2, w, P.rH, P.lw);
+    if (dist) statAt(g, dist, xl, y);
+    statAt(g, time, b, y);
+  }
+  function polaroid(g, d, img, photo) {
+    var P = POLAROID, col = { zh: COL.tealInk, en: COL.teal }, k = lockInk(img, P.s, col);
+    var cx = 540 - (k.l + k.r) / 2, my = 1350 - P.edge - k.b, m = my + k.t - P.gap - P.rH / 2;   // the lockup's ink: centred, edge up
+    g.fillStyle = COL.white; g.fillRect(0, 0, 1080, 1350);
+    lockup(g, img, cx, my, P.s, col);
+    photoIn(g, photo, P.edge, P.edge, 1080 - 2 * P.edge, Math.round(m - P.rH / 2 - P.gap - P.edge), 16);
+    statRow(g, d, P.edge, 1080 - P.edge, m, P);
   }
 
   /** A cream edge round a cut-out picture (the sticker look of 'big'): its shape in cream, drawn r px out all round. */
@@ -16007,7 +16241,7 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
     return s;
   }
 
-  var api = App.walkpic = { draw: draw, open: open, _frameOk: false };
+  var api = App.walkpic = { draw: draw, open: open, _frameOk: false, _clean: clean };
 })(window.App);
 
 ;
@@ -18453,10 +18687,12 @@ window.APP_BUILD = {"version":"2026-11-12.ce696c8b","seedUrl":"seed-data.json","
     if (!el) { el = document.createElement('div'); el.id = 'app'; document.body.appendChild(el); }
     return el;
   }
-  /** The boot screen. retry: a 「再試一次」 button (an iPhone home-screen app has no reload button). */
+  /** The boot screen: the logo with 豆米特 and 「Dog Meet」 stacked in the middle, where the iPhone launch picture has them
+   *  (Willie 2026-11-12, A), and the message under it. tools/build_web.py writes the same markup into index.html, shown
+   *  before any script runs. retry: a 「再試一次」 button (an iPhone home-screen app has no reload button). */
   function shell(msg, retry) {
     var ui = App.ui;
-    root().innerHTML = String(ui.html`<div class="boot" role="status"><div class="h1-tab">${ui.brandMark({ size: 48 })}豆米特</div><p class="sub">${msg || '載入中…'}</p>${retry ? ui.html`<button type="button" class="btn btn-secondary" id="boot-retry">再試一次</button>` : ''}</div>`);
+    root().innerHTML = String(ui.html`<div class="boot" role="status">${ui.brandStack('豆米特')}<div class="boot-msg"><p class="sub">${msg || '載入中…'}</p>${retry ? ui.html`<button type="button" class="btn btn-secondary" id="boot-retry">再試一次</button>` : ''}</div></div>`);
     var b = document.getElementById('boot-retry');
     if (b) b.addEventListener('click', function () { b.disabled = true; try { window.location.reload(); } catch (e) { /* ignore */ } });
     if (ui._reattachBanner) ui._reattachBanner(root()); // a sync-lost banner raised during boot stays visible
@@ -23881,6 +24117,7 @@ try {
     s.textContent =
       '.hu{padding-top:12px}' +
       '.hu-brand{display:flex;align-items:center;gap:6px;min-height:48px;color:var(--teal-ink);font-size:14px;line-height:20px;font-weight:700}' +
+      '.hu-brand .brand-under{margin:2px 0}' +
       '.hu .h1{overflow-wrap:anywhere}' +
       '.hu-meta{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:10px;font-size:14px;line-height:20px;color:var(--muted)}' +
       '.hu-meta span{display:inline-flex;align-items:center;gap:6px}' +
@@ -23935,7 +24172,7 @@ try {
     if (!p) return '';
     return p.y === y ? fmt.dateTime(ts) : p.y + '/' + p.m + '/' + p.d + ' ' + fmt.time(ts);
   }
-  function brand() { return html`<div class="hu-brand">${ui.brandMark({ size: 28 })}${H.title}</div>`; }
+  function brand() { return html`<div class="hu-brand">${ui.brandUnder(34, 11)}${H.title}</div>`; }
   function failedOpen() { return { ok: false, reason: 'failed', title: V.failed.title, message: V.failed.body }; }
 
   /** Add chosen / dropped files (only pictures and PDFs, at most what the link still takes). */
@@ -24209,6 +24446,7 @@ try {
       '.hv{padding-top:12px}' +
       '.hv-topline{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px}' +
       '.hv-brand{display:inline-flex;align-items:center;gap:6px;color:var(--teal-ink);font-size:14px;line-height:20px;font-weight:700}' +
+      '.hv-brand .brand-under{margin:2px 0}' +
       '.hv-print{min-height:44px;padding:0 20px 2px;font-size:16px}' +
       '.hv-until{display:flex;align-items:center;gap:6px;margin-top:2px;font-size:14px;line-height:20px;color:var(--muted)}' +
       '.hv-until svg{flex-shrink:0}' +
@@ -24516,7 +24754,7 @@ try {
     </div>`;
   }
 
-  function brand() { return html`<span class="hv-brand">${ui.brandMark({ size: 28 })}${H.title}</span>`; }
+  function brand() { return html`<span class="hv-brand">${ui.brandUnder(34, 11)}${H.title}</span>`; }
   /** A medicine given within the last day: its 「3 小時前」 label needs refreshing. */
   function recentDose(v) {
     var t = Date.now();
@@ -27929,7 +28167,7 @@ try {
       var p = D.me();
       return html`
         <div class="rm-top">
-          <div class="topbar"><button type="button" class="iconbtn" data-act="back" aria-label="回狗狗檔案">${ui.icon('back')}</button><span class="grow topbar-brand">${ui.brandMark({ size: 34 })}</span><span style="width:44px"></span></div>
+          <div class="topbar"><button type="button" class="iconbtn" data-act="back" aria-label="回狗狗檔案">${ui.icon('back')}</button><span class="grow topbar-brand">${ui.brandUnder(34, 11)}</span><span style="width:44px"></span></div>
           <h1 class="h1 px">提醒中心</h1>
           <div class="px">${ui.dogSwitch({ dogs: App.me.isPersona ? [] : D.myDogs(), current: App.me.actorId, act: 'dog' })}</div>
           ${p ? html`<span class="rm-face" aria-hidden="true">${ui.dogAvatar(p, { size: 72, label: false, ring: false })}</span>` : ''}
@@ -29069,7 +29307,7 @@ try {
       '.scr-Walk_Now .fb-link{color:#B9D9DD}',
       '.scr-Walk_Now .btn-text{color:#B9D9DD}',
       '.wn-top{min-height:60px;display:flex;align-items:center;gap:10px;padding:8px var(--gutter)}',
-      '.wn-logo{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;background:var(--cream)}',
+      '.wn-logo{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:5px 7px 3px;border-radius:14px;background:var(--cream)}',   // the logo 34 with 「Dog Meet」 under it (2026-11-12)
       '.wn-title{font-family:var(--font-head);font-size:20px;line-height:26px}',
       '.wn-time{display:block;margin-top:24px;text-align:center;font-family:var(--font-head);font-size:64px;line-height:72px;font-variant-numeric:tabular-nums}',
       '.wn-msg{margin:32px var(--gutter) 0;text-align:center;font-family:var(--font-head);font-size:24px;line-height:32px}',
@@ -29219,7 +29457,7 @@ try {
     },
     render: function (ctx) {
       var W = C.walklog, cur = App.walkrec.current(), paused = !!(cur && cur.paused && !cur.ended && !cur.discarded), state = paused ? W.paused : W.nowTitle;
-      var top = html`<div class="wn-top"><span class="wn-logo">${ui.brandMark({ size: 32 })}</span><span class="wn-title">${state}</span></div>`;
+      var top = html`<div class="wn-top"><span class="wn-logo">${ui.brandUnder(34, 11)}</span><span class="wn-title">${state}</span></div>`;
       if (!cur) {
         return html`${top}<p class="wn-msg">${W.none}</p><p class="wn-note">${W.noneBody}</p>
           <div class="wn-actions">${ui.primaryBtn(W.backToMap, { act: 'map' })}</div>`;
